@@ -400,6 +400,7 @@ const TRAMOS_RAM=['KM1 → T. LAUTARO','T. LAUTARO → LOS LOROS','LOS LOROS →
 let condicion='normal';
 let gruposFaena=[],gruposPos=[];
 let gfId=0,gpId=0;
+let planes=[],planActivo=null;
 
 // ── RELOJ ────────────────────────────────────────────
 function getNow(){const n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
@@ -1021,9 +1022,6 @@ function genPosicion(){
 
 
 // ── PLANIFICACIÓN ─────────────────────────────────────
-let planes=[];
-let planActivo=null;
-
 function initPlan(){planes=[];planActivo=null;renderPlanSel();}
 
 function renderPlanSel(){
