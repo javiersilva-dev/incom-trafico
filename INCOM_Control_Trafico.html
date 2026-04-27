@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INCOM — Control de Tráfico</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap');
+:root{--blue:#003DA5;--blue2:#0051CC;--blue-light:#E8F0FE;--green:#1B7E3A;--green-light:#E6F4EA;--amber:#92550A;--amber-light:#FEF3E2;--red:#B91C1C;--red-light:#FEE2E2;--gray-bg:#F0F2F5;--gray-border:#D1D5DB;--gray-text:#6B7280;--text:#111827;--white:#fff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--gray-bg);color:var(--text);min-height:100vh}
+.topbar{background:var(--blue);padding:0 1rem;display:flex;align-items:center;gap:10px;height:50px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.topbar-logo{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:#fff;letter-spacing:1px;border:1.5px solid rgba(255,255,255,.35);padding:2px 10px;border-radius:4px}
+.topbar-title{font-size:13px;color:rgba(255,255,255,.8);flex:1}
+.topbar select{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-family:'Inter',sans-serif;font-size:12px;padding:5px 8px;border-radius:6px;outline:none}
+.topbar select option{background:#003DA5}
+.hora-sistema{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:#fff;background:rgba(255,255,255,.12);padding:3px 10px;border-radius:6px;letter-spacing:.5px;min-width:56px;text-align:center}
+.main-tabs{display:flex;background:#fff;border-bottom:1px solid var(--gray-border);overflow-x:auto;-webkit-overflow-scrolling:touch}
+.main-tab{flex:1;min-width:75px;padding:11px 4px;font-family:'Inter',sans-serif;font-size:11px;font-weight:500;color:var(--gray-text);background:transparent;border:none;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
+.main-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.content{max-width:680px;margin:0 auto;padding:1rem}
+.card{background:#fff;border:1px solid var(--gray-border);border-radius:12px;padding:1rem;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.card-title{font-size:11px;font-weight:600;color:var(--gray-text);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px}
+.field-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.lbl{font-size:13px;color:var(--gray-text);min-width:100px;flex-shrink:0}
+select,input[type=text],input[type=time],input[type=date],input[type=number]{font-family:'Inter',sans-serif;font-size:13px;border:1px solid var(--gray-border);border-radius:7px;padding:7px 10px;background:#fff;color:var(--text);width:100%;outline:none;transition:border-color .15s}
+select:focus,input:focus{border-color:var(--blue)}
+input[type=number]{width:70px;text-align:center}
+.btn-primary{background:var(--blue);color:#fff;border:none;padding:10px 18px;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;width:100%;transition:opacity .15s}
+.btn-primary:hover{opacity:.9}
+.btn-outline{background:transparent;color:var(--text);border:1px solid var(--gray-border);padding:9px 16px;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;width:100%;transition:background .15s}
+.btn-outline:hover{background:var(--gray-bg)}
+.btn-danger{background:transparent;color:var(--red);border:1px solid #FECACA;padding:4px 8px;border-radius:6px;font-size:11px;cursor:pointer}
+.btn-import{background:var(--blue-light);color:var(--blue);border:1px solid #93C5FD;padding:9px 16px;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;width:100%}
+.cond-row{display:flex;gap:6px;margin-bottom:12px}
+.cond-btn{flex:1;padding:8px 4px;font-size:12px;font-family:'Inter',sans-serif;font-weight:500;border:1px solid var(--gray-border);border-radius:8px;background:transparent;color:var(--gray-text);cursor:pointer}
+.cond-btn.sel-normal{background:var(--green-light);border-color:#86EFAC;color:var(--green)}
+.cond-btn.sel-precaucion{background:var(--amber-light);border-color:#FCD34D;color:var(--amber)}
+.cond-btn.sel-critica{background:var(--red-light);border-color:#FCA5A5;color:var(--red)}
+.eq-counter{display:flex;align-items:center;gap:10px}
+.eq-counter button{width:30px;height:30px;border-radius:50%;border:1px solid var(--gray-border);background:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text)}
+.eq-num{font-size:16px;font-weight:700;min-width:28px;text-align:center}
+.totalizador{margin-top:10px;padding:10px 14px;border-radius:8px;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:space-between;transition:all .2s}
+.tot-ok{background:var(--green-light);color:var(--green);border:1px solid #86EFAC}
+.tot-err{background:var(--red-light);color:var(--red);border:1px solid #FCA5A5}
+.grupo-card{border:1px solid var(--gray-border);border-radius:10px;padding:12px;margin-bottom:10px;background:var(--gray-bg)}
+.grupo-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.grupo-num{width:30px;height:30px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.eq-block{background:#fff;border:1px solid var(--gray-border);border-radius:8px;padding:10px;margin-bottom:8px}
+.eq-block-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.eq-3col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:0}
+.eq-label{font-size:10px;font-weight:600;color:var(--gray-text);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+.hidden{display:none!important}
+.empty{text-align:center;padding:2rem;color:var(--gray-text);font-size:13px}
+
+/* TARJETA MATUTINO */
+.rpt-card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);margin-top:1rem}
+.rpt-card-header{background:var(--blue);padding:16px 20px;display:flex;align-items:center;gap:12px}
+.rpt-card-logo{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:#fff;border:2px solid rgba(255,255,255,.4);padding:2px 10px;border-radius:5px}
+.rpt-card-title{font-size:15px;font-weight:700;color:#fff}
+.rpt-card-sub{font-size:12px;color:rgba(255,255,255,.75);margin-top:2px}
+.rpt-card-hora{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:700;color:#fff;text-align:right}
+.rpt-section{padding:14px 20px;border-bottom:1px solid #F3F4F6}
+.rpt-section:last-child{border-bottom:none}
+.rpt-section-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.rpt-section-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.rpt-section-label{font-size:12px;font-weight:700;color:var(--gray-text);text-transform:uppercase;letter-spacing:.5px;flex:1}
+.rpt-section-dest{font-size:11px;color:var(--gray-text);background:#F3F4F6;padding:2px 8px;border-radius:20px}
+.rpt-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0}
+.rpt-row-label{font-size:13px;color:var(--gray-text)}
+.rpt-row-val{font-size:14px;font-weight:600;color:var(--text)}
+.rpt-divider{border:none;border-top:1px dashed #E5E7EB;margin:6px 0}
+.rpt-total-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0 4px}
+.rpt-total-label{font-size:13px;font-weight:700;color:var(--text)}
+.rpt-total-val{font-size:18px;font-weight:700;color:var(--blue)}
+.rpt-badge-ok{background:#DCFCE7;color:#166534;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.rpt-badge-err{background:#FEE2E2;color:#991B1B;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.rpt-footer{background:#F9FAFB;padding:10px 20px;display:flex;align-items:center;justify-content:space-between}
+
+/* TABLA FAENA */
+.rpt-outer{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);margin-top:1rem}
+.rpt-title-bar{background:var(--blue);text-align:center;padding:12px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:#fff;letter-spacing:.5px}
+.rpt-scroll{overflow-x:auto}
+.rpt-table{width:100%;border-collapse:collapse;font-family:'Inter',sans-serif;font-size:10px;min-width:580px}
+.rpt-table th{background:#002D7A;color:#fff;padding:5px 6px;text-align:center;font-size:8px;font-weight:700;border:1px solid #001F5C;white-space:nowrap}
+.rpt-table td{border:1px solid #E5E7EB;padding:4px 6px;text-align:center;color:#111;background:#fff;vertical-align:middle}
+.td-nombre{text-align:left!important;font-size:9px;font-weight:500}
+.td-grupo{background:#003DA5!important;color:#fff!important;font-family:'Barlow Condensed',sans-serif;font-size:26px!important;font-weight:700}
+.td-desp{font-size:14px;font-weight:700;color:#003DA5}
+.td-salida{font-size:12px;font-weight:700}
+.td-tramo{background:#003DA5!important;color:#fff!important;font-size:9px;text-align:left!important;padding-left:8px!important;font-weight:600}
+.td-proy{font-size:11px;font-weight:700;color:#374151}
+.td-llegada-ok{background:#16A34A!important;color:#fff!important;font-size:12px;font-weight:700}
+.td-llegada-empty{background:#F3F4F6;color:#9CA3AF;font-size:9px}
+.td-tiempo-ok{background:#16A34A!important;color:#fff!important;font-family:'Barlow Condensed',sans-serif;font-size:18px!important;font-weight:700}
+.grp-hdr th{background:#1F2937!important;font-size:7px!important;padding:3px 5px!important}
+
+/* TARJETA POSICION */
+.pos-card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);margin-top:1rem}
+.pos-card-header{background:linear-gradient(135deg,#003DA5,#0051CC);padding:14px 18px;display:flex;align-items:center;gap:12px}
+.pos-grupo{background:#fff;border-radius:10px;margin:10px 16px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.pos-grupo-header{background:#003DA5;padding:8px 14px;display:flex;align-items:center;gap:8px}
+.pos-grupo-num{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:#fff;min-width:24px}
+.pos-grupo-nombre{font-size:12px;font-weight:600;color:rgba(255,255,255,.9)}
+.pos-grupo-body{padding:10px 14px}
+.pos-ubicacion-badge{background:var(--blue-light);color:var(--blue);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;border:1px solid #BFDBFE}
+
+/* TRAMOS */
+.tramos-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:8px}
+.tramo-btn{padding:7px 6px;font-size:11px;font-family:'Inter',sans-serif;font-weight:500;border:1px solid var(--gray-border);border-radius:7px;background:#fff;color:var(--gray-text);cursor:pointer;text-align:center;transition:all .15s}
+.tramo-btn:hover{background:#F3F4F6}
+.tramo-btn.sel{background:#003DA5;border-color:#003DA5;color:#fff;font-weight:600}
+
+/* SEGMENTOS */
+.seg-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;margin-bottom:8px}
+
+input.time-ok{border-color:var(--green)!important;background:#F0FDF4!important}
+.llegada-item{padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--gray-border)}
+
+/* COND INFO */
+.cond-info{font-size:12px;color:var(--gray-text);margin-top:-8px;margin-bottom:12px;padding:8px 12px;background:#F9FAFB;border-radius:8px;border:1px solid var(--gray-border)}
+
+@media(max-width:480px){.content{padding:.75rem}.eq-3col{grid-template-columns:1fr 1fr}}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="topbar-logo">INCOM</span>
+  <span class="topbar-title">Control de Tráfico</span>
+  <span class="hora-sistema" id="reloj-topbar">--:--</span>
+  <select id="sup-sel">
+    <option value="">Supervisor...</option>
+    <option>Ignacio Bustos</option>
+    <option>Boris Gana Carvajal</option>
+    <option>Camila Muñoz</option>
+    <option>Gonzalo Fernandez</option>
+    <option>Javier Silva</option>
+    <option>Administrador</option>
+  </select>
+</div>
+
+<div class="main-tabs">
+  <button class="main-tab" onclick="switchTab('plan')">📋 Planificación</button>
+  <button class="main-tab active" onclick="switchTab('matutino')">Reporte 8 AM</button>
+  <button class="main-tab" onclick="switchTab('faena')">Salida faena</button>
+  <button class="main-tab" onclick="switchTab('posicion')">Posición ruta</button>
+  <button class="main-tab" onclick="switchTab('segmentos')">⚙ Tiempos</button>
+</div>
+
+<div class="content">
+
+<!-- ════ TAB PLANIFICACIÓN ════ -->
+<div id="tab-plan" class="hidden">
+
+  <div class="card" style="background:linear-gradient(135deg,#EFF6FF,#fff);border-color:#BFDBFE">
+    <div style="font-size:13px;font-weight:600;color:#1E40AF;margin-bottom:6px">💡 ¿Cómo funciona?</div>
+    <div style="font-size:12px;color:#374151;line-height:1.6">
+      Crea y edita planificaciones en esta pantalla. Usa <strong>💾 Exportar</strong> para guardar el archivo en tu PC o celular, y <strong>📂 Importar</strong> para cargarlo de vuelta mañana o en otro dispositivo.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Planificaciones en sesión</div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+      <select id="plan-sel" style="flex:1" onchange="cargarPlan()">
+        <option value="">— Seleccionar planificación —</option>
+      </select>
+      <button class="btn-danger" onclick="eliminarPlan()" style="white-space:nowrap;padding:7px 10px;font-size:12px">🗑</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+      <button class="btn-import" onclick="nuevaPlan()">+ Nueva</button>
+      <button class="btn-import" onclick="duplicarPlan()">⧉ Duplicar</button>
+      <button class="btn-import" onclick="document.getElementById('plan-file-input').click()">📂 Importar</button>
+    </div>
+    <input type="file" id="plan-file-input" accept=".json" style="display:none" onchange="importarPlanArchivo(event)">
+  </div>
+
+  <div id="plan-form" class="hidden">
+    <div class="card">
+      <div class="card-title">Datos de la planificación</div>
+      <div class="field-row"><span class="lbl">Nombre</span>
+        <input type="text" id="plan-nombre" placeholder="Ej: Turno Lunes 28-04" style="flex:1">
+      </div>
+      <div class="field-row"><span class="lbl">Fecha servicio</span>
+        <input type="date" id="plan-fecha" style="flex:1">
+      </div>
+      <div class="field-row"><span class="lbl">Turno</span>
+        <select id="plan-turno" style="flex:1">
+          <option>Día</option><option>Noche</option><option>Completo</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div>
+          <div class="card-title" style="margin-bottom:2px">🟢 Bateas — Pto. Totoralillo</div>
+          <div style="font-size:11px;color:var(--gray-text)" id="plan-bat-resumen">0 equipos / 0 grupos</div>
+        </div>
+      </div>
+      <div id="plan-grupos-bat"></div>
+      <button class="btn-outline" style="margin-top:4px" onclick="addPlanGrupo('bat')">+ Agregar grupo Bateas</button>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div>
+          <div class="card-title" style="margin-bottom:2px">🔵 Ramplas — Base INCOM Copiapó</div>
+          <div style="font-size:11px;color:var(--gray-text)" id="plan-ram-resumen">0 equipos / 0 grupos</div>
+        </div>
+      </div>
+      <div id="plan-grupos-ram"></div>
+      <button class="btn-outline" style="margin-top:4px" onclick="addPlanGrupo('ram')">+ Agregar grupo Ramplas</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <button class="btn-primary" onclick="guardarPlan()">💾 Guardar</button>
+      <button class="btn-primary" style="background:#1B7E3A" onclick="exportarPlan()">⬇ Exportar archivo</button>
+    </div>
+    <button class="btn-outline" style="width:100%;margin-bottom:12px" onclick="aplicarPlanAFaena()">→ Aplicar a turno de hoy</button>
+    <div id="plan-aviso" class="hidden" style="background:#DCFCE7;border:1px solid #86EFAC;border-radius:8px;padding:10px 14px;font-size:13px;color:#166534;margin-bottom:12px;text-align:center"></div>
+  </div>
+
+</div>
+
+<!-- ════ TAB MATUTINO ════ -->
+<div id="tab-matutino">
+  <div class="card">
+    <div class="card-title">Bateas — Puerto Totoralillo</div>
+    <div class="field-row"><span class="lbl">Total asignados</span><div class="eq-counter"><button onclick="adjM('mb-total',-1)">−</button><span class="eq-num" id="mb-total">15</span><button onclick="adjM('mb-total',1)">+</button></div></div>
+    <div class="field-row"><span class="lbl">En base</span><div class="eq-counter"><button onclick="adjM('mb-base',-1)">−</button><span class="eq-num" id="mb-base">0</span><button onclick="adjM('mb-base',1)">+</button></div></div>
+    <div class="field-row"><span class="lbl">En ruta a faena</span><div class="eq-counter"><button onclick="adjM('mb-rutaf',-1)">−</button><span class="eq-num" id="mb-rutaf">0</span><button onclick="adjM('mb-rutaf',1)">+</button></div></div>
+    <div class="field-row"><span class="lbl">En faena (KM1)</span><div class="eq-counter"><button onclick="adjM('mb-faena',-1)">−</button><span class="eq-num" id="mb-faena">15</span><button onclick="adjM('mb-faena',1)">+</button></div></div>
+    <div class="totalizador tot-ok" id="tot-bat-el"><span>Suma de estados</span><span id="tot-bat-txt">15 / 15 ✓ Cuadra</span></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Ramplas — Base INCOM Copiapó</div>
+    <div class="field-row"><span class="lbl">Total asignados</span><div class="eq-counter"><button onclick="adjM('mr-total',-1)">−</button><span class="eq-num" id="mr-total">7</span><button onclick="adjM('mr-total',1)">+</button></div></div>
+    <div class="field-row"><span class="lbl">En carga</span><div class="eq-counter"><button onclick="adjM('mr-carga',-1)">−</button><span class="eq-num" id="mr-carga">0</span><button onclick="adjM('mr-carga',1)">+</button></div></div>
+    <div class="field-row"><span class="lbl">En descarga</span><div class="eq-counter"><button onclick="adjM('mr-desc',-1)">−</button><span class="eq-num" id="mr-desc">0</span><button onclick="adjM('mr-desc',1)">+</button></div></div>
+    <div class="field-row"><span class="lbl">En ruta a faena</span><div class="eq-counter"><button onclick="adjM('mr-rutaf',-1)">−</button><span class="eq-num" id="mr-rutaf">0</span><button onclick="adjM('mr-rutaf',1)">+</button></div></div>
+    <div class="field-row"><span class="lbl">En faena</span><div class="eq-counter"><button onclick="adjM('mr-faena',-1)">−</button><span class="eq-num" id="mr-faena">0</span><button onclick="adjM('mr-faena',1)">+</button></div></div>
+    <div class="field-row"><span class="lbl">En ruta a base</span><div class="eq-counter"><button onclick="adjM('mr-rutab',-1)">−</button><span class="eq-num" id="mr-rutab">0</span><button onclick="adjM('mr-rutab',1)">+</button></div></div>
+    <div class="totalizador tot-ok" id="tot-ram-el"><span>Suma de estados</span><span id="tot-ram-txt">0 / 7 ⚠ Faltan 7</span></div>
+  </div>
+  <button class="btn-primary" onclick="genMatutino()">📋 Generar tarjeta visual</button>
+  <div id="out-matutino" class="hidden" style="margin-top:12px">
+    <div id="tarjeta-matutino"></div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn-primary" onclick="descargarPNG('tarjeta-matutino','reporte_turno')">⬇ Descargar imagen</button>
+    </div>
+    <p style="font-size:11px;color:var(--gray-text);text-align:center;margin-top:6px">Descarga la imagen y envíala directamente por WhatsApp</p>
+  </div>
+</div>
+
+<!-- ════ TAB FAENA ════ -->
+<div id="tab-faena" class="hidden">
+  <div class="card">
+    <div class="card-title">Condición de ruta</div>
+    <div class="cond-row">
+      <button class="cond-btn sel-normal" onclick="setCond('normal',this)">✅ Normal</button>
+      <button class="cond-btn" onclick="setCond('precaucion',this)">⚠️ Precaución</button>
+      <button class="cond-btn" onclick="setCond('critica',this)">🔴 Crítica</button>
+    </div>
+    <div class="cond-info" id="cond-info-txt">Normal — tiempos de ruta estándar</div>
+    <div class="card-title">Tipo de transporte</div>
+    <select id="f-tipo" style="width:100%;margin-bottom:10px">
+      <option value="bateas">Transporte Concentrado — Bateas</option>
+      <option value="ramplas">Transporte Catodo/Molibdeno — Ramplas</option>
+    </select>
+    <div class="field-row">
+      <span class="lbl">Total equipos</span>
+      <input type="number" id="f-total" value="15" min="1" max="30" style="width:70px">
+    </div>
+    <div class="field-row">
+      <span class="lbl">Fecha</span>
+      <input type="date" id="f-fecha" style="flex:1">
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Grupos / Convoys</div>
+    <div id="grupos-faena-cont"></div>
+    <button class="btn-outline" style="margin-top:4px" onclick="addGrupoFaena()">+ Agregar grupo</button>
+  </div>
+  <div style="display:flex;gap:4px;background:#E5E7EB;padding:4px;border-radius:8px;margin-bottom:12px">
+    <button class="main-tab active" id="ftab-reporte" style="flex:1;font-size:11px;padding:7px 4px" onclick="switchFaenaTab('reporte');renderReporte()">Tabla</button>
+    <button class="main-tab" id="ftab-llegadas" style="flex:1;font-size:11px;padding:7px 4px" onclick="switchFaenaTab('llegadas');renderLlegadas()">Llegadas reales</button>
+  </div>
+  <div id="fsub-reporte"><div id="rpt-wrap"></div></div>
+  <div id="fsub-llegadas" class="hidden">
+    <div class="card">
+      <div class="card-title">Registrar hora de llegada real</div>
+      <div id="llegadas-cont"></div>
+    </div>
+    <button class="btn-primary" onclick="switchFaenaTab('reporte');renderReporte()">Actualizar tabla</button>
+  </div>
+  <p style="font-size:11px;color:var(--gray-text);text-align:center;margin-top:8px">📸 Captura la tabla con screenshot y envía por WhatsApp</p>
+</div>
+
+<!-- ════ TAB POSICION ════ -->
+<div id="tab-posicion" class="hidden">
+  <div class="card">
+    <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
+      <div style="flex:1">
+        <div class="card-title" style="margin-bottom:6px">Tipo</div>
+        <select id="p-tipo" style="width:100%">
+          <option value="bateas">Bateas</option>
+          <option value="ramplas">Ramplas</option>
+        </select>
+      </div>
+      <div style="text-align:center">
+        <div class="card-title" style="margin-bottom:6px">Hora reporte</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;color:var(--blue)" id="pos-hora-display">--:--</div>
+      </div>
+    </div>
+    <button class="btn-import" onclick="importarDesdeFaena()">↓ Importar grupos desde Salida de faena</button>
+  </div>
+  <div id="grupos-pos-cont"></div>
+  <button class="btn-outline" style="margin-bottom:12px" onclick="addGrupoPos()">+ Agregar grupo manualmente</button>
+  <button class="btn-primary" onclick="genPosicion()">📋 Generar tarjeta visual</button>
+  <div id="out-posicion" class="hidden">
+    <div id="tarjeta-posicion" class="pos-card"></div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn-primary" onclick="descargarPNG('tarjeta-posicion','posicion_ruta')">⬇ Descargar imagen</button>
+    </div>
+    <p style="font-size:11px;color:var(--gray-text);text-align:center;margin-top:6px">Descarga la imagen y envíala directamente por WhatsApp</p>
+  </div>
+</div>
+
+<!-- ════ TAB SEGMENTOS ════ -->
+<div id="tab-segmentos" class="hidden">
+  <div class="card">
+    <div class="card-title">Tiempos de tramo — Bateas (minutos)</div>
+    <p style="font-size:12px;color:var(--gray-text);margin-bottom:14px">Tramos KM1 → Puerto Totoralillo</p>
+    <div id="segs-bat-list"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Tiempos de tramo — Ramplas (minutos)</div>
+    <p style="font-size:12px;color:var(--gray-text);margin-bottom:14px">Tramos KM1 → Base INCOM Copiapó (vía Ac. Ruta 5)</p>
+    <div id="segs-ram-list"></div>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<script>
+// ── FLOTA ────────────────────────────────────────────
+const CONDUCTORES_BAT=[
+  'JAVIER CORTES','DAMM CRUZ','MARTIN VITALI','JUAN MUÑOZ','RICARDO RAMIREZ',
+  'FRANCISCO HANSHING','FELIPE CORTES','RICARDO CONTRERAS','LUIS MUÑOZ','JOSE GONZALEZ',
+  'RENE PAEZ','MARCO QUIROGA','ABELINO CARRIZO','CRISTIAN OLIVARES','ENRIQUE ROJAS',
+  'DANIEL VEGA PEREIRA','BRAYAN GUEVARA','EDUARDO LEDESMA','PEDRO SAEZ','MARCO RIQUELME',
+  'WILFREDO OLIVARES','UBER ZAMORA'
+];
+const CONDUCTORES_RAM=[
+  'ALBERTO ASTORGA','BORIS ROJAS','LUIS MADARIAGA','PEDRO ARRIAGADA',
+  'JOSE URIZAR','ROBERTO FAJARDO','CRISTIAN LANAS'
+];
+const BATEAS=[
+  {p:'KDKS-88',c:'JAVIER CORTES'},{p:'KDKS-89',c:'DAMM CRUZ'},{p:'KYRG-46',c:'MARTIN VITALI'},
+  {p:'KYPR-55',c:'JUAN MUÑOZ'},{p:'KDKS-72',c:'RICARDO RAMIREZ'},{p:'KDKS-71',c:'FRANCISCO HANSHING'},
+  {p:'KYPV-88',c:'FELIPE CORTES'},{p:'KYPV-87',c:'RICARDO CONTRERAS'},{p:'KYLG-17',c:'LUIS MUÑOZ'},
+  {p:'KYPT-47',c:'JOSE GONZALEZ'},{p:'KDKS-57',c:'RENE PAEZ'},{p:'KDKS-78',c:'MARCO QUIROGA'},
+  {p:'KYRG-45',c:'ABELINO CARRIZO'},{p:'PWVW-83',c:'CRISTIAN OLIVARES'},{p:'KYRH-78',c:'ENRIQUE ROJAS'},
+  {p:'PTXP-75',c:'DANIEL VEGA PEREIRA'},{p:'HGKS-91',c:'BRAYAN GUEVARA'},{p:'KYPJ-52',c:'EDUARDO LEDESMA'},
+  {p:'HGKS-68',c:'PEDRO SAEZ'},{p:'KYPJ-54',c:'MARCO RIQUELME'},{p:'KYPJ-53',c:'WILFREDO OLIVARES'},
+];
+const RAMPLAS=[
+  {p:'PWVX-90',c:'ALBERTO ASTORGA'},{p:'PWVX-89',c:'BORIS ROJAS'},{p:'PWVW-81',c:'LUIS MADARIAGA'},
+  {p:'PWVW-56',c:'PEDRO ARRIAGADA'},{p:'PWVW-82',c:'JOSE URIZAR'},{p:'PWVW-58',c:'ROBERTO FAJARDO'},
+  {p:'PWVW-57',c:'CRISTIAN LANAS'},
+];
+const TRACTOS=[
+  {p:'PJBP-94'},{p:'PPPW-79'},{p:'RVXB-98'},{p:'RVFK-47'},{p:'LXXL-81'},{p:'RVFK-46'},
+  {p:'SHLL-37'},{p:'LRVV-86'},{p:'SYPL-10'},{p:'LRVV-85'},{p:'RJBV-34'},{p:'RJBV-35'},
+  {p:'SPSH-74'},{p:'RVXC-10'},{p:'PJFD-98'},{p:'RVFF-14'},{p:'RVFF-13'},{p:'RTRJ-40'},
+  {p:'PJFD-81'},{p:'SSHY-46'},{p:'PJFD-83'},{p:'PPPW-78'},{p:'RVFK-45'},{p:'RKGC-82'},
+  {p:'PJFD-76'},{p:'PJBP-95'},
+];
+
+// ── SEGMENTOS ────────────────────────────────────────
+let segsBat=[
+  {o:'KM1',d:'T. LAUTARO',min:45},{o:'T. LAUTARO',d:'LOS LOROS',min:30},
+  {o:'LOS LOROS',d:'PABELLON',min:25},{o:'PABELLON',d:'NANTOCO',min:15},
+  {o:'NANTOCO',d:'AC. RUTA 5',min:25},{o:'AC. RUTA 5',d:'BYPASS TOLEDO',min:30},
+  {o:'BYPASS TOLEDO',d:'PEAJE P. VIEJO',min:15},{o:'PEAJE P. VIEJO',d:'CALDERA',min:30},
+  {o:'CALDERA',d:'TOTORALILLO',min:20},
+];
+let segsRam=[
+  {o:'KM1',d:'T. LAUTARO',min:45},{o:'T. LAUTARO',d:'LOS LOROS',min:30},
+  {o:'LOS LOROS',d:'PABELLON',min:25},{o:'PABELLON',d:'NANTOCO',min:15},
+  {o:'NANTOCO',d:'AC. RUTA 5',min:25},{o:'AC. RUTA 5',d:'BASE INCOM COPIAPÓ',min:30},
+];
+
+const TRAMOS_BAT=['KM1 → T. LAUTARO','T. LAUTARO → LOS LOROS','LOS LOROS → PABELLON','PABELLON → NANTOCO','NANTOCO → AC. RUTA 5','AC. RUTA 5 → BYPASS TOLEDO','BYPASS TOLEDO → PEAJE P. VIEJO','PEAJE P. VIEJO → CALDERA','CALDERA → TOTORALILLO','TOTORALILLO (Descargando)'];
+const TRAMOS_RAM=['KM1 → T. LAUTARO','T. LAUTARO → LOS LOROS','LOS LOROS → PABELLON','PABELLON → NANTOCO','NANTOCO → AC. RUTA 5','AC. RUTA 5 → BASE INCOM COPIAPÓ','BASE INCOM COPIAPÓ (Descargando)'];
+
+let condicion='normal';
+let gruposFaena=[],gruposPos=[];
+let gfId=0,gpId=0;
+let planes=[],planActivo=null;
+
+// ── RELOJ ────────────────────────────────────────────
+function getNow(){const n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
+function tickReloj(){
+  const t=getNow();
+  document.getElementById('reloj-topbar').textContent=t;
+  const pd=document.getElementById('pos-hora-display');if(pd)pd.textContent=t;
+}
+tickReloj();setInterval(tickReloj,10000);
+
+// ── INIT ─────────────────────────────────────────────
+(function(){
+  const n=new Date();
+  document.getElementById('f-fecha').value=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');
+  renderSegs();renderGruposFaena();renderGruposPos();
+  setTimeout(updateTot,50);
+  initPlan();
+})();
+
+// ── UTILS ────────────────────────────────────────────
+function getFecha(){
+  const v=document.getElementById('f-fecha').value;
+  if(v){const[y,m,d]=v.split('-');return d+'-'+m+'-'+y;}
+  const n=new Date();return String(n.getDate()).padStart(2,'0')+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+n.getFullYear();
+}
+function getHoy(){const n=new Date();return String(n.getDate()).padStart(2,'0')+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+n.getFullYear();}
+function addTime(base,mins){
+  if(!base||!base.includes(':'))return'';
+  const[h,m]=base.split(':').map(Number);const t=h*60+m+mins;
+  return String(Math.floor(t/60)%24).padStart(2,'0')+':'+String(t%60).padStart(2,'0');
+}
+function calcMins(t1,t2){
+  if(!t1||!t2)return null;
+  const[h1,m1]=t1.split(':').map(Number);const[h2,m2]=t2.split(':').map(Number);
+  const d=(h2*60+m2)-(h1*60+m1);return d<0?null:d;
+}
+function calcETA(salida,tipo){
+  const factor=condicion==='normal'?1:condicion==='precaucion'?1.15:1.30;
+  const segs=tipo==='ramplas'?segsRam:segsBat;
+  let t=salida,res=[];
+  segs.forEach(s=>{t=addTime(t,Math.round(s.min*factor));res.push({punto:s.d,hora:t});});
+  return res;
+}
+function getSup(){return document.getElementById('sup-sel').value||'Supervisor de turno';}
+function getTipoLabel(){return document.getElementById('f-tipo').value==='bateas'?'Transporte de Concentrado / Catodos de Cobre':'Transporte Catodo / Molibdeno — Ramplas';}
+function getN(id){return parseInt(document.getElementById(id).textContent)||0;}
+function getDestino(tipo){return tipo==='bateas'?'Puerto Totoralillo':'Base INCOM Copiapó';}
+function getUltimoPunto(tipo){return tipo==='ramplas'?'BASE INCOM COPIAPÓ':'TOTORALILLO';}
+
+function switchTab(t){
+  ['plan','matutino','faena','posicion','segmentos'].forEach(id=>document.getElementById('tab-'+id).classList.toggle('hidden',id!==t));
+  document.querySelectorAll('.main-tab').forEach((el,i)=>el.classList.toggle('active',['plan','matutino','faena','posicion','segmentos'][i]===t));
+}
+function switchFaenaTab(t){
+  ['reporte','llegadas'].forEach(id=>document.getElementById('fsub-'+id).classList.toggle('hidden',id!==t));
+  ['ftab-reporte','ftab-llegadas'].forEach((id,i)=>document.getElementById(id).classList.toggle('active',['reporte','llegadas'][i]===t));
+}
+function setCond(c,btn){
+  condicion=c;
+  document.querySelectorAll('.cond-btn').forEach(b=>b.className='cond-btn');
+  btn.classList.add('sel-'+c);
+  const msgs={normal:'Normal — tiempos de ruta estándar',precaucion:'Precaución — ETAs aumentadas un 15% (neblina, lluvia, tráfico)',critica:'Crítica — ETAs aumentadas un 30% (ruta cortada, condición severa)'};
+  document.getElementById('cond-info-txt').textContent=msgs[c];
+}
+
+// ── TOTALIZADORES ─────────────────────────────────────
+function adj(id,d){const el=document.getElementById(id);el.textContent=Math.max(0,parseInt(el.textContent)+d);}
+function adjM(id,d){adj(id,d);updateTot();}
+function updateTot(){
+  function check(total,suma,elId,txtId){
+    const el=document.getElementById(elId),txt=document.getElementById(txtId);
+    if(suma===total){el.className='totalizador tot-ok';txt.textContent=suma+' / '+total+' ✓ Cuadra';}
+    else{el.className='totalizador tot-err';const d=total-suma;txt.textContent=suma+' / '+total+' ⚠ '+(d>0?'Faltan '+d:'Sobran '+Math.abs(d));}
+  }
+  check(getN('mb-total'),getN('mb-base')+getN('mb-rutaf')+getN('mb-faena'),'tot-bat-el','tot-bat-txt');
+  check(getN('mr-total'),getN('mr-carga')+getN('mr-desc')+getN('mr-rutaf')+getN('mr-faena')+getN('mr-rutab'),'tot-ram-el','tot-ram-txt');
+}
+
+// ── SELECTORES HTML ───────────────────────────────────
+function selConductor(tipo,id,val){
+  const lista=tipo==='ramplas'?CONDUCTORES_RAM:CONDUCTORES_BAT;
+  return'<select id="'+id+'" style="font-size:11px;padding:5px 6px;border-radius:6px;border:1px solid #D1D5DB;width:100%;font-family:Inter,sans-serif">'+
+    '<option value="">— Conductor —</option>'+
+    lista.map(c=>'<option value="'+c+'"'+(val===c?' selected':'')+'>'+c+'</option>').join('')+
+    '</select>';
+}
+function selTracto(id,val){
+  return'<select id="'+id+'" style="font-size:11px;padding:5px 6px;border-radius:6px;border:1px solid #D1D5DB;width:100%;font-family:Inter,sans-serif">'+
+    '<option value="">— Tracto —</option>'+
+    TRACTOS.map(t=>'<option value="'+t.p+'"'+(val===t.p?' selected':'')+'>'+t.p+'</option>').join('')+
+    '</select>';
+}
+function selSemi(tipo,id,val){
+  const lista=tipo==='ramplas'?RAMPLAS:BATEAS;
+  return'<select id="'+id+'" style="font-size:11px;padding:5px 6px;border-radius:6px;border:1px solid #D1D5DB;width:100%;font-family:Inter,sans-serif">'+
+    '<option value="">— Semi —</option>'+
+    lista.map(b=>'<option value="'+b.p+'"'+(val===b.p?' selected':'')+'>'+b.p+'</option>').join('')+
+    '</select>';
+}
+
+// ── GRUPOS FAENA ──────────────────────────────────────
+function addGrupoFaena(){
+  gruposFaena.push({id:gfId++,num:gruposFaena.length+1,equipos:[{conductor:'',tracto:'',semi:''}],salida:'',llegLoros:'',llegFin:''});
+  renderGruposFaena();
+}
+function removeGrupoFaena(id){gruposFaena=gruposFaena.filter(g=>g.id!==id);gruposFaena.forEach((g,i)=>g.num=i+1);renderGruposFaena();}
+function addEqF(gid){const g=gruposFaena.find(x=>x.id===gid);if(g&&g.equipos.length<3){readGruposFaena();g.equipos.push({conductor:'',tracto:'',semi:''});}renderGruposFaena();}
+function removeEqF(gid,ei){const g=gruposFaena.find(x=>x.id===gid);if(g&&g.equipos.length>1){readGruposFaena();g.equipos.splice(ei,1);}renderGruposFaena();}
+
+function readGruposFaena(){
+  const tipo=document.getElementById('f-tipo').value;
+  gruposFaena.forEach(g=>{
+    const s=document.getElementById('fsal-'+g.id);if(s)g.salida=s.value;
+    g.equipos.forEach((eq,ei)=>{
+      const c=document.getElementById('fcond-'+g.id+'-'+ei);
+      const t=document.getElementById('ftr-'+g.id+'-'+ei);
+      const sm=document.getElementById('fsm-'+g.id+'-'+ei);
+      if(c)eq.conductor=c.value;if(t)eq.tracto=t.value;if(sm)eq.semi=sm.value;
+    });
+  });
+}
+
+// ── CAMBIO DE EQUIPO POR FALLA MECÁNICA ───────────────
+function abrirCambioEquipo(gid,ei){
+  readGruposFaena();
+  const g=gruposFaena.find(x=>x.id===gid);
+  if(!g)return;
+  const eq=g.equipos[ei];
+  const tipo=document.getElementById('f-tipo').value;
+  // Guardar historial del equipo original si no existe
+  if(!eq.original){
+    eq.original={conductor:eq.conductor,tracto:eq.tracto,semi:eq.semi};
+  }
+  // Mostrar modal simple
+  const modal=document.createElement('div');
+  modal.id='modal-cambio';
+  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:flex;align-items:center;justify-content:center;padding:1rem';
+  modal.innerHTML=
+    '<div style="background:#fff;border-radius:14px;padding:1.5rem;width:100%;max-width:420px;box-shadow:0 8px 32px rgba(0,0,0,.2)">'+
+      '<div style="font-size:15px;font-weight:700;color:#B91C1C;margin-bottom:4px">🔧 Cambio de equipo por falla</div>'+
+      '<div style="font-size:12px;color:#6B7280;margin-bottom:16px">Grupo '+g.num+' — Equipo '+(ei+1)+'</div>'+
+      (eq.original?
+        '<div style="background:#FEF3E2;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px">'+
+          '<div style="font-weight:600;color:#92550A;margin-bottom:4px">Equipo original:</div>'+
+          '<div style="color:#78350F">'+(eq.original.conductor||'—')+' · '+(eq.original.tracto||'—')+' / '+(eq.original.semi||'—')+'</div>'+
+        '</div>':'')+
+      '<div style="font-size:11px;font-weight:700;color:#374151;margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px">Equipo de reemplazo:</div>'+
+      '<div style="margin-bottom:8px"><div class="eq-label">👤 Conductor reemplazo</div>'+selConductor(tipo,'cambio-cond','')+'</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">'+
+        '<div><div class="eq-label">🚛 Tracto</div>'+selTracto('cambio-tr','')+'</div>'+
+        '<div><div class="eq-label">🔗 Semi</div>'+selSemi(tipo,'cambio-sm','')+'</div>'+
+      '</div>'+
+      '<div style="margin-bottom:12px"><div class="eq-label">📝 Motivo de la falla</div>'+
+        '<input type="text" id="cambio-motivo" placeholder="Ej: Falla motor, pinchazo, etc." style="font-size:13px">'+
+      '</div>'+
+      '<div style="display:flex;gap:8px">'+
+        '<button class="btn-outline" style="flex:1" onclick="cerrarModal()">Cancelar</button>'+
+        '<button class="btn-primary" style="flex:1;background:#B91C1C" onclick="confirmarCambio('+gid+','+ei+')">Confirmar cambio</button>'+
+      '</div>'+
+    '</div>';
+  document.body.appendChild(modal);
+}
+
+function cerrarModal(){
+  const m=document.getElementById('modal-cambio');
+  if(m)m.remove();
+}
+
+function confirmarCambio(gid,ei){
+  const g=gruposFaena.find(x=>x.id===gid);
+  if(!g)return;
+  const nuevoC=document.getElementById('cambio-cond').value;
+  const nuevoT=document.getElementById('cambio-tr').value;
+  const nuevoS=document.getElementById('cambio-sm').value;
+  const motivo=document.getElementById('cambio-motivo').value;
+  if(!nuevoC&&!nuevoT){alert('Selecciona al menos el conductor o tracto de reemplazo');return;}
+  // Guardar historial
+  if(!g.historialCambios)g.historialCambios=[];
+  g.historialCambios.push({
+    equipo:ei+1,
+    hora:getNow(),
+    original:{...g.equipos[ei].original||g.equipos[ei]},
+    motivo:motivo||'Sin especificar'
+  });
+  // Aplicar reemplazo
+  g.equipos[ei].conductor=nuevoC||g.equipos[ei].conductor;
+  g.equipos[ei].tracto=nuevoT||g.equipos[ei].tracto;
+  g.equipos[ei].semi=nuevoS||g.equipos[ei].semi;
+  g.equipos[ei].falla=true;
+  cerrarModal();
+  renderGruposFaena();
+}
+
+function renderGruposFaena(){
+  const tipo=document.getElementById('f-tipo').value;
+  const cont=document.getElementById('grupos-faena-cont');
+  if(!gruposFaena.length){cont.innerHTML='<div class="empty">Agrega grupos a medida que salen de KM1</div>';return;}
+  cont.innerHTML='';
+  gruposFaena.forEach(g=>{
+    const div=document.createElement('div');div.className='grupo-card';
+    const eqHTML=g.equipos.map((eq,ei)=>
+      '<div class="eq-block" style="'+(eq.falla?'border-color:#F59E0B;background:#FFFBEB':'')+'">'+
+        '<div class="eq-block-header">'+
+          '<span style="font-size:11px;font-weight:700;color:'+(eq.falla?'#92550A':'#003DA5')+'">'+
+            (eq.falla?'🔄 Reemplazo ':'')+'Equipo '+(ei+1)+
+          '</span>'+
+          '<div style="display:flex;gap:4px">'+
+            '<button style="background:transparent;color:#B91C1C;border:1px solid #FECACA;padding:3px 7px;border-radius:5px;font-size:10px;cursor:pointer" onclick="abrirCambioEquipo('+g.id+','+ei+')">🔧 Cambio</button>'+
+            (g.equipos.length>1?'<button class="btn-danger" onclick="readGruposFaena();removeEqF('+g.id+','+ei+')">✕</button>':'')+
+          '</div>'+
+        '</div>'+
+        (eq.original?
+          '<div style="font-size:10px;color:#92550A;background:#FEF3E2;padding:3px 8px;border-radius:5px;margin-bottom:6px">'+
+            'Original: '+(eq.original.conductor||'—')+' · '+(eq.original.tracto||'—')+
+          '</div>':'')+
+        '<div style="margin-bottom:6px"><div class="eq-label">👤 Conductor</div>'+
+          selConductor(tipo,'fcond-'+g.id+'-'+ei,eq.conductor)+'</div>'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+
+          '<div><div class="eq-label">🚛 Tracto</div>'+selTracto('ftr-'+g.id+'-'+ei,eq.tracto)+'</div>'+
+          '<div><div class="eq-label">🔗 Semi</div>'+selSemi(tipo,'fsm-'+g.id+'-'+ei,eq.semi)+'</div>'+
+        '</div>'+
+      '</div>'
+    ).join('');
+    // Historial de cambios
+    const histHTML=(g.historialCambios||[]).length?
+      '<div style="background:#FEF3E2;border:1px solid #FCD34D;border-radius:8px;padding:8px 12px;margin-bottom:8px">'+
+        '<div style="font-size:11px;font-weight:700;color:#92550A;margin-bottom:4px">🔧 Historial de cambios</div>'+
+        (g.historialCambios||[]).map(h=>
+          '<div style="font-size:11px;color:#78350F;padding:3px 0;border-bottom:1px solid #FDE68A">'+
+            '⏱ '+h.hora+' hrs · Eq.'+h.equipo+' · '+h.motivo+
+            (h.original.conductor?' · Ant: '+h.original.conductor:'')+
+          '</div>'
+        ).join('')+
+      '</div>':'';
+    div.innerHTML=
+      '<div class="grupo-header">'+
+        '<div class="grupo-num">'+g.num+'</div>'+
+        '<span style="font-size:13px;font-weight:600;flex:1">Grupo '+g.num+'</span>'+
+        '<button class="btn-danger" onclick="removeGrupoFaena('+g.id+')">Quitar</button>'+
+      '</div>'+
+      histHTML+
+      eqHTML+
+      (g.equipos.length<3?'<button class="btn-outline" style="font-size:11px;padding:5px 10px;width:auto;margin-bottom:8px" onclick="readGruposFaena();addEqF('+g.id+')">+ Agregar equipo</button>':'')+
+      '<div class="field-row" style="margin-top:4px">'+
+        '<span class="lbl">Salida KM1</span>'+
+        '<input type="time" id="fsal-'+g.id+'" value="'+g.salida+'" style="width:120px">'+
+      '</div>';
+    cont.appendChild(div);
+  });
+}
+
+// ── LLEGADAS ─────────────────────────────────────────
+function renderLlegadas(){
+  readGruposFaena();
+  const tipo=document.getElementById('f-tipo').value;
+  const esRampla=tipo==='ramplas';
+  const cont=document.getElementById('llegadas-cont');
+  if(!gruposFaena.length){cont.innerHTML='<div class="empty">Sin grupos</div>';return;}
+  cont.innerHTML='';
+  gruposFaena.forEach(g=>{
+    const nombres=g.equipos.map(eq=>eq.conductor).filter(Boolean).join(' / ')||'Grupo '+g.num;
+    const div=document.createElement('div');div.className='llegada-item';
+    div.innerHTML=
+      '<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:#003DA5">Grupo '+g.num+' — '+nombres+'</div>'+
+      '<div class="field-row"><span class="lbl">Los Loros</span>'+
+        '<input type="time" id="ll-loros-'+g.id+'" value="'+(g.llegLoros||'')+'" style="width:120px" class="'+(g.llegLoros?'time-ok':'')+'"'+
+        ' oninput="gruposFaena.find(x=>x.id==='+g.id+').llegLoros=this.value;this.className=this.value?\'time-ok\':\'\'">'+'</div>'+
+      '<div class="field-row"><span class="lbl">'+(esRampla?'Base INCOM':'Totoralillo')+'</span>'+
+        '<input type="time" id="ll-toto-'+g.id+'" value="'+(g.llegFin||'')+'" style="width:120px" class="'+(g.llegFin?'time-ok':'')+'"'+
+        ' oninput="gruposFaena.find(x=>x.id==='+g.id+').llegFin=this.value;this.className=this.value?\'time-ok\':\'\'">'+'</div>';
+    cont.appendChild(div);
+  });
+}
+
+// ── RENDER TABLA FAENA ────────────────────────────────
+function renderReporte(){
+  readGruposFaena();
+  const tipo=document.getElementById('f-tipo').value;
+  const total=parseInt(document.getElementById('f-total').value)||15;
+  const wrap=document.getElementById('rpt-wrap');
+  if(!gruposFaena.length){wrap.innerHTML='<div class="empty">Sin grupos aún</div>';return;}
+  let rows='';let despAcum=0;
+  gruposFaena.forEach(g=>{
+    const eqV=g.equipos.filter(eq=>eq.conductor||eq.tracto||eq.semi);
+    despAcum+=eqV.length||1;
+    const desp=despAcum+'/'+total;
+    const eta=g.salida?calcETA(g.salida,tipo):[];
+    const etaLoros=eta.find(e=>e.punto==='LOS LOROS');
+    const etaFin=eta.find(e=>e.punto===getUltimoPunto(tipo));
+    const pL=etaLoros?etaLoros.hora:'';
+    const pFin=etaFin?etaFin.hora:'';
+    const tL=g.llegLoros||'';const tFin=g.llegFin||'';
+    const mT=g.llegFin&&g.salida?calcMins(g.salida,g.llegFin):null;
+    const tDisp=mT!=null?Math.floor(mT/60)+':'+String(mT%60).padStart(2,'0'):'';
+    const rs=2+(eqV.length>2?1:0);
+    function parseEq(eq){if(!eq)return{pat:'',nom:''};return{pat:eq.tracto||eq.semi||'',nom:eq.conductor||''};}
+    const e0=parseEq(eqV[0]),e1=parseEq(eqV[1]),e2=parseEq(eqV[2]);
+    const destinoLabel=tipo==='ramplas'?'Base INCOM':'Totoralillo';
+    rows+='<tr class="grp-hdr"><th>GRUPO</th><th>NOMBRE</th><th>TRACTO</th><th>EQ. DESPACHADOS</th><th>SALIDA K1</th><th>TRAMOS</th><th>HORA PROYECTADA</th><th>HORA DE LLEGADA</th><th>TIEMPO TOTAL</th></tr>';
+    rows+='<tr><td class="td-grupo" rowspan="'+rs+'">'+g.num+'</td><td class="td-nombre">'+e0.nom+'</td><td style="font-size:9px">'+e0.pat+'</td><td class="td-desp" rowspan="'+rs+'">'+desp+'</td><td class="td-salida" rowspan="'+rs+'">'+(g.salida||'')+'</td><td class="td-tramo">Los Loros</td><td class="td-proy">'+pL+'</td><td class="'+(tL?'td-llegada-ok':'td-llegada-empty')+'">'+tL+'</td><td class="'+(tDisp?'td-tiempo-ok':'')+'" rowspan="2">'+tDisp+'</td></tr>';
+    rows+='<tr><td class="td-nombre">'+(e1?e1.nom:'')+'</td><td style="font-size:9px">'+(e1?e1.pat:'')+'</td><td class="td-tramo">'+destinoLabel+'</td><td class="td-proy">'+pFin+'</td><td class="'+(tFin?'td-llegada-ok':'td-llegada-empty')+'">'+tFin+'</td></tr>';
+    if(eqV[2])rows+='<tr><td class="td-nombre">'+e2.nom+'</td><td style="font-size:9px">'+e2.pat+'</td><td colspan="3" style="background:#F9FAFB"></td></tr>';
+  });
+  wrap.innerHTML='<div class="rpt-outer"><div class="rpt-title-bar">'+getTipoLabel()+'&nbsp;&nbsp;'+getFecha()+'</div><div class="rpt-scroll"><table class="rpt-table"><thead></thead><tbody>'+rows+'</tbody></table></div></div>';
+}
+
+// ── TARJETA MATUTINO ──────────────────────────────────
+function genMatutino(){
+  const hora=getNow();
+  const bT=getN('mb-total'),bB=getN('mb-base'),bRF=getN('mb-rutaf'),bF=getN('mb-faena');
+  const rT=getN('mr-total'),rC=getN('mr-carga'),rD=getN('mr-desc'),rRF=getN('mr-rutaf'),rF=getN('mr-faena'),rRB=getN('mr-rutab');
+  const bOk=bB+bRF+bF===bT,rOk=rC+rD+rRF+rF+rRB===rT;
+  function fila(label,val){return'<div class="rpt-row"><span class="rpt-row-label">'+label+'</span><span class="rpt-row-val">'+val+'</span></div>';}
+  const html=
+    '<div style="background:var(--blue);padding:16px 20px;display:flex;align-items:center;gap:12px;border-radius:16px 16px 0 0">'+
+      '<div style="font-family:Barlow Condensed,sans-serif;font-size:20px;font-weight:700;color:#fff;border:2px solid rgba(255,255,255,.4);padding:2px 10px;border-radius:5px">INCOM</div>'+
+      '<div style="flex:1"><div style="font-size:15px;font-weight:700;color:#fff">Reporte de Turno</div>'+
+        '<div style="font-size:12px;color:rgba(255,255,255,.75);margin-top:2px">'+getHoy()+' &nbsp;·&nbsp; Sup: '+getSup()+'</div></div>'+
+      '<div style="text-align:right"><div style="font-family:Barlow Condensed,sans-serif;font-size:30px;font-weight:700;color:#fff">'+hora+'</div>'+
+        '<div style="font-size:11px;color:rgba(255,255,255,.7)">hrs</div></div>'+
+    '</div>'+
+
+    '<div class="rpt-section">'+
+      '<div class="rpt-section-header"><div class="rpt-section-dot" style="background:#16A34A"></div>'+
+        '<span class="rpt-section-label">Bateas</span><span class="rpt-section-dest">Pto. Totoralillo</span></div>'+
+      '<div style="background:#EFF6FF;border-radius:10px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">'+
+        '<span style="font-size:13px;font-weight:700;color:#1E3A5F">Total equipos del día</span>'+
+        '<span style="font-family:Barlow Condensed,sans-serif;font-size:28px;font-weight:700;color:#003DA5">'+bT+'</span>'+
+      '</div>'+
+      fila('En base',bB)+fila('En ruta a faena',bRF)+fila('En faena (KM1)',bF)+
+      (!bOk?'<div style="margin-top:6px;background:#FEE2E2;border-radius:7px;padding:5px 10px;font-size:12px;color:#991B1B;font-weight:500">⚠ No cuadra — verificar conteo</div>':'')+
+    '</div>'+
+
+    '<div class="rpt-section">'+
+      '<div class="rpt-section-header"><div class="rpt-section-dot" style="background:#2563EB"></div>'+
+        '<span class="rpt-section-label">Ramplas</span><span class="rpt-section-dest">Base INCOM Copiapó</span></div>'+
+      '<div style="background:#EFF6FF;border-radius:10px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">'+
+        '<span style="font-size:13px;font-weight:700;color:#1E3A5F">Total equipos del día</span>'+
+        '<span style="font-family:Barlow Condensed,sans-serif;font-size:28px;font-weight:700;color:#003DA5">'+rT+'</span>'+
+      '</div>'+
+      fila('En carga',rC)+fila('En descarga',rD)+fila('En ruta a faena',rRF)+fila('En faena',rF)+fila('En ruta a base',rRB)+
+      (!rOk?'<div style="margin-top:6px;background:#FEE2E2;border-radius:7px;padding:5px 10px;font-size:12px;color:#991B1B;font-weight:500">⚠ No cuadra — verificar conteo</div>':'')+
+    '</div>'+
+
+    '<div style="background:#F9FAFB;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;border-radius:0 0 16px 16px">'+
+      '<span style="font-size:12px;color:#6B7280">Supervisor: <strong style="color:#111">'+getSup()+'</strong></span>'+
+      '<span style="font-size:11px;color:#9CA3AF">INCOM Control de Tráfico</span>'+
+    '</div>';
+  document.getElementById('out-matutino').classList.remove('hidden');
+  document.getElementById('tarjeta-matutino').innerHTML='<div class="rpt-card">'+html+'</div>';
+  document.getElementById('out-matutino').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ── POSICION EN RUTA ──────────────────────────────────
+function importarDesdeFaena(){
+  readGruposFaena();
+  if(!gruposFaena.length){alert('No hay grupos en Salida de faena. Agrégalos primero.');return;}
+  gruposPos=gruposFaena.map(g=>({
+    id:gpId++,num:g.num,
+    equipos:g.equipos.map(eq=>({conductor:eq.conductor,tracto:eq.tracto,semi:eq.semi})),
+    salida:g.salida,tramo:'',pannes:[],obs:''
+  }));
+  renderGruposPos();
+  alert('✓ '+gruposPos.length+' grupos importados correctamente');
+}
+
+function addGrupoPos(){
+  gruposPos.push({id:gpId++,num:gruposPos.length+1,equipos:[{conductor:'',tracto:'',semi:''}],salida:'',tramo:'',pannes:[],obs:''});
+  renderGruposPos();
+}
+function removePosGrupo(id){gruposPos=gruposPos.filter(g=>g.id!==id);gruposPos.forEach((g,i)=>g.num=i+1);renderGruposPos();}
+function setPosTramo(gid,tramo,btn){
+  gruposPos.find(x=>x.id===gid).tramo=tramo;
+  btn.closest('.tramos-grid').querySelectorAll('.tramo-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+function addPanne(gid){const g=gruposPos.find(x=>x.id===gid);if(g){g.pannes=g.pannes||[];g.pannes.push({conductor:'',tracto:'',semi:'',escolta:'',condEscolta:''});}renderGruposPos();}
+function removePanne(gid,pi){const g=gruposPos.find(x=>x.id===gid);if(g)g.pannes.splice(pi,1);renderGruposPos();}
+
+function readGruposPos(){
+  const tipo=document.getElementById('p-tipo').value;
+  gruposPos.forEach(g=>{
+    const ob=document.getElementById('pobs-'+g.id);if(ob)g.obs=ob.value;
+    (g.pannes||[]).forEach((pn,pi)=>{
+      const t=document.getElementById('pntr-'+g.id+'-'+pi);const s=document.getElementById('pnsm-'+g.id+'-'+pi);
+      const e=document.getElementById('pnes-'+g.id+'-'+pi);const c=document.getElementById('pncd-'+g.id+'-'+pi);
+      if(t)pn.tracto=t.value;if(s)pn.semi=s.value;if(e)pn.escolta=e.value;if(c)pn.condEscolta=c.value;
+    });
+  });
+}
+
+function renderGruposPos(){
+  const tipo=document.getElementById('p-tipo').value;
+  const tramos=tipo==='ramplas'?TRAMOS_RAM:TRAMOS_BAT;
+  const cont=document.getElementById('grupos-pos-cont');
+  if(!gruposPos.length){cont.innerHTML='<div class="empty">Importa desde Salida de faena o agrega manualmente</div>';return;}
+  cont.innerHTML='';
+  gruposPos.forEach(g=>{
+    const div=document.createElement('div');div.className='card';
+    // equipos
+    const eqList=(g.equipos||[]).map(eq=>{
+      if(eq.conductor||eq.tracto||eq.semi){
+        return'<div style="display:flex;gap:6px;align-items:center;padding:4px 0;font-size:12px">'+
+          (eq.conductor?'<span style="font-weight:600;color:#111">'+eq.conductor+'</span>':'')+''+
+          (eq.tracto?'<span style="background:#F3F4F6;padding:1px 7px;border-radius:5px;font-size:11px">'+eq.tracto+'</span>':'')+
+          (eq.semi?'<span style="background:#EEF2FF;padding:1px 7px;border-radius:5px;font-size:11px;color:#4338CA">'+eq.semi+'</span>':'')+
+        '</div>';
+      }
+      return'';
+    }).join('');
+    // tramos
+    const tramosHTML=tramos.map(t=>'<button class="tramo-btn'+(g.tramo===t?' sel':'')+'" onclick="setPosTramo('+g.id+',\''+t.replace(/\'/g,"\\'")+'\',this)">'+t+'</button>').join('');
+    // pannes
+    const pannesHTML=(g.pannes||[]).map((pn,pi)=>
+      '<div style="background:#FEF3E2;border:1px solid #FCD34D;border-radius:8px;padding:10px;margin-bottom:8px">'+
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'+
+          '<span style="font-size:12px;font-weight:700;color:#92550A">🔧 Equipo en Panne '+(pi+1)+'</span>'+
+          '<button class="btn-danger" onclick="readGruposPos();removePanne('+g.id+','+pi+')">Quitar</button></div>'+
+        '<div class="eq-3col" style="margin-bottom:8px">'+
+          '<div><div class="eq-label">Conductor</div>'+selConductor(tipo,'pncond-'+g.id+'-'+pi,pn.conductor||'')+'</div>'+
+          '<div><div class="eq-label">Tracto</div>'+selTracto('pntr-'+g.id+'-'+pi,pn.tracto)+'</div>'+
+          '<div><div class="eq-label">Semi</div>'+selSemi(tipo,'pnsm-'+g.id+'-'+pi,pn.semi)+'</div>'+
+        '</div>'+
+        '<div class="field-row"><span class="lbl" style="min-width:80px;font-size:12px">Escolta</span>'+
+          '<input type="text" id="pnes-'+g.id+'-'+pi+'" placeholder="Ej: Toyota Hilux ABC-123" value="'+(pn.escolta||'')+'"></div>'+
+        '<div class="field-row"><span class="lbl" style="min-width:80px;font-size:12px">Cond. INCOM</span>'+
+          '<input type="text" id="pncd-'+g.id+'-'+pi+'" placeholder="Nombre conductor escolta" value="'+(pn.condEscolta||'')+'"></div>'+
+      '</div>'
+    ).join('');
+
+    div.innerHTML=
+      '<div class="grupo-header">'+
+        '<div class="grupo-num">'+g.num+'</div>'+
+        '<div style="flex:1"><div style="font-size:13px;font-weight:600">Grupo '+g.num+'</div>'+
+          (g.salida?'<div style="font-size:11px;color:#6B7280">Salida KM1: '+g.salida+' hrs</div>':'')+
+        '</div><button class="btn-danger" onclick="removePosGrupo('+g.id+')">Quitar</button>'+
+      '</div>'+
+      (eqList?'<div style="margin-bottom:10px;padding:8px;background:#F9FAFB;border-radius:8px">'+eqList+'</div>':'')+
+      '<div style="font-size:10px;font-weight:700;color:#374151;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">Tramo actual:</div>'+
+      '<div class="tramos-grid">'+tramosHTML+'</div>'+
+      (pannesHTML?'<div style="margin-top:10px">'+pannesHTML+'</div>':'')+
+      '<button class="btn-outline" style="font-size:11px;padding:5px 10px;margin-top:8px;width:auto;color:#92550A;border-color:#FCD34D;background:#FFFBEB" onclick="readGruposPos();addPanne('+g.id+')">🔧 + Equipo en panne</button>'+
+      '<div class="field-row" style="margin-top:8px"><span class="lbl">Observación</span>'+
+        '<input type="text" id="pobs-'+g.id+'" placeholder="Opcional" value="'+(g.obs||'')+'"></div>';
+    cont.appendChild(div);
+  });
+}
+
+// ── ANÁLISIS DE TIEMPO EN RUTA ────────────────────────
+// Convierte "HH:MM" a minutos desde medianoche
+function toMin(t){if(!t||!t.includes(':'))return null;const[h,m]=t.split(':').map(Number);return h*60+m;}
+
+// Dado salida KM1, tramo actual y tipo, calcula:
+//  - etaTramo: hora proyectada de llegada al inicio del tramo actual
+//  - etaFin:   hora proyectada de llegada al destino final
+//  - diffMin:  diferencia en minutos (negativo = adelantado, positivo = atrasado)
+//  - etaFinActualizada: ETA al destino desde la posición actual usando hora actual
+function analizarTiempo(salida, tramoActual, tipo){
+  if(!salida||!tramoActual) return null;
+  const factor=condicion==='normal'?1:condicion==='precaucion'?1.15:1.30;
+  const segs=tipo==='ramplas'?segsRam:segsBat;
+  const horaActual=getNow();
+  const nowMin=toMin(horaActual);
+  const salidaMin=toMin(salida);
+
+  // Buscar índice del tramo actual
+  // El tramo es "ORIGEN → DESTINO", el origen es la clave
+  const tramoOrigen=tramoActual.split('→')[0].trim();
+  let idxTramo=-1;
+  segs.forEach((s,i)=>{if(s.o.toUpperCase()===tramoOrigen.toUpperCase())idxTramo=i;});
+
+  if(idxTramo<0) return null;
+
+  // Calcular ETA acumulada hasta el inicio del tramo actual (= cuándo debería haber partido ese tramo)
+  let minAcum=0;
+  for(let i=0;i<idxTramo;i++) minAcum+=Math.round(segs[i].min*factor);
+  const etaInicioTramoMin=salidaMin+minAcum;
+  const etaInicioTramo=String(Math.floor(etaInicioTramoMin/60)%24).padStart(2,'0')+':'+String(etaInicioTramoMin%60).padStart(2,'0');
+
+  // Diferencia: hora actual vs hora proyectada de inicio del tramo
+  const diffMin=nowMin-etaInicioTramoMin;
+
+  // ETA al destino final desde ahora: tiempo restante desde tramo actual en adelante
+  let minRestante=0;
+  for(let i=idxTramo;i<segs.length;i++) minRestante+=Math.round(segs[i].min*factor);
+  const etaFinMin=nowMin+minRestante;
+  const etaFin=String(Math.floor(etaFinMin/60)%24).padStart(2,'0')+':'+String(etaFinMin%60).padStart(2,'0');
+
+  // ETA final proyectada desde salida
+  let minTotal=0;
+  segs.forEach(s=>minTotal+=Math.round(s.min*factor));
+  const etaFinProyMin=salidaMin+minTotal;
+  const etaFinProy=String(Math.floor(etaFinProyMin/60)%24).padStart(2,'0')+':'+String(etaFinProyMin%60).padStart(2,'0');
+
+  return{diffMin,etaInicioTramo,etaFin,etaFinProy,destino:segs[segs.length-1].d};
+}
+
+function semaforoHTML(analisis){
+  if(!analisis) return '';
+  const{diffMin,etaInicioTramo,etaFin,etaFinProy,destino}=analisis;
+  const abs=Math.abs(diffMin);
+  let icono,color,bg,border,texto;
+  if(diffMin<=-1){
+    icono='🟢';color='#166534';bg='#DCFCE7';border='#86EFAC';
+    texto='Adelantado '+abs+' min';
+  } else if(diffMin<=15){
+    icono='🟡';color='#854D0E';bg='#FEF9C3';border='#FDE047';
+    texto=diffMin===0?'En tiempo exacto':'Demora leve: +'+diffMin+' min';
+  } else {
+    icono='🔴';color='#991B1B';bg='#FEE2E2';border='#FCA5A5';
+    texto='Demora: +'+diffMin+' min sobre lo proyectado';
+  }
+  return'<div style="margin-top:10px;background:'+bg+';border:1px solid '+border+';border-radius:10px;padding:10px 14px">'+
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'+
+      '<span style="font-size:18px">'+icono+'</span>'+
+      '<span style="font-size:13px;font-weight:700;color:'+color+'">'+texto+'</span>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+
+      '<div style="background:rgba(255,255,255,.7);border-radius:7px;padding:6px 10px">'+
+        '<div style="font-size:10px;color:#6B7280;font-weight:600;text-transform:uppercase;letter-spacing:.4px">Proyectado en tramo</div>'+
+        '<div style="font-size:14px;font-weight:700;color:#111;margin-top:2px">'+etaInicioTramo+' hrs</div>'+
+      '</div>'+
+      '<div style="background:rgba(255,255,255,.7);border-radius:7px;padding:6px 10px">'+
+        '<div style="font-size:10px;color:#6B7280;font-weight:600;text-transform:uppercase;letter-spacing:.4px">🏁 ETA '+destino+'</div>'+
+        '<div style="font-size:14px;font-weight:700;color:#003DA5;margin-top:2px">~'+etaFin+' hrs</div>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+}
+
+function genPosicion(){
+  readGruposPos();
+  if(!gruposPos.length){alert('Agrega al menos un grupo');return;}
+  const hora=getNow();
+  const tipo=document.getElementById('p-tipo').value;
+  const tipoLabel=tipo==='bateas'?'BATEAS':'RAMPLAS';
+  let gruposHTML='';
+
+  gruposPos.forEach(g=>{
+    const eqV=(g.equipos||[]).filter(eq=>eq.conductor||eq.tracto);
+    const conductores=eqV.map(eq=>eq.conductor).filter(Boolean);
+    const patentes=eqV.map(eq=>eq.tracto||eq.semi||'').filter(Boolean);
+    const nombreGrupo=conductores.length?conductores.join(' / '):'Grupo '+g.num;
+
+    // Análisis de tiempo
+    const analisis=g.salida&&g.tramo?analizarTiempo(g.salida,g.tramo,tipo):null;
+
+    const pannesCardHTML=(g.pannes||[]).map(pn=>
+      '<div style="background:#FEF3E2;border-left:3px solid #F59E0B;padding:5px 10px;margin-top:6px;border-radius:0 6px 6px 0;font-size:11px">'+
+        '<span style="font-weight:700;color:#92550A">🔧 Panne: </span>'+
+        '<span style="color:#78350F">'+(pn.conductor||pn.tracto||'S/D')+(pn.tracto?' · '+pn.tracto:'')+'</span>'+
+        (pn.escolta?'<br><span style="color:#92550A">🚐 Escolta: </span><span style="color:#78350F">'+pn.escolta+'</span>':'')+
+        (pn.condEscolta?' <span style="color:#92550A">· Cond: </span><span style="color:#78350F">'+pn.condEscolta+'</span>':'')+
+      '</div>'
+    ).join('');
+
+    // Badge estado para el header
+    let headerBadge='';
+    if(analisis){
+      const{diffMin}=analisis;
+      const badgeBg=diffMin<=-1?'rgba(22,163,74,.25)':diffMin<=15?'rgba(234,179,8,.25)':'rgba(220,38,38,.25)';
+      const badgeTxt=diffMin<=-1?'Adelantado':diffMin<=15&&diffMin>=0?'En tiempo':'Con demora';
+      headerBadge='<div style="background:'+badgeBg+';border-radius:12px;padding:2px 10px;font-size:10px;color:#fff;font-weight:700">'+badgeTxt+'</div>';
+    } else if(g.tramo){
+      headerBadge='<div style="background:rgba(255,255,255,.15);border-radius:12px;padding:2px 8px;font-size:10px;color:#fff;font-weight:600">En ruta</div>';
+    }
+
+    gruposHTML+=
+      '<div class="pos-grupo">'+
+        '<div class="pos-grupo-header">'+
+          '<span class="pos-grupo-num">'+g.num+'</span>'+
+          '<div style="flex:1">'+
+            '<div class="pos-grupo-nombre">'+nombreGrupo+'</div>'+
+            '<div style="font-size:10px;color:rgba(255,255,255,.65);margin-top:1px">'+
+              patentes.join(' · ')+(g.salida?' · Salida '+g.salida+' hrs':'')+
+            '</div>'+
+          '</div>'+
+          headerBadge+
+        '</div>'+
+        '<div class="pos-grupo-body">'+
+          (g.tramo?
+            '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+              '<span style="font-size:12px;color:#6B7280">📍 Tramo:</span>'+
+              '<div class="pos-ubicacion-badge">'+g.tramo+'</div>'+
+            '</div>'
+            :'<div style="color:#9CA3AF;font-size:12px">Sin tramo registrado</div>')+
+          (analisis?semaforoHTML(analisis):
+            (!g.salida&&g.tramo?'<div style="margin-top:8px;font-size:11px;color:#9CA3AF">⚠ Sin hora de salida — agrega la hora KM1 en Salida de faena para calcular tiempos</div>':''))+
+          pannesCardHTML+
+          (g.obs?'<div style="margin-top:6px;font-size:12px;color:#6B7280">📝 '+g.obs+'</div>':'')+
+        '</div>'+
+      '</div>';
+  });
+
+  const tarjetaPos=document.getElementById('tarjeta-posicion');
+  const outPos=document.getElementById('out-posicion');
+  outPos.classList.remove('hidden');
+  tarjetaPos.innerHTML=
+    '<div class="pos-card-header">'+
+      '<div style="font-family:Barlow Condensed,sans-serif;font-size:20px;font-weight:700;color:#fff;border:2px solid rgba(255,255,255,.4);padding:2px 10px;border-radius:5px">INCOM</div>'+
+      '<div style="flex:1;margin-left:8px">'+
+        '<div style="font-size:15px;font-weight:700;color:#fff">Posición en Ruta</div>'+
+        '<div style="font-size:12px;color:rgba(255,255,255,.75);margin-top:2px">'+
+          '<span style="background:rgba(255,255,255,.15);padding:1px 8px;border-radius:10px;margin-right:6px">'+tipoLabel+'</span>'+getHoy()+
+        '</div>'+
+      '</div>'+
+      '<div style="text-align:right">'+
+        '<div style="font-family:Barlow Condensed,sans-serif;font-size:28px;font-weight:700;color:#fff">'+hora+'</div>'+
+        '<div style="font-size:10px;color:rgba(255,255,255,.65)">hrs</div>'+
+      '</div>'+
+    '</div>'+
+    gruposHTML+
+    '<div style="padding:10px 18px 16px;display:flex;align-items:center;justify-content:space-between">'+
+      '<span style="font-size:11px;color:#9CA3AF">Sup: '+getSup()+'</span>'+
+      '<span style="font-size:11px;color:#9CA3AF">INCOM Control de Tráfico</span>'+
+    '</div>';
+  outPos.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+
+// ── PLANIFICACIÓN ─────────────────────────────────────
+function initPlan(){planes=[];planActivo=null;renderPlanSel();}
+
+function renderPlanSel(){
+  const sel=document.getElementById('plan-sel');
+  const cur=planActivo?planActivo.id:'';
+  sel.innerHTML='<option value="">— Seleccionar planificación —</option>';
+  planes.forEach(p=>{
+    const opt=document.createElement('option');
+    opt.value=p.id;
+    const fd=p.fecha?p.fecha.split('-').reverse().join('-'):'sin fecha';
+    opt.textContent=p.nombre+' · '+fd+' · '+p.turno;
+    if(p.id===cur)opt.selected=true;
+    sel.appendChild(opt);
+  });
+}
+
+function cargarPlan(){
+  try{
+    const id=document.getElementById('plan-sel').value;
+    if(!id){document.getElementById('plan-form').classList.add('hidden');planActivo=null;return;}
+    planActivo=planes.find(p=>p.id===id)||null;
+    if(!planActivo){alert('No se encontró la planificación');return;}
+    document.getElementById('plan-nombre').value=planActivo.nombre||'';
+    document.getElementById('plan-fecha').value=planActivo.fecha||'';
+    const turnoSel=document.getElementById('plan-turno');
+    if(turnoSel)turnoSel.selectedIndex=0;
+    document.getElementById('plan-form').classList.remove('hidden');
+    renderPlanGrupos('bat');
+    renderPlanGrupos('ram');
+    actualizarResumen();
+  }catch(e){alert('Error al cargar: '+e.message);}
+}
+
+function nuevaPlan(){
+  try{
+    const n=new Date();
+    const m=new Date(n);m.setDate(n.getDate()+1);
+    const fs=m.getFullYear()+'-'+String(m.getMonth()+1).padStart(2,'0')+'-'+String(m.getDate()).padStart(2,'0');
+    const fd=String(m.getDate()).padStart(2,'0')+'-'+String(m.getMonth()+1).padStart(2,'0')+'-'+m.getFullYear();
+    planActivo={id:'plan_'+Date.now(),nombre:'Planificacion '+fd,fecha:fs,turno:'Dia',gruposBat:[],gruposRam:[]};
+    planes.push(planActivo);
+    renderPlanSel();
+    document.getElementById('plan-sel').value=planActivo.id;
+    document.getElementById('plan-nombre').value=planActivo.nombre;
+    document.getElementById('plan-fecha').value=planActivo.fecha;
+    const turnoSel=document.getElementById('plan-turno');
+    if(turnoSel)turnoSel.selectedIndex=0;
+    const form=document.getElementById('plan-form');
+    if(form)form.classList.remove('hidden');
+    renderPlanGrupos('bat');
+    renderPlanGrupos('ram');
+    actualizarResumen();
+  }catch(e){alert('Error en nuevaPlan: '+e.message);}
+}
+
+function duplicarPlan(){
+  if(!planActivo){alert('Selecciona una planificación para duplicar');return;}
+  readPlanForm();
+  const n=new Date();const sig=new Date(n);sig.setDate(n.getDate()+1);
+  const fs=sig.getFullYear()+'-'+String(sig.getMonth()+1).padStart(2,'0')+'-'+String(sig.getDate()).padStart(2,'0');
+  const fd=String(sig.getDate()).padStart(2,'0')+'-'+String(sig.getMonth()+1).padStart(2,'0')+'-'+sig.getFullYear();
+  const copia={
+    id:'plan_'+Date.now(),
+    nombre:planActivo.nombre.replace(/\d{2}-\d{2}-\d{4}/,fd)||'Planificación '+fd,
+    fecha:fs,turno:planActivo.turno,
+    gruposBat:JSON.parse(JSON.stringify(planActivo.gruposBat||[])),
+    gruposRam:JSON.parse(JSON.stringify(planActivo.gruposRam||[])),
+  };
+  planes.push(copia);planActivo=copia;
+  renderPlanSel();
+  document.getElementById('plan-sel').value=copia.id;
+  document.getElementById('plan-nombre').value=copia.nombre;
+  document.getElementById('plan-fecha').value=copia.fecha;
+  document.getElementById('plan-turno').value=copia.turno;
+  document.getElementById('plan-form').classList.remove('hidden');
+  renderPlanGrupos('bat');renderPlanGrupos('ram');
+  mostrarAviso('✓ Duplicada para '+fd+' — recuerda Exportar');
+}
+
+function eliminarPlan(){
+  if(!planActivo){alert('Selecciona una planificación');return;}
+  if(!confirm('¿Eliminar "'+planActivo.nombre+'"?'))return;
+  planes=planes.filter(p=>p.id!==planActivo.id);
+  planActivo=null;renderPlanSel();
+  document.getElementById('plan-form').classList.add('hidden');
+}
+
+function guardarPlan(){
+  readPlanForm();renderPlanSel();actualizarResumen();
+  mostrarAviso('✓ Guardado en sesión. Usa ⬇ Exportar para guardar el archivo.');
+}
+
+function exportarPlan(){
+  readPlanForm();
+  if(!planActivo){alert('No hay planificación activa');return;}
+  const blob=new Blob([JSON.stringify(planes,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.download='INCOM_Planificacion.json';
+  a.href=url;a.click();URL.revokeObjectURL(url);
+  mostrarAviso('✓ Archivo exportado');
+}
+
+function importarPlanArchivo(event){
+  const file=event.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const datos=JSON.parse(e.target.result);
+      if(!Array.isArray(datos))throw new Error('Formato inválido');
+      datos.forEach(p=>{if(!planes.find(x=>x.id===p.id))planes.push(p);});
+      renderPlanSel();
+      if(datos.length>0){planActivo=datos[0];document.getElementById('plan-sel').value=planActivo.id;cargarPlan();}
+      mostrarAviso('✓ '+datos.length+' planificación(es) importada(s)');
+    }catch(err){alert('Error al importar: '+err.message);}
+  };
+  reader.readAsText(file);event.target.value='';
+}
+
+function mostrarAviso(msg){
+  const el=document.getElementById('plan-aviso');if(!el)return;
+  el.textContent=msg;el.classList.remove('hidden');
+  setTimeout(()=>el.classList.add('hidden'),4000);
+}
+
+function readPlanForm(){
+  if(!planActivo)return;
+  planActivo.nombre=document.getElementById('plan-nombre').value||planActivo.nombre;
+  planActivo.fecha=document.getElementById('plan-fecha').value||planActivo.fecha;
+  planActivo.turno=document.getElementById('plan-turno').value||planActivo.turno;
+  ['bat','ram'].forEach(tipo=>{
+    const arr=tipo==='bat'?planActivo.gruposBat:planActivo.gruposRam;
+    (arr||[]).forEach((g,gi)=>{
+      const s=document.getElementById('pg-'+tipo+'-sal-'+gi);if(s)g.salidaEst=s.value;
+      (g.equipos||[]).forEach((eq,ei)=>{
+        const c=document.getElementById('pg-'+tipo+'-cond-'+gi+'-'+ei);
+        const t=document.getElementById('pg-'+tipo+'-tr-'+gi+'-'+ei);
+        const sm=document.getElementById('pg-'+tipo+'-sm-'+gi+'-'+ei);
+        if(c)eq.conductor=c.value;if(t)eq.tracto=t.value;if(sm)eq.semi=sm.value;
+      });
+    });
+  });
+}
+
+function addPlanGrupo(tipo){
+  readPlanForm();if(!planActivo)return;
+  const arr=tipo==='bat'?planActivo.gruposBat:planActivo.gruposRam;
+  arr.push({num:arr.length+1,equipos:[{conductor:'',tracto:'',semi:''}],salidaEst:''});
+  renderPlanGrupos(tipo);actualizarResumen();
+}
+function removePlanGrupo(tipo,gi){
+  readPlanForm();
+  const arr=tipo==='bat'?planActivo.gruposBat:planActivo.gruposRam;
+  arr.splice(gi,1);arr.forEach((g,i)=>g.num=i+1);
+  renderPlanGrupos(tipo);actualizarResumen();
+}
+function addPlanEq(tipo,gi){
+  readPlanForm();
+  const arr=tipo==='bat'?planActivo.gruposBat:planActivo.gruposRam;
+  if(arr[gi]&&(arr[gi].equipos||[]).length<3)arr[gi].equipos.push({conductor:'',tracto:'',semi:''});
+  renderPlanGrupos(tipo);actualizarResumen();
+}
+function removePlanEq(tipo,gi,ei){
+  readPlanForm();
+  const arr=tipo==='bat'?planActivo.gruposBat:planActivo.gruposRam;
+  if(arr[gi]&&(arr[gi].equipos||[]).length>1)arr[gi].equipos.splice(ei,1);
+  renderPlanGrupos(tipo);actualizarResumen();
+}
+
+function actualizarResumen(){
+  if(!planActivo)return;
+  const bE=(planActivo.gruposBat||[]).reduce((s,g)=>s+(g.equipos||[]).length,0);
+  const rE=(planActivo.gruposRam||[]).reduce((s,g)=>s+(g.equipos||[]).length,0);
+  const be=document.getElementById('plan-bat-resumen');const re=document.getElementById('plan-ram-resumen');
+  if(be)be.textContent=bE+' equipos / '+(planActivo.gruposBat||[]).length+' grupos';
+  if(re)re.textContent=rE+' equipos / '+(planActivo.gruposRam||[]).length+' grupos';
+}
+
+function renderPlanGrupos(tipo){
+  if(!planActivo)return;
+  const arr=tipo==='bat'?(planActivo.gruposBat||[]):(planActivo.gruposRam||[]);
+  const cont=document.getElementById('plan-grupos-'+tipo);
+  const tipoSel=tipo==='bat'?'bateas':'ramplas';
+  if(!cont)return;
+  if(!arr.length){cont.innerHTML='<div class="empty" style="padding:1rem">Sin grupos — agrega uno</div>';return;}
+  cont.innerHTML='';
+  arr.forEach((g,gi)=>{
+    const div=document.createElement('div');div.className='grupo-card';
+    const eqHTML=(g.equipos||[]).map((eq,ei)=>
+      '<div class="eq-block">'+
+        '<div class="eq-block-header">'+
+          '<span style="font-size:11px;font-weight:700;color:#003DA5">Equipo '+(ei+1)+'</span>'+
+          ((g.equipos||[]).length>1?'<button class="btn-danger" onclick="readPlanForm();removePlanEq(\''+tipo+'\','+gi+','+ei+')">✕</button>':'')+
+        '</div>'+
+        '<div style="margin-bottom:6px"><div class="eq-label">👤 Conductor</div>'+
+          selConductor(tipoSel,'pg-'+tipo+'-cond-'+gi+'-'+ei,eq.conductor)+'</div>'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+
+          '<div><div class="eq-label">🚛 Tracto</div>'+selTracto('pg-'+tipo+'-tr-'+gi+'-'+ei,eq.tracto)+'</div>'+
+          '<div><div class="eq-label">🔗 Semi</div>'+selSemi(tipoSel,'pg-'+tipo+'-sm-'+gi+'-'+ei,eq.semi)+'</div>'+
+        '</div>'+
+      '</div>'
+    ).join('');
+    div.innerHTML=
+      '<div class="grupo-header">'+
+        '<div class="grupo-num">'+g.num+'</div>'+
+        '<span style="font-size:13px;font-weight:600;flex:1">Grupo '+g.num+'</span>'+
+        '<button class="btn-danger" onclick="readPlanForm();removePlanGrupo(\''+tipo+'\','+gi+')">Quitar</button>'+
+      '</div>'+
+      eqHTML+
+      ((g.equipos||[]).length<3?'<button class="btn-outline" style="font-size:11px;padding:4px 10px;width:auto;margin-bottom:8px" onclick="readPlanForm();addPlanEq(\''+tipo+'\','+gi+')">+ Equipo</button>':'')+
+      '<div class="field-row" style="margin-top:4px">'+
+        '<span class="lbl">Salida KM1 est.</span>'+
+        '<input type="time" id="pg-'+tipo+'-sal-'+gi+'" value="'+(g.salidaEst||'')+'" style="width:120px">'+
+      '</div>';
+    cont.appendChild(div);
+  });
+}
+
+function aplicarPlanAFaena(){
+  readPlanForm();
+  if(!planActivo){alert('No hay planificación activa');return;}
+  const tipo=document.getElementById('f-tipo').value;
+  const arr=tipo==='ramplas'?(planActivo.gruposRam||[]):(planActivo.gruposBat||[]);
+  if(!arr.length){alert('No hay grupos planificados para '+(tipo==='ramplas'?'Ramplas':'Bateas'));return;}
+  gruposFaena=arr.map((g,i)=>({
+    id:gfId++,num:i+1,
+    equipos:(g.equipos||[]).map(eq=>({conductor:eq.conductor||'',tracto:eq.tracto||'',semi:eq.semi||''})),
+    salida:g.salidaEst||'',llegLoros:'',llegFin:''
+  }));
+  const totalEq=arr.reduce((s,g)=>s+(g.equipos||[]).length,0);
+  if(tipo==='ramplas'){document.getElementById('mr-total').textContent=totalEq;document.getElementById('mr-faena').textContent=totalEq;}
+  else{document.getElementById('mb-total').textContent=totalEq;document.getElementById('mb-faena').textContent=totalEq;}
+  if(planActivo.fecha)document.getElementById('f-fecha').value=planActivo.fecha;
+  document.getElementById('f-total').value=totalEq;
+  updateTot();switchTab('faena');renderGruposFaena();
+}
+
+
+// ── DESCARGA PNG ──────────────────────────────────────
+function descargarPNG(elementId, nombre){
+  const el=document.getElementById(elementId);
+  if(!el){alert('Error: no se encontró el elemento');return;}
+  html2canvas(el,{
+    scale:2,
+    backgroundColor:'#ffffff',
+    useCORS:true,
+    logging:false
+  }).then(canvas=>{
+    const link=document.createElement('a');
+    link.download=nombre+'_'+getHoy().replace(/-/g,'')+'.png';
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+  }).catch(()=>alert('Error al generar imagen. Intenta con screenshot manual.'));
+}
+
+// ── SEGMENTOS ─────────────────────────────────────────
+function renderSegs(){
+  function renderLista(segs,contId,arr){
+    const cont=document.getElementById(contId);cont.innerHTML='';
+    segs.forEach((s,i)=>{
+      const row=document.createElement('div');row.className='seg-row';
+      row.innerHTML='<span style="font-size:13px;color:var(--text)">'+s.o+' → '+s.d+'</span>'+
+        '<input type="number" min="5" max="180" value="'+s.min+'" style="width:65px;text-align:center" onchange="'+arr+'['+i+'].min=parseInt(this.value)||'+s.min+'">'+
+        '<span style="font-size:12px;color:#6B7280">min</span>';
+      cont.appendChild(row);
+    });
+  }
+  renderLista(segsBat,'segs-bat-list','segsBat');
+  renderLista(segsRam,'segs-ram-list','segsRam');
+}
+</script>
+</body>
+</html>
