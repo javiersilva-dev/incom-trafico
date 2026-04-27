@@ -509,6 +509,56 @@ function selBtn(id,val){
       b.style.fontWeight=isMe?'600':'400';
     });
   }
+  // Actualizar resumen visual del equipo
+  // El id tiene formato: pe-bat-cond-0, pe-bat-tr-0, pe-bat-sm-0
+  // o: fcond-X-Y, ftr-X-Y, fsm-X-Y
+  // Detectar prefijo del equipo y actualizar resumen
+  const partes=id.split('-');
+  let resumenId=null;
+  if(id.startsWith('pe-')){
+    // pe-bat-cond-0 → resumen-pe-bat-0
+    resumenId='resumen-pe-'+partes[1]+'-'+partes[partes.length-1];
+  } else if(id.startsWith('fcond-')||id.startsWith('ftr-')||id.startsWith('fsm-')){
+    // fcond-5-0 → resumen-f-5-0
+    const gid=partes[1];const ei=partes[2];
+    resumenId='resumen-f-'+gid+'-'+ei;
+  } else if(id.startsWith('pg-')){
+    // pg-bat-cond-0-0 → resumen-pg-bat-0-0
+    resumenId='resumen-pg-'+partes[1]+'-'+partes[3]+'-'+partes[4];
+  }
+  if(resumenId){
+    actualizarResumenEquipo(resumenId,id);
+  }
+}
+
+function actualizarResumenEquipo(resumenId, changedId){
+  const el=document.getElementById(resumenId);
+  if(!el)return;
+  // Determinar qué IDs de cond/tr/sm corresponden a este resumen
+  // El resumenId tiene el sufijo que identifica al equipo
+  const sufijo=resumenId.replace('resumen-','');
+  // Reconstruir los IDs de los 3 campos
+  let condId,trId,smId;
+  if(sufijo.startsWith('pe-')){
+    const parts=sufijo.split('-'); // pe-bat-0
+    condId='pe-'+parts[1]+'-cond-'+parts[2];
+    trId='pe-'+parts[1]+'-tr-'+parts[2];
+    smId='pe-'+parts[1]+'-sm-'+parts[2];
+  } else if(sufijo.startsWith('f-')){
+    const parts=sufijo.split('-'); // f-gid-ei
+    condId='fcond-'+parts[1]+'-'+parts[2];
+    trId='ftr-'+parts[1]+'-'+parts[2];
+    smId='fsm-'+parts[1]+'-'+parts[2];
+  } else {return;}
+  const cond=getVal(condId)||'';
+  const tr=getVal(trId)||'';
+  const sm=getVal(smId)||'';
+  if(!cond&&!tr&&!sm){el.style.display='none';return;}
+  el.style.display='flex';
+  el.innerHTML=
+    (cond?'<span style="background:#003DA5;color:#fff;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600">👤 '+cond+'</span>':'')+
+    (tr?'<span style="background:#F3F4F6;color:#374151;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500">🚛 '+tr+'</span>':'')+
+    (sm?'<span style="background:#EEF2FF;color:#4338CA;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500">🔗 '+sm+'</span>':'');
 }
 
 function selConductor(tipo,id,val){
@@ -1218,6 +1268,11 @@ function renderPlanEquipos(tipo){
       '<div class="eq-block-header">'+
         '<span style="font-size:11px;font-weight:700;color:#003DA5">Equipo '+(i+1)+'</span>'+
         '<button class="btn-danger" onclick="readPlanForm();removePlanEquipo(\''+tipo+'\','+i+')">✕ Quitar</button>'+
+      '</div>'+
+      '<div id="resumen-pe-'+tipo+'-'+i+'" style="display:'+(eq.conductor||eq.tracto||eq.semi?'flex':'none')+';flex-wrap:wrap;gap:6px;margin-bottom:10px;align-items:center">'+
+        (eq.conductor?'<span style="background:#003DA5;color:#fff;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600">👤 '+eq.conductor+'</span>':'')+
+        (eq.tracto?'<span style="background:#F3F4F6;color:#374151;padding:3px 10px;border-radius:20px;font-size:11px">🚛 '+eq.tracto+'</span>':'')+
+        (eq.semi?'<span style="background:#EEF2FF;color:#4338CA;padding:3px 10px;border-radius:20px;font-size:11px">🔗 '+eq.semi+'</span>':'')+
       '</div>'+
       '<div style="margin-bottom:6px"><div class="eq-label">👤 Conductor</div>'+
         selConductor('bat','pe-'+tipo+'-cond-'+i,eq.conductor)+'</div>'+
