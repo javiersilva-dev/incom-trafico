@@ -189,14 +189,34 @@ input.time-ok{border-color:var(--green)!important;background:#F0FDF4!important}
 
     <!-- BATEAS -->
     <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-        <div>
-          <div class="card-title" style="margin-bottom:2px">🟢 Bateas — Pto. Totoralillo</div>
-          <div style="font-size:11px;color:var(--gray-text)" id="plan-bat-resumen">0 equipos</div>
+      <!-- SELECTOR ACTIVO -->
+      <div class="card" style="border-color:#003DA5">
+        <div class="card-title" style="color:#003DA5">🟢 Agregar equipo Batea</div>
+        <!-- Resumen selección activa -->
+        <div id="sel-bat-preview" style="display:none;flex-wrap:wrap;gap:6px;margin-bottom:12px;padding:8px 12px;background:#EFF6FF;border-radius:8px;align-items:center"></div>
+        <div style="margin-bottom:8px">
+          <div class="eq-label">👤 Conductor</div>
+          <div id="sel-bat-cond-wrap"></div>
+          <input type="hidden" id="sel-bat-cond">
         </div>
-        <button class="btn-outline" style="padding:5px 12px;font-size:12px" onclick="addPlanEquipo('bat')">+ Equipo</button>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+          <div>
+            <div class="eq-label">🚛 Tracto</div>
+            <div id="sel-bat-tr-wrap"></div>
+            <input type="hidden" id="sel-bat-tr">
+          </div>
+          <div>
+            <div class="eq-label">🔗 Semi</div>
+            <div id="sel-bat-sm-wrap"></div>
+            <input type="hidden" id="sel-bat-sm">
+          </div>
+        </div>
+        <button class="btn-primary" onclick="confirmarEquipo('bat')">+ Agregar a lista</button>
       </div>
-      <div id="plan-equipos-bat"></div>
+
+      <!-- LISTA ACUMULADA BATEAS -->
+      <div id="plan-equipos-bat" style="margin-bottom:4px"></div>
+
     </div>
 
     <!-- RAMPLAS -->
@@ -206,8 +226,33 @@ input.time-ok{border-color:var(--green)!important;background:#F0FDF4!important}
           <div class="card-title" style="margin-bottom:2px">🔵 Ramplas — Base INCOM Copiapó</div>
           <div style="font-size:11px;color:var(--gray-text)" id="plan-ram-resumen">0 equipos</div>
         </div>
-        <button class="btn-outline" style="padding:5px 12px;font-size:12px" onclick="addPlanEquipo('ram')">+ Equipo</button>
       </div>
+
+      <!-- SELECTOR ACTIVO RAMPLAS -->
+      <div style="border:1px solid #1D4ED8;border-radius:10px;padding:12px;margin-bottom:10px">
+        <div class="card-title" style="color:#1D4ED8;margin-bottom:10px">🔵 Agregar equipo Rampla</div>
+        <div id="sel-ram-preview" style="display:none;flex-wrap:wrap;gap:6px;margin-bottom:12px;padding:8px 12px;background:#EFF6FF;border-radius:8px;align-items:center"></div>
+        <div style="margin-bottom:8px">
+          <div class="eq-label">👤 Conductor</div>
+          <div id="sel-ram-cond-wrap"></div>
+          <input type="hidden" id="sel-ram-cond">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+          <div>
+            <div class="eq-label">🚛 Tracto</div>
+            <div id="sel-ram-tr-wrap"></div>
+            <input type="hidden" id="sel-ram-tr">
+          </div>
+          <div>
+            <div class="eq-label">🔗 Semi</div>
+            <div id="sel-ram-sm-wrap"></div>
+            <input type="hidden" id="sel-ram-sm">
+          </div>
+        </div>
+        <button class="btn-primary" style="background:#1D4ED8" onclick="confirmarEquipo('ram')">+ Agregar a lista</button>
+      </div>
+
+      <!-- LISTA ACUMULADA RAMPLAS -->
       <div id="plan-equipos-ram"></div>
     </div>
 
@@ -1127,6 +1172,7 @@ function cargarPlan(){
     renderPlanEquipos('bat');
     renderPlanEquipos('ram');
     actualizarResumen();
+    initSelectorPlan();
   }catch(e){alert('Error: '+e.message);}
 }
 
@@ -1146,6 +1192,7 @@ function nuevaPlan(){
     renderPlanEquipos('bat');
     renderPlanEquipos('ram');
     actualizarResumen();
+    initSelectorPlan();
   }catch(e){alert('Error en nuevaPlan: '+e.message);}
 }
 
@@ -1230,15 +1277,68 @@ function readPlanForm(){
   });
 }
 
-function addPlanEquipo(tipo){
-  readPlanForm();if(!planActivo)return;
+function initSelectorPlan(){
+  // Renderizar botones en los selectores activos
+  ['bat','ram'].forEach(tipo=>{
+    const tipoSel=tipo==='bat'?'bateas':'ramplas';
+    // Conductor
+    const cw=document.getElementById('sel-'+tipo+'-cond-wrap');
+    if(cw)cw.innerHTML=btnGroup(CONDUCTORES_BAT,'sel-'+tipo+'-cond','','selPlanBtn',false);
+    // Tracto
+    const tw=document.getElementById('sel-'+tipo+'-tr-wrap');
+    if(tw)tw.innerHTML=btnGroup(TRACTOS.map(t=>t.p),'sel-'+tipo+'-tr','','selPlanBtn',true);
+    // Semi
+    const lista=tipo==='bat'?BATEAS:RAMPLAS;
+    const sw=document.getElementById('sel-'+tipo+'-sm-wrap');
+    if(sw)sw.innerHTML=btnGroup(lista.map(b=>b.p),'sel-'+tipo+'-sm','','selPlanBtn',true);
+  });
+}
+
+function selPlanBtn(id,val){
+  // igual que selBtn pero actualiza preview
+  selBtn(id,val);
+  // detectar tipo
+  const tipo=id.includes('-bat-')?'bat':'ram';
+  const cond=getVal('sel-'+tipo+'-cond');
+  const tr=getVal('sel-'+tipo+'-tr');
+  const sm=getVal('sel-'+tipo+'-sm');
+  const prev=document.getElementById('sel-'+tipo+'-preview');
+  if(!prev)return;
+  if(!cond&&!tr&&!sm){prev.style.display='none';return;}
+  prev.style.display='flex';
+  prev.innerHTML=
+    (cond?'<span style="background:#003DA5;color:#fff;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700">👤 '+cond+'</span>':
+      '<span style="background:#F3F4F6;color:#9CA3AF;padding:4px 12px;border-radius:20px;font-size:12px">👤 Sin conductor</span>')+
+    (tr?'<span style="background:#F3F4F6;color:#374151;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500">🚛 '+tr+'</span>':'')+
+    (sm?'<span style="background:#EEF2FF;color:#4338CA;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500">🔗 '+sm+'</span>':'');
+}
+
+function confirmarEquipo(tipo){
+  const cond=getVal('sel-'+tipo+'-cond');
+  const tr=getVal('sel-'+tipo+'-tr');
+  const sm=getVal('sel-'+tipo+'-sm');
+  if(!cond&&!tr){alert('Selecciona al menos el conductor o tracto');return;}
+  if(!planActivo)return;
   const arr=tipo==='bat'?planActivo.equiposBat:planActivo.equiposRam;
-  arr.push({conductor:'',tracto:'',semi:''});
-  renderPlanEquipos(tipo);actualizarResumen();
+  arr.push({conductor:cond,tracto:tr,semi:sm});
+  // Limpiar selección
+  ['cond','tr','sm'].forEach(campo=>{
+    const inp=document.getElementById('sel-'+tipo+'-'+campo);
+    if(inp)inp.value='';
+    const grp=document.getElementById('grp-sel-'+tipo+'-'+campo);
+    if(grp)grp.querySelectorAll('button').forEach(b=>{
+      b.style.background='#fff';b.style.color='#374151';
+      b.style.borderColor='#D1D5DB';b.style.fontWeight='400';
+    });
+  });
+  const prev=document.getElementById('sel-'+tipo+'-preview');
+  if(prev)prev.style.display='none';
+  renderPlanEquipos(tipo);
+  actualizarResumen();
 }
 
 function removePlanEquipo(tipo,i){
-  readPlanForm();
+  if(!planActivo)return;
   const arr=tipo==='bat'?planActivo.equiposBat:planActivo.equiposRam;
   arr.splice(i,1);
   renderPlanEquipos(tipo);actualizarResumen();
@@ -1259,29 +1359,29 @@ function renderPlanEquipos(tipo){
   const arr=tipo==='bat'?(planActivo.equiposBat||[]):(planActivo.equiposRam||[]);
   const cont=document.getElementById('plan-equipos-'+tipo);
   if(!cont)return;
-  if(!arr.length){cont.innerHTML='<div class="empty" style="padding:1rem">Sin equipos — agrega uno</div>';return;}
+  if(!arr.length){cont.innerHTML='<div style="text-align:center;padding:1rem;color:#9CA3AF;font-size:13px">Sin equipos agregados</div>';return;}
   cont.innerHTML='';
-  arr.forEach((eq,i)=>{
-    const div=document.createElement('div');
-    div.className='eq-block';
-    div.innerHTML=
-      '<div class="eq-block-header">'+
-        '<span style="font-size:11px;font-weight:700;color:#003DA5">Equipo '+(i+1)+'</span>'+
-        '<button class="btn-danger" onclick="readPlanForm();removePlanEquipo(\''+tipo+'\','+i+')">✕ Quitar</button>'+
-      '</div>'+
-      '<div id="resumen-pe-'+tipo+'-'+i+'" style="display:'+(eq.conductor||eq.tracto||eq.semi?'flex':'none')+';flex-wrap:wrap;gap:6px;margin-bottom:10px;align-items:center">'+
-        (eq.conductor?'<span style="background:#003DA5;color:#fff;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600">👤 '+eq.conductor+'</span>':'')+
-        (eq.tracto?'<span style="background:#F3F4F6;color:#374151;padding:3px 10px;border-radius:20px;font-size:11px">🚛 '+eq.tracto+'</span>':'')+
-        (eq.semi?'<span style="background:#EEF2FF;color:#4338CA;padding:3px 10px;border-radius:20px;font-size:11px">🔗 '+eq.semi+'</span>':'')+
-      '</div>'+
-      '<div style="margin-bottom:6px"><div class="eq-label">👤 Conductor</div>'+
-        selConductor('bat','pe-'+tipo+'-cond-'+i,eq.conductor)+'</div>'+
-      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+
-        '<div><div class="eq-label">🚛 Tracto</div>'+selTracto('pe-'+tipo+'-tr-'+i,eq.tracto)+'</div>'+
-        '<div><div class="eq-label">🔗 Semi</div>'+selSemi(tipo==='bat'?'bateas':'ramplas','pe-'+tipo+'-sm-'+i,eq.semi)+'</div>'+
-      '</div>';
-    cont.appendChild(div);
-  });
+  // Tabla compacta
+  const tabla=document.createElement('div');
+  tabla.style.cssText='border:1px solid #E5E7EB;border-radius:10px;overflow:hidden;margin-bottom:8px';
+  const header='<div style="display:grid;grid-template-columns:auto 1fr auto auto auto;gap:0;background:#F9FAFB;border-bottom:1px solid #E5E7EB;padding:6px 12px">'+
+    '<span style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;width:28px">#</span>'+
+    '<span style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase">Conductor</span>'+
+    '<span style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;min-width:72px;text-align:center">Tracto</span>'+
+    '<span style="font-size:10px;font-weight:700;color:#4338CA;text-transform:uppercase;min-width:72px;text-align:center">Semi</span>'+
+    '<span style="width:32px"></span>'+
+  '</div>';
+  const filas=arr.map((eq,i)=>
+    '<div style="display:grid;grid-template-columns:auto 1fr auto auto auto;gap:0;align-items:center;padding:8px 12px;border-bottom:1px solid #F3F4F6;'+(i%2===0?'':'background:#FAFAFA')+'" >'+
+      '<span style="font-size:12px;font-weight:700;color:#003DA5;width:28px">'+(i+1)+'</span>'+
+      '<span style="font-size:12px;font-weight:600;color:#111">'+(eq.conductor||'—')+'</span>'+
+      '<span style="font-size:11px;color:#374151;min-width:72px;text-align:center;background:#F3F4F6;padding:2px 8px;border-radius:5px;margin:0 4px">'+(eq.tracto||'—')+'</span>'+
+      '<span style="font-size:11px;color:#4338CA;min-width:72px;text-align:center;background:#EEF2FF;padding:2px 8px;border-radius:5px;margin:0 4px">'+(eq.semi||'—')+'</span>'+
+      '<button onclick="removePlanEquipo(\''+tipo+'\','+i+')" style="background:transparent;border:none;color:#EF4444;cursor:pointer;font-size:16px;padding:0 4px;width:28px">✕</button>'+
+    '</div>'
+  ).join('');
+  tabla.innerHTML=header+filas;
+  cont.appendChild(tabla);
 }
 
 function genTarjetaConductores(){
