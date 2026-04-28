@@ -521,6 +521,9 @@ let condicion='normal';
 let gruposFaena=[],gruposPos=[];
 let gfId=0,gpId=0;
 let planes=[],planActivo=null;
+let equiposDisponibles=[];
+let equiposSeleccionados=[];
+const APPS_URL='https://script.google.com/macros/s/AKfycbxyQGoXaePo7FakfUf1PWkybt-SWpLzcHCnN-AGiLDAzDQA_edK3-Z-Nu4dsDULF1oU/exec';
 
 // ── RELOJ ────────────────────────────────────────────
 function getNow(){const n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
@@ -775,8 +778,6 @@ function getVal(id){const el=document.getElementById(id);return el?el.value:'';}
 
 
 // ── ARMADOR DE CONVOYS ────────────────────────────────
-let equiposDisponibles=[]; // equipos planificados aún no asignados a convoy
-let equiposSeleccionados=[]; // equipos seleccionados para el convoy actual
 
 function setTipoFaena(tipo){
   document.getElementById('f-tipo').value=tipo;
@@ -1395,7 +1396,6 @@ function genPosicion(){
 
 
 // ── GOOGLE SHEETS ─────────────────────────────────────
-const APPS_URL='https://script.google.com/macros/s/AKfycbxyQGoXaePo7FakfUf1PWkybt-SWpLzcHCnN-AGiLDAzDQA_edK3-Z-Nu4dsDULF1oU/exec';
 
 async function guardarEnSheets(plan){
   try{
