@@ -273,6 +273,13 @@ input.time-ok{border-color:var(--green)!important;background:#F0FDF4!important}
 
 <!-- ════ TAB MATUTINO ════ -->
 <div id="tab-matutino">
+  <div class="card" style="background:#EFF6FF;border-color:#BFDBFE;padding:10px 14px">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <span style="font-size:13px;color:#1E40AF;font-weight:500">¿Tienes planificación activa?</span>
+      <button class="btn-import" style="padding:6px 14px;font-size:12px" onclick="cargarTotalesDesdePlan()">↓ Cargar totales</button>
+    </div>
+    <div style="font-size:11px;color:#3B82F6;margin-top:4px">Importa los totales de bateas y ramplas desde la planificación del día</div>
+  </div>
   <div class="card">
     <div class="card-title">Bateas — Puerto Totoralillo</div>
     <div class="field-row"><span class="lbl">Total asignados</span><div class="eq-counter"><button onclick="adjM('mb-total',-1)">−</button><span class="eq-num" id="mb-total">15</span><button onclick="adjM('mb-total',1)">+</button></div></div>
@@ -517,6 +524,31 @@ function setCond(c,btn){
 // ── TOTALIZADORES ─────────────────────────────────────
 function adj(id,d){const el=document.getElementById(id);el.textContent=Math.max(0,parseInt(el.textContent)+d);}
 function adjM(id,d){adj(id,d);updateTot();}
+
+function cargarTotalesDesdePlan(){
+  if(!planActivo){alert('No hay planificación activa. Ve a Planificación y carga una primero.');return;}
+  const tBat=(planActivo.equiposBat||[]).length;
+  const tRam=(planActivo.equiposRam||[]).length;
+  if(!tBat&&!tRam){alert('La planificación no tiene equipos.');return;}
+  document.getElementById('mb-total').textContent=tBat;
+  document.getElementById('mb-base').textContent=0;
+  document.getElementById('mb-rutaf').textContent=0;
+  document.getElementById('mb-faena').textContent=tBat;
+  document.getElementById('mr-total').textContent=tRam;
+  document.getElementById('mr-carga').textContent=0;
+  document.getElementById('mr-desc').textContent=0;
+  document.getElementById('mr-rutaf').textContent=0;
+  document.getElementById('mr-faena').textContent=tRam;
+  document.getElementById('mr-rutab').textContent=0;
+  updateTot();
+  document.getElementById('f-total').value=tBat;
+  // Mostrar confirmación
+  const aviso=document.createElement('div');
+  aviso.style.cssText='position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#003DA5;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,.2)';
+  aviso.textContent='✓ Cargado: '+tBat+' bateas · '+tRam+' ramplas';
+  document.body.appendChild(aviso);
+  setTimeout(()=>aviso.remove(),3000);
+}
 function updateTot(){
   function check(total,suma,elId,txtId){
     const el=document.getElementById(elId),txt=document.getElementById(txtId);
