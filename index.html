@@ -1326,85 +1326,125 @@ function genPosicion(){
   const hora=getNow();
   const tipo=document.getElementById('p-tipo').value;
   const tipoLabel=tipo==='bateas'?'BATEAS':'RAMPLAS';
-  let gruposHTML='';
+  const segs=tipo==='ramplas'?segsRam:segsBat;
+  const tramosLabels=['KM1','T.LAU','LOROS','PABE','NANT','AC.R5','BYPAS','PEAJE','CALD','TOTO'];
+  const tramosLabelsFull=segs.map(s=>s.d);
+
+  // Construir filas por grupo
+  let filasHTML='';
+  let totalDesc=0;
 
   gruposPos.forEach(g=>{
     const eqV=(g.equipos||[]).filter(eq=>eq.conductor||eq.tracto);
-    const conductores=eqV.map(eq=>eq.conductor).filter(Boolean);
-    const patentes=eqV.map(eq=>eq.tracto||eq.semi||'').filter(Boolean);
-    const nombreGrupo=conductores.length?conductores.join(' / '):'Grupo '+g.num;
-
-    // Análisis de tiempo
     const analisis=g.salida&&g.tramo?analizarTiempo(g.salida,g.tramo,tipo):null;
 
-    const pannesCardHTML=(g.pannes||[]).map(pn=>
-      '<div style="background:#FEF3E2;border-left:3px solid #F59E0B;padding:5px 10px;margin-top:6px;border-radius:0 6px 6px 0;font-size:11px">'+
-        '<span style="font-weight:700;color:#92550A">🔧 Panne: </span>'+
-        '<span style="color:#78350F">'+(pn.conductor||pn.tracto||'S/D')+(pn.tracto?' · '+pn.tracto:'')+'</span>'+
-        (pn.escolta?'<br><span style="color:#92550A">🚐 Escolta: </span><span style="color:#78350F">'+pn.escolta+'</span>':'')+
-        (pn.condEscolta?' <span style="color:#92550A">· Cond: </span><span style="color:#78350F">'+pn.condEscolta+'</span>':'')+
-      '</div>'
-    ).join('');
+    // Determinar índice del tramo actual
+    const tramoOrigen=g.tramo?g.tramo.split('→')[0].trim().toUpperCase():'';
+    let idxActual=-1;
+    segs.forEach((s,i)=>{if(s.o.toUpperCase()===tramoOrigen)idxActual=i;});
+    const enDescarga=g.tramo&&g.tramo.toUpperCase().includes('DESCARG');
+    if(enDescarga)totalDesc+=eqV.length;
 
-    // Badge estado para el header
-    let headerBadge='';
+    // Semáforo
+    let semColor='#6B7280',semIcon='⚪',semTxt='Sin datos';
     if(analisis){
-      const{diffMin}=analisis;
-      const badgeBg=diffMin<=-1?'rgba(22,163,74,.25)':diffMin<=15?'rgba(234,179,8,.25)':'rgba(220,38,38,.25)';
-      const badgeTxt=diffMin<=-1?'Adelantado':diffMin<=15&&diffMin>=0?'En tiempo':'Con demora';
-      headerBadge='<div style="background:'+badgeBg+';border-radius:12px;padding:2px 10px;font-size:10px;color:#fff;font-weight:700">'+badgeTxt+'</div>';
-    } else if(g.tramo){
-      headerBadge='<div style="background:rgba(255,255,255,.15);border-radius:12px;padding:2px 8px;font-size:10px;color:#fff;font-weight:600">En ruta</div>';
+      const d=analisis.diffMin;
+      if(d<=-1){semColor='#16A34A';semIcon='🟢';semTxt='En tiempo';}
+      else if(d<=15){semColor='#D97706';semIcon='🟡';semTxt='+'+d+' min';}
+      else{semColor='#DC2626';semIcon='🔴';semTxt='+'+d+' min demora';}
     }
 
-    gruposHTML+=
-      '<div class="pos-grupo">'+
-        '<div class="pos-grupo-header">'+
-          '<span class="pos-grupo-num">'+g.num+'</span>'+
-          '<div style="flex:1">'+
-            '<div class="pos-grupo-nombre">'+nombreGrupo+'</div>'+
-            '<div style="font-size:10px;color:rgba(255,255,255,.65);margin-top:1px">'+
-              patentes.join(' · ')+(g.salida?' · Salida '+g.salida+' hrs':'')+
-            '</div>'+
-          '</div>'+
-          headerBadge+
-        '</div>'+
-        '<div class="pos-grupo-body">'+
-          (g.tramo?
-            '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
-              '<span style="font-size:12px;color:#6B7280">📍 Tramo:</span>'+
-              '<div class="pos-ubicacion-badge">'+g.tramo+'</div>'+
-            '</div>'
-            :'<div style="color:#9CA3AF;font-size:12px">Sin tramo registrado</div>')+
-          (analisis?semaforoHTML(analisis):
-            (!g.salida&&g.tramo?'<div style="margin-top:8px;font-size:11px;color:#9CA3AF">⚠ Sin hora de salida — agrega la hora KM1 en Salida de faena para calcular tiempos</div>':''))+
-          pannesCardHTML+
-          (g.obs?'<div style="margin-top:6px;font-size:12px;color:#6B7280">📝 '+g.obs+'</div>':'')+
-        '</div>'+
-      '</div>';
+    // Header del grupo
+    filasHTML+=
+      '<tr style="background:#003DA5">'+
+        '<td colspan="2" style="padding:6px 10px;color:#fff;font-size:11px;font-weight:700;text-align:left">'+
+          'GRUPO '+g.num+(g.salida?' · Salida KM1: '+g.salida+' hrs':'')+
+        '</td>'+
+        segs.map((_,i)=>'<td style="background:#002D7A;border:1px solid #001F5C"></td>').join('')+
+        '<td style="background:#002D7A;border:1px solid #001F5C;color:'+semColor+';font-size:12px;font-weight:700;text-align:center">'+semIcon+'</td>'+
+        '<td style="background:#002D7A;border:1px solid #001F5C;color:#fff;font-size:10px;text-align:center">'+semTxt+'</td>'+
+        (analisis?'<td style="background:#002D7A;color:#93C5FD;font-size:10px;text-align:center">~'+analisis.etaFin+'</td>':'<td style="background:#002D7A"></td>')+
+      '</tr>';
+
+    // Filas por equipo
+    eqV.forEach((eq,ei)=>{
+      const celdas=segs.map((_,i)=>{
+        if(enDescarga&&i===segs.length-1)
+          return'<td style="background:#16A34A;border:1px solid #E5E7EB;text-align:center;color:#fff;font-size:14px">✓</td>';
+        if(i<idxActual)
+          return'<td style="background:#DCFCE7;border:1px solid #E5E7EB;text-align:center;color:#16A34A;font-size:12px">✓</td>';
+        if(i===idxActual)
+          return'<td style="background:#003DA5;border:1px solid #E5E7EB;text-align:center;color:#fff;font-size:11px;font-weight:700">●</td>';
+        return'<td style="border:1px solid #E5E7EB;background:#F9FAFB"></td>';
+      }).join('');
+      filasHTML+=
+        '<tr style="border-bottom:1px solid #F3F4F6">'+
+          '<td style="padding:7px 10px;font-size:12px;font-weight:600;color:#111;border:1px solid #E5E7EB;white-space:nowrap">'+(eq.conductor||'—')+'</td>'+
+          '<td style="padding:7px 8px;font-size:11px;color:#374151;border:1px solid #E5E7EB;white-space:nowrap">'+
+            '<span style="background:#F3F4F6;padding:1px 6px;border-radius:4px">'+(eq.tracto||'—')+'</span> '+
+            '<span style="background:#EEF2FF;padding:1px 6px;border-radius:4px;color:#4338CA">'+(eq.semi||'—')+'</span>'+
+          '</td>'+
+          celdas+
+          (ei===0?'<td rowspan="'+eqV.length+'" style="text-align:center;font-size:16px;vertical-align:middle;border:1px solid #E5E7EB">'+semIcon+'</td>':'')+ 
+          (ei===0?'<td rowspan="'+eqV.length+'" style="text-align:center;font-size:10px;font-weight:600;color:'+semColor+';vertical-align:middle;border:1px solid #E5E7EB">'+semTxt+'</td>':'')+ 
+          (ei===0&&analisis?'<td rowspan="'+eqV.length+'" style="text-align:center;font-size:10px;color:#003DA5;vertical-align:middle;border:1px solid #E5E7EB">~'+analisis.etaFin+' hrs</td>':'')+ 
+          (ei===0&&!analisis?'<td rowspan="'+eqV.length+'" style="border:1px solid #E5E7EB"></td>':'')+
+        '</tr>';
+    });
+
+    // Panne
+    (g.pannes||[]).forEach(pn=>{
+      filasHTML+=
+        '<tr style="background:#FEF3E2">'+
+          '<td style="padding:5px 10px;font-size:11px;color:#92550A;font-weight:600;border:1px solid #FCD34D">🔧 '+(pn.conductor||pn.tracto||'Panne')+'</td>'+
+          '<td style="padding:5px 8px;font-size:11px;color:#78350F;border:1px solid #FCD34D">'+(pn.escolta?'🚐 '+pn.escolta:'Esperando escolta')+'</td>'+
+          '<td colspan="'+(segs.length+3)+'" style="padding:5px 8px;font-size:11px;color:#92550A;border:1px solid #FCD34D">'+(pn.motivo||'')+'</td>'+
+        '</tr>';
+    });
   });
+
+  // Encabezados de tramos abreviados
+  const thTramos=segs.map((s,i)=>
+    '<th style="background:#002D7A;color:#fff;font-size:8px;font-weight:700;padding:4px 2px;text-align:center;border:1px solid #001F5C;white-space:nowrap;writing-mode:vertical-lr;transform:rotate(180deg);height:60px">'+
+      (s.o+' →<br>'+s.d)+
+    '</th>'
+  ).join('');
+
+  const tabla=
+    '<table style="width:100%;border-collapse:collapse;font-family:Inter,sans-serif;font-size:11px">'+
+      '<thead><tr>'+
+        '<th style="background:#1F2937;color:#fff;padding:6px 10px;text-align:left;font-size:10px;border:1px solid #374151;white-space:nowrap">CONDUCTOR</th>'+
+        '<th style="background:#1F2937;color:#fff;padding:6px 8px;text-align:left;font-size:10px;border:1px solid #374151;white-space:nowrap">TRACTO · SEMI</th>'+
+        thTramos+
+        '<th style="background:#1F2937;color:#fff;padding:4px;text-align:center;font-size:9px;border:1px solid #374151">EST.</th>'+
+        '<th style="background:#1F2937;color:#fff;padding:4px;text-align:center;font-size:9px;border:1px solid #374151">TIEMPO</th>'+
+        '<th style="background:#1F2937;color:#fff;padding:4px;text-align:center;font-size:9px;border:1px solid #374151">ETA</th>'+
+      '</tr></thead>'+
+      '<tbody>'+filasHTML+'</tbody>'+
+    '</table>';
 
   const tarjetaPos=document.getElementById('tarjeta-posicion');
   const outPos=document.getElementById('out-posicion');
   outPos.classList.remove('hidden');
   tarjetaPos.innerHTML=
-    '<div class="pos-card-header">'+
-      '<div style="font-family:Barlow Condensed,sans-serif;font-size:20px;font-weight:700;color:#fff;border:2px solid rgba(255,255,255,.4);padding:2px 10px;border-radius:5px">INCOM</div>'+
-      '<div style="flex:1;margin-left:8px">'+
-        '<div style="font-size:15px;font-weight:700;color:#fff">Posición en Ruta</div>'+
-        '<div style="font-size:12px;color:rgba(255,255,255,.75);margin-top:2px">'+
-          '<span style="background:rgba(255,255,255,.15);padding:1px 8px;border-radius:10px;margin-right:6px">'+tipoLabel+'</span>'+getHoy()+
+    '<div style="background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12)">'+
+      '<div class="pos-card-header">'+
+        '<div style="font-family:Barlow Condensed,sans-serif;font-size:20px;font-weight:700;color:#fff;border:2px solid rgba(255,255,255,.4);padding:2px 10px;border-radius:5px">INCOM</div>'+
+        '<div style="flex:1;margin-left:8px">'+
+          '<div style="font-size:15px;font-weight:700;color:#fff">Posición en Ruta — '+tipoLabel+'</div>'+
+          '<div style="font-size:12px;color:rgba(255,255,255,.75);margin-top:2px">'+getHoy()+'</div>'+
+        '</div>'+
+        '<div style="text-align:right">'+
+          '<div style="font-family:Barlow Condensed,sans-serif;font-size:28px;font-weight:700;color:#fff">'+hora+'</div>'+
+          '<div style="font-size:10px;color:rgba(255,255,255,.65)">hrs</div>'+
         '</div>'+
       '</div>'+
-      '<div style="text-align:right">'+
-        '<div style="font-family:Barlow Condensed,sans-serif;font-size:28px;font-weight:700;color:#fff">'+hora+'</div>'+
-        '<div style="font-size:10px;color:rgba(255,255,255,.65)">hrs</div>'+
+      '<div style="overflow-x:auto">'+tabla+'</div>'+
+      '<div style="padding:10px 16px;display:flex;align-items:center;justify-content:space-between;background:#F9FAFB">'+
+        '<span style="font-size:11px;color:#6B7280">Sup: '+getSup()+'</span>'+
+        '<span style="font-size:11px;color:#6B7280">✓ pasado &nbsp; ● actual &nbsp; 🟢 en tiempo &nbsp; 🟡 leve &nbsp; 🔴 demora</span>'+
+        '<span style="font-size:11px;color:#9CA3AF">INCOM Control de Tráfico</span>'+
       '</div>'+
-    '</div>'+
-    gruposHTML+
-    '<div style="padding:10px 18px 16px;display:flex;align-items:center;justify-content:space-between">'+
-      '<span style="font-size:11px;color:#9CA3AF">Sup: '+getSup()+'</span>'+
-      '<span style="font-size:11px;color:#9CA3AF">INCOM Control de Tráfico</span>'+
     '</div>';
   outPos.scrollIntoView({behavior:'smooth',block:'start'});
 }
