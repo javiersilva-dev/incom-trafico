@@ -223,7 +223,10 @@ input.time-ok{border-color:var(--green)!important;background:#F0FDF4!important}
             <input type="hidden" id="sel-bat-sm">
           </div>
         </div>
-        <button class="btn-primary" onclick="confirmarEquipo('bat')">+ Agregar a lista</button>
+        <div style="display:flex;gap:8px;margin-bottom:4px">
+          <button class="btn-primary" style="flex:1" onclick="confirmarEquipo('bat')">+ Agregar a lista</button>
+          <button style="padding:7px 12px;border-radius:8px;border:1.5px solid #DC2626;background:#fff;color:#DC2626;font-family:Inter,sans-serif;font-size:12px;font-weight:600;cursor:pointer" onclick="marcarFueraServicio('bat')">🔴 Fuera de servicio</button>
+        </div>
       </div>
 
       <!-- LISTA ACUMULADA BATEAS -->
@@ -261,7 +264,10 @@ input.time-ok{border-color:var(--green)!important;background:#F0FDF4!important}
             <input type="hidden" id="sel-ram-sm">
           </div>
         </div>
-        <button class="btn-primary" style="background:#1D4ED8" onclick="confirmarEquipo('ram')">+ Agregar a lista</button>
+        <div style="display:flex;gap:8px;margin-bottom:4px">
+          <button class="btn-primary" style="flex:1;background:#1D4ED8" onclick="confirmarEquipo('ram')">+ Agregar a lista</button>
+          <button style="padding:7px 12px;border-radius:8px;border:1.5px solid #DC2626;background:#fff;color:#DC2626;font-family:Inter,sans-serif;font-size:12px;font-weight:600;cursor:pointer" onclick="marcarFueraServicio('ram')">🔴 Fuera de servicio</button>
+        </div>
       </div>
 
       <!-- LISTA ACUMULADA RAMPLAS -->
@@ -1624,6 +1630,40 @@ function readPlanForm(){
   // NO tocar equiposBat ni equiposRam — se manejan con confirmarEquipo/removePlanEquipo
 }
 
+const MOTIVOS_FS=['Mantención','Reparación','Certificación','Otro'];
+
+function marcarFueraServicio(tipo){
+  const tracto=getVal('sel-'+tipo+'-tr');
+  const semi=getVal('sel-'+tipo+'-sm');
+  if(!tracto&&!semi){alert('Selecciona al menos el tracto o semi a marcar fuera de servicio');return;}
+  // Pedir motivo
+  const motivo=prompt('Motivo fuera de servicio:\n1. Mantención\n2. Reparación\n3. Certificación\n4. Otro\n\nEscribe el número o el motivo:');
+  if(!motivo)return;
+  const motivoTexto=motivo==='1'?'Mantención':motivo==='2'?'Reparación':motivo==='3'?'Certificación':motivo==='4'?'Otro':motivo;
+  if(!planActivo)return;
+  const arr=tipo==='bat'?planActivo.equiposBat:planActivo.equiposRam;
+  if(tracto){
+    arr.push({conductor:'',tracto,semi:'',fueraServicio:true,motivoFS:'Tracto · '+motivoTexto});
+  }
+  if(semi&&semi!==tracto){
+    arr.push({conductor:'',tracto:'',semi,fueraServicio:true,motivoFS:'Semi · '+motivoTexto});
+  }
+  // Limpiar selección
+  ['cond','tr','sm'].forEach(campo=>{
+    const inp=document.getElementById('sel-'+tipo+'-'+campo);
+    if(inp)inp.value='';
+    const grp=document.getElementById('grp-sel-'+tipo+'-'+campo);
+    if(grp)grp.querySelectorAll('button').forEach(b=>{
+      b.style.background='#fff';b.style.color='#374151';
+      b.style.borderColor='#D1D5DB';b.style.fontWeight='400';
+    });
+  });
+  const prev=document.getElementById('sel-'+tipo+'-preview');
+  if(prev)prev.style.display='none';
+  ocultarUsados('bat');ocultarUsados('ram');
+  renderPlanEquipos(tipo);actualizarResumen();
+}
+
 function initSelectorPlan(){
   ['bat','ram'].forEach(tipo=>{
     // Conductor — lista completa
@@ -1691,9 +1731,12 @@ function ocultarUsados(tipo){
   if(!planActivo)return;
   const arrBat=planActivo.equiposBat||[];
   const arrRam=planActivo.equiposRam||[];
-
-  // Conductores — se ocultan GLOBALMENTE en ambos selectores
   const todosCondUsados=[...arrBat,...arrRam].map(e=>e.conductor).filter(Boolean);
+  const tractosUsados=[...arrBat,...arrRam].map(e=>e.tracto).filter(Boolean);
+  const sUsadosBat=arrBat.map(e=>e.semi).filter(Boolean);
+  const sUsadosRam=arrRam.map(e=>e.semi).filter(Boolean);
+
+  // Conductores — ocultar globalmente
   ['bat','ram'].forEach(t=>{
     const grp=document.getElementById('grp-sel-'+t+'-cond');
     if(grp)grp.querySelectorAll('button').forEach(b=>{
@@ -1702,7 +1745,6 @@ function ocultarUsados(tipo){
   });
 
   // Tractos — compartidos, ocultar en AMBOS
-  const tractosUsados=[...arrBat,...arrRam].map(e=>e.tracto).filter(Boolean);
   ['bat','ram'].forEach(t=>{
     const grp=document.getElementById('grp-sel-'+t+'-tr');
     if(grp)grp.querySelectorAll('button').forEach(b=>{
@@ -1711,8 +1753,6 @@ function ocultarUsados(tipo){
   });
 
   // Semis — independientes por tipo
-  const sUsadosBat=arrBat.map(e=>e.semi).filter(Boolean);
-  const sUsadosRam=arrRam.map(e=>e.semi).filter(Boolean);
   ['bat','ram'].forEach(t=>{
     const usados=t==='bat'?sUsadosBat:sUsadosRam;
     const grp=document.getElementById('grp-sel-'+t+'-sm');
@@ -1783,6 +1823,15 @@ function renderPlanEquipos(tipo){
   const header='<div style="display:grid;grid-template-columns:'+gridCols+';gap:0;background:#F9FAFB;border-bottom:1px solid #E5E7EB;padding:6px 12px">'+colsHeader+'</div>';
 
   const filas=arr.map((eq,i)=>{
+    const fs=eq.fueraServicio;
+    if(fs){
+      return'<div style="display:grid;grid-template-columns:auto 1fr auto auto;gap:0;align-items:center;padding:8px 12px;border-bottom:1px solid #FECACA;background:#FEE2E2">'+
+        '<span style="font-size:12px;font-weight:700;color:#DC2626;width:28px">'+(i+1)+'</span>'+
+        '<span style="font-size:12px;font-weight:600;color:#DC2626">🔴 FUERA DE SERVICIO — '+(eq.tracto||eq.semi||'—')+'</span>'+
+        '<span style="font-size:11px;color:#991B1B;background:#FECACA;padding:2px 8px;border-radius:5px;margin:0 4px">'+eq.motivoFS+'</span>'+
+        '<button onclick="removePlanEquipo(\''+tipo+'\','+i+')" style="background:transparent;border:none;color:#EF4444;cursor:pointer;font-size:16px;padding:0 4px;width:28px">✕</button>'+
+      '</div>';
+    }
     const estadoBtns=tipo==='ram'?
       '<div style="display:flex;flex-wrap:wrap;gap:3px;padding:0 4px">'+
         ESTADOS_RAM.map(est=>
@@ -1824,14 +1873,23 @@ function genTarjetaConductores(){
 
   function filasBat(){
     if(!bat.length)return'';
-    return'<tr style="background:#003DA5"><td colspan="3" style="padding:7px 12px;color:#fff;font-size:11px;font-weight:700">🟢 BATEAS — Puerto Totoralillo ('+bat.length+' equipos)</td></tr>'+
-      bat.map((eq,i)=>
+    const normales=bat.filter(eq=>!eq.fueraServicio);
+    const fuera=bat.filter(eq=>eq.fueraServicio);
+    return'<tr style="background:#003DA5"><td colspan="3" style="padding:7px 12px;color:#fff;font-size:11px;font-weight:700">🟢 BATEAS — Puerto Totoralillo ('+normales.length+' equipos activos)</td></tr>'+
+      normales.map((eq,i)=>
         '<tr style="border-bottom:1px solid #F3F4F6">'+
           '<td style="padding:8px 12px;font-size:13px;font-weight:600;color:#111">'+(eq.conductor||'—')+'</td>'+
           '<td style="padding:8px 10px;font-size:12px;color:#374151;text-align:center">'+(eq.tracto||'—')+'</td>'+
           '<td style="padding:8px 10px;font-size:12px;color:#4338CA;text-align:center">'+(eq.semi||'—')+'</td>'+
         '</tr>'
-      ).join('');
+      ).join('')+
+      (fuera.length?'<tr style="background:#DC2626"><td colspan="3" style="padding:6px 12px;color:#fff;font-size:10px;font-weight:700">🔴 FUERA DE SERVICIO ('+fuera.length+')</td></tr>'+
+        fuera.map(eq=>
+          '<tr style="background:#FEE2E2;border-bottom:1px solid #FECACA">'+
+            '<td style="padding:7px 12px;font-size:12px;font-weight:600;color:#DC2626">'+(eq.tracto||eq.semi||'—')+'</td>'+
+            '<td colspan="2" style="padding:7px 10px;font-size:11px;color:#991B1B">'+(eq.motivoFS||'Sin motivo')+'</td>'+
+          '</tr>'
+        ).join(''):'');
   }
   function filasRam(){
     if(!ram.length)return'';
