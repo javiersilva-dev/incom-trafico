@@ -684,15 +684,15 @@ function updateTot(){
 
 // ── SELECTORES RÁPIDOS (botones) ──────────────────────
 function btnGroup(lista,id,val,onsel,small){
-  const s=small?'font-size:10px;padding:4px 7px;text-align:center':'font-size:12px;padding:7px 8px;text-align:left';
-  const cols=small?'repeat(6,1fr)':'repeat(4,1fr)';
+  const s=small?'font-size:11px;padding:5px 4px;text-align:center':'font-size:12px;padding:7px 8px;text-align:left';
+  const cols=small?'repeat(4,1fr)':'repeat(4,1fr)';
   const btns=lista.map(v=>{
     const sel=v===val;
     return'<button onclick="'+onsel+'(\''+id+'\',\''+v.replace(/'/g,"\\'")+'\')" '+
       'style="'+s+';border-radius:6px;border:1.5px solid '+(sel?'#003DA5':'#D1D5DB')+';'+
       'background:'+(sel?'#003DA5':'#fff')+';color:'+(sel?'#fff':'#374151')+';'+
       'cursor:pointer;font-family:Inter,sans-serif;font-weight:'+(sel?'600':'400')+';'+
-      'white-space:nowrap;overflow:hidden;text-overflow:ellipsis" '+
+      'white-space:nowrap;width:100%" '+
       'id="btn-'+id+'-'+v.replace(/[^a-zA-Z0-9]/g,'_')+'">'+v+'</button>';
   }).join('');
   return'<div style="display:grid;grid-template-columns:'+cols+';gap:4px;margin-top:4px" id="grp-'+id+'">'+btns+'</div>'+
