@@ -1366,7 +1366,23 @@ function genPosicion(){
 // ── PLANIFICACIÓN ─────────────────────────────────────
 // Estructura: {id, nombre, fecha, equiposBat:[{conductor,tracto,semi}], equiposRam:[...]}
 
-function initPlan(){planes=[];planActivo=null;renderPlanSel();}
+function initPlan(){
+  try{
+    const saved=localStorage.getItem('incom_planes');
+    const savedActivo=localStorage.getItem('incom_plan_activo');
+    if(saved){
+      planes=JSON.parse(saved);
+      if(savedActivo&&planes.length){
+        planActivo=planes.find(p=>p.id===savedActivo)||planes[0]||null;
+      }
+    } else {planes=[];planActivo=null;}
+  }catch(e){planes=[];planActivo=null;}
+  renderPlanSel();
+  if(planActivo){
+    document.getElementById('plan-sel').value=planActivo.id;
+    cargarPlan();
+  }
+}
 
 function renderPlanSel(){
   const sel=document.getElementById('plan-sel');
@@ -1406,6 +1422,7 @@ function nuevaPlan(){
     const fd=String(m.getDate()).padStart(2,'0')+'-'+String(m.getMonth()+1).padStart(2,'0')+'-'+m.getFullYear();
     planActivo={id:'plan_'+Date.now(),nombre:fd,fecha:fs,equiposBat:[],equiposRam:[]};
     planes.push(planActivo);
+    try{sessionStorage.setItem('incom_planes',JSON.stringify(planes));sessionStorage.setItem('incom_plan_activo',planActivo.id);}catch(e){}
     renderPlanSel();
     document.getElementById('plan-sel').value=planActivo.id;
     document.getElementById('plan-nombre').value=planActivo.nombre;
@@ -1448,8 +1465,14 @@ function eliminarPlan(){
 }
 
 function guardarPlan(){
-  readPlanForm();renderPlanSel();actualizarResumen();
-  mostrarAviso('✓ Guardado. Usa ⬇ Exportar para guardar el archivo.');
+  readPlanForm();
+  // Guardar en sessionStorage
+  try{
+    localStorage.setItem('incom_planes',JSON.stringify(planes));
+    if(planActivo)localStorage.setItem('incom_plan_activo',planActivo.id);
+  }catch(e){}
+  renderPlanSel();actualizarResumen();
+  mostrarAviso('✓ Guardado. Usa ⬇ Exportar para guardar el archivo permanentemente.');
 }
 
 function exportarPlan(){
@@ -1471,6 +1494,7 @@ function importarPlanArchivo(event){
       const datos=JSON.parse(e.target.result);
       if(!Array.isArray(datos))throw new Error('Formato inválido');
       datos.forEach(p=>{if(!planes.find(x=>x.id===p.id))planes.push(p);});
+      try{sessionStorage.setItem('incom_planes',JSON.stringify(planes));}catch(e){}
       renderPlanSel();
       if(datos.length>0){planActivo=datos[0];document.getElementById('plan-sel').value=planActivo.id;cargarPlan();}
       mostrarAviso('✓ '+datos.length+' planificación(es) importada(s)');
