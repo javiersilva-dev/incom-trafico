@@ -541,8 +541,6 @@ function tickReloj(){
   document.getElementById('reloj-topbar').textContent=t;
   const pd=document.getElementById('pos-hora-display');if(pd)pd.textContent=t;
 }
-tickReloj();setInterval(tickReloj,10000);
-
 // ── INIT ─────────────────────────────────────────────
 (function(){
   const n=new Date();
@@ -550,6 +548,8 @@ tickReloj();setInterval(tickReloj,10000);
   renderSegs();renderGruposFaena();renderGruposPos();
   setTimeout(updateTot,50);
   initPlan();
+  tickReloj();
+  setInterval(tickReloj,10000);
 })();
 
 // ── UTILS ────────────────────────────────────────────
