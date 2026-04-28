@@ -541,8 +541,7 @@ function tickReloj(){
   document.getElementById('reloj-topbar').textContent=t;
   const pd=document.getElementById('pos-hora-display');if(pd)pd.textContent=t;
 }
-// ── INIT ─────────────────────────────────────────────
-(function(){
+document.addEventListener('DOMContentLoaded',function(){
   const n=new Date();
   document.getElementById('f-fecha').value=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');
   renderSegs();renderGruposFaena();renderGruposPos();
@@ -550,7 +549,7 @@ function tickReloj(){
   initPlan();
   tickReloj();
   setInterval(tickReloj,10000);
-})();
+});
 
 // ── UTILS ────────────────────────────────────────────
 function getFecha(){
