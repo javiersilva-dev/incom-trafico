@@ -1276,14 +1276,7 @@ function readPlanForm(){
   if(!planActivo)return;
   planActivo.nombre=document.getElementById('plan-nombre').value||planActivo.nombre;
   planActivo.fecha=document.getElementById('plan-fecha').value||planActivo.fecha;
-  ['bat','ram'].forEach(tipo=>{
-    const arr=tipo==='bat'?planActivo.equiposBat:planActivo.equiposRam;
-    (arr||[]).forEach((eq,i)=>{
-      eq.conductor=getVal('pe-'+tipo+'-cond-'+i);
-      eq.tracto=getVal('pe-'+tipo+'-tr-'+i);
-      eq.semi=getVal('pe-'+tipo+'-sm-'+i);
-    });
-  });
+  // NO tocar equiposBat ni equiposRam — se manejan con confirmarEquipo/removePlanEquipo
 }
 
 function initSelectorPlan(){
@@ -1342,8 +1335,9 @@ function confirmarEquipo(tipo){
   });
   const prev=document.getElementById('sel-'+tipo+'-preview');
   if(prev)prev.style.display='none';
-  // Ocultar botones ya usados
-  ocultarUsados(tipo);
+  // Ocultar usados en AMBOS selectores
+  ocultarUsados('bat');
+  ocultarUsados('ram');
   renderPlanEquipos(tipo);
   actualizarResumen();
 }
@@ -1353,18 +1347,16 @@ function ocultarUsados(tipo){
   const arrBat=planActivo.equiposBat||[];
   const arrRam=planActivo.equiposRam||[];
 
-  // Conductores — cada tipo oculta los suyos
-  const cUsadosBat=arrBat.map(e=>e.conductor).filter(Boolean);
-  const cUsadosRam=arrRam.map(e=>e.conductor).filter(Boolean);
+  // Conductores — se ocultan GLOBALMENTE en ambos selectores
+  const todosCondUsados=[...arrBat,...arrRam].map(e=>e.conductor).filter(Boolean);
   ['bat','ram'].forEach(t=>{
-    const usados=t==='bat'?cUsadosBat:cUsadosRam;
     const grp=document.getElementById('grp-sel-'+t+'-cond');
     if(grp)grp.querySelectorAll('button').forEach(b=>{
-      b.style.display=usados.includes(b.textContent.trim())?'none':'inline-block';
+      b.style.display=todosCondUsados.includes(b.textContent.trim())?'none':'inline-block';
     });
   });
 
-  // Tractos — compartidos, ocultar en AMBOS si ya fue usado en cualquiera
+  // Tractos — compartidos, ocultar en AMBOS
   const tractosUsados=[...arrBat,...arrRam].map(e=>e.tracto).filter(Boolean);
   ['bat','ram'].forEach(t=>{
     const grp=document.getElementById('grp-sel-'+t+'-tr');
@@ -1373,7 +1365,7 @@ function ocultarUsados(tipo){
     });
   });
 
-  // Semis — cada tipo oculta los suyos independientemente
+  // Semis — independientes por tipo
   const sUsadosBat=arrBat.map(e=>e.semi).filter(Boolean);
   const sUsadosRam=arrRam.map(e=>e.semi).filter(Boolean);
   ['bat','ram'].forEach(t=>{
@@ -1391,7 +1383,8 @@ function removePlanEquipo(tipo,i){
   arr.splice(i,1);
   renderPlanEquipos(tipo);
   actualizarResumen();
-  ocultarUsados(tipo);
+  ocultarUsados('bat');
+  ocultarUsados('ram');
 }
 
 function actualizarResumen(){
