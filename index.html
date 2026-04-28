@@ -282,20 +282,46 @@ input.time-ok{border-color:var(--green)!important;background:#F0FDF4!important}
   </div>
   <div class="card">
     <div class="card-title">Bateas — Puerto Totoralillo</div>
-    <div class="field-row"><span class="lbl">Total asignados</span><div class="eq-counter"><button onclick="adjM('mb-total',-1)">−</button><span class="eq-num" id="mb-total">15</span><button onclick="adjM('mb-total',1)">+</button></div></div>
-    <div class="field-row"><span class="lbl">En base</span><div class="eq-counter"><button onclick="adjM('mb-base',-1)">−</button><span class="eq-num" id="mb-base">0</span><button onclick="adjM('mb-base',1)">+</button></div></div>
-    <div class="field-row"><span class="lbl">En ruta a faena</span><div class="eq-counter"><button onclick="adjM('mb-rutaf',-1)">−</button><span class="eq-num" id="mb-rutaf">0</span><button onclick="adjM('mb-rutaf',1)">+</button></div></div>
-    <div class="field-row"><span class="lbl">En faena (KM1)</span><div class="eq-counter"><button onclick="adjM('mb-faena',-1)">−</button><span class="eq-num" id="mb-faena">15</span><button onclick="adjM('mb-faena',1)">+</button></div></div>
+    <!-- Total destacado en azul -->
+    <div style="background:#003DA5;border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
+      <span style="font-size:13px;font-weight:700;color:#fff">Total asignados</span>
+      <input type="number" id="mb-total" value="15" min="0" max="30"
+        style="width:64px;text-align:center;font-size:20px;font-weight:700;color:#003DA5;border:none;border-radius:8px;padding:4px 8px;background:#fff"
+        oninput="updateTot()">
+    </div>
+    <div class="field-row"><span class="lbl">En base</span>
+      <input type="number" id="mb-base" value="0" min="0" max="30" style="width:80px;text-align:center;font-size:15px;font-weight:600" oninput="updateTot()">
+    </div>
+    <div class="field-row"><span class="lbl">En ruta a faena</span>
+      <input type="number" id="mb-rutaf" value="0" min="0" max="30" style="width:80px;text-align:center;font-size:15px;font-weight:600" oninput="updateTot()">
+    </div>
+    <div class="field-row"><span class="lbl">En faena</span>
+      <input type="number" id="mb-faena" value="15" min="0" max="30" style="width:80px;text-align:center;font-size:15px;font-weight:600" oninput="updateTot()">
+    </div>
     <div class="totalizador tot-ok" id="tot-bat-el"><span>Suma de estados</span><span id="tot-bat-txt">15 / 15 ✓ Cuadra</span></div>
   </div>
   <div class="card">
     <div class="card-title">Ramplas — Base INCOM Copiapó</div>
-    <div class="field-row"><span class="lbl">Total asignados</span><div class="eq-counter"><button onclick="adjM('mr-total',-1)">−</button><span class="eq-num" id="mr-total">7</span><button onclick="adjM('mr-total',1)">+</button></div></div>
-    <div class="field-row"><span class="lbl">En carga</span><div class="eq-counter"><button onclick="adjM('mr-carga',-1)">−</button><span class="eq-num" id="mr-carga">0</span><button onclick="adjM('mr-carga',1)">+</button></div></div>
-    <div class="field-row"><span class="lbl">En descarga</span><div class="eq-counter"><button onclick="adjM('mr-desc',-1)">−</button><span class="eq-num" id="mr-desc">0</span><button onclick="adjM('mr-desc',1)">+</button></div></div>
-    <div class="field-row"><span class="lbl">En ruta a faena</span><div class="eq-counter"><button onclick="adjM('mr-rutaf',-1)">−</button><span class="eq-num" id="mr-rutaf">0</span><button onclick="adjM('mr-rutaf',1)">+</button></div></div>
-    <div class="field-row"><span class="lbl">En faena</span><div class="eq-counter"><button onclick="adjM('mr-faena',-1)">−</button><span class="eq-num" id="mr-faena">0</span><button onclick="adjM('mr-faena',1)">+</button></div></div>
-    <div class="field-row"><span class="lbl">En ruta a base</span><div class="eq-counter"><button onclick="adjM('mr-rutab',-1)">−</button><span class="eq-num" id="mr-rutab">0</span><button onclick="adjM('mr-rutab',1)">+</button></div></div>
+    <!-- Total destacado en azul -->
+    <div style="background:#003DA5;border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
+      <span style="font-size:13px;font-weight:700;color:#fff">Total asignados</span>
+      <input type="number" id="mr-total" value="7" min="0" max="20"
+        style="width:64px;text-align:center;font-size:20px;font-weight:700;color:#003DA5;border:none;border-radius:8px;padding:4px 8px;background:#fff"
+        oninput="updateTot()">
+    </div>
+    <div class="field-row"><span class="lbl">En carga</span>
+      <input type="number" id="mr-carga" value="0" min="0" max="20" style="width:80px;text-align:center;font-size:15px;font-weight:600" oninput="updateTot()">
+    </div>
+    <div class="field-row"><span class="lbl">En descarga</span>
+      <input type="number" id="mr-desc" value="0" min="0" max="20" style="width:80px;text-align:center;font-size:15px;font-weight:600" oninput="updateTot()">
+    </div>
+    <div class="field-row"><span class="lbl">En ruta a faena</span>
+      <input type="number" id="mr-rutaf" value="0" min="0" max="20" style="width:80px;text-align:center;font-size:15px;font-weight:600" oninput="updateTot()">
+    </div>
+    <div class="field-row"><span class="lbl">En faena</span>
+      <input type="number" id="mr-faena" value="0" min="0" max="20" style="width:80px;text-align:center;font-size:15px;font-weight:600" oninput="updateTot()">
+    </div>
+    <input type="hidden" id="mr-rutab" value="0">
     <div class="totalizador tot-ok" id="tot-ram-el"><span>Suma de estados</span><span id="tot-ram-txt">0 / 7 ⚠ Faltan 7</span></div>
   </div>
   <button class="btn-primary" onclick="genMatutino()">📋 Generar tarjeta visual</button>
@@ -319,10 +345,17 @@ input.time-ok{border-color:var(--green)!important;background:#F0FDF4!important}
     </div>
     <div class="cond-info" id="cond-info-txt">Normal — tiempos de ruta estándar</div>
     <div class="card-title">Tipo de transporte</div>
-    <select id="f-tipo" style="width:100%;margin-bottom:10px">
-      <option value="bateas">Transporte Concentrado — Bateas</option>
-      <option value="ramplas">Transporte Catodo/Molibdeno — Ramplas</option>
-    </select>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+      <button id="tipo-bat-btn" onclick="setTipoFaena('bateas',this)"
+        style="padding:12px;border-radius:10px;border:2px solid #003DA5;background:#003DA5;color:#fff;font-family:Inter,sans-serif;font-size:13px;font-weight:700;cursor:pointer">
+        🟢 Bateas
+      </button>
+      <button id="tipo-ram-btn" onclick="setTipoFaena('ramplas',this)"
+        style="padding:12px;border-radius:10px;border:2px solid #D1D5DB;background:#fff;color:#374151;font-family:Inter,sans-serif;font-size:13px;font-weight:600;cursor:pointer">
+        🔵 Ramplas
+      </button>
+    </div>
+    <input type="hidden" id="f-tipo" value="bateas">
     <div class="field-row">
       <span class="lbl">Total equipos</span>
       <input type="number" id="f-total" value="15" min="1" max="30" style="width:70px">
@@ -334,8 +367,12 @@ input.time-ok{border-color:var(--green)!important;background:#F0FDF4!important}
   </div>
   <div class="card">
     <div class="card-title">Grupos / Convoys</div>
+    <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:10px 12px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
+      <span style="font-size:12px;color:#1E40AF;font-weight:500">Importar desde planificación</span>
+      <button class="btn-import" style="padding:5px 12px;font-size:12px" onclick="importarPlanAFaena()">↓ Importar</button>
+    </div>
     <div id="grupos-faena-cont"></div>
-    <button class="btn-outline" style="margin-top:4px" onclick="addGrupoFaena()">+ Agregar grupo</button>
+    <button class="btn-outline" style="margin-top:4px" onclick="addGrupoFaena()">+ Agregar grupo manual</button>
   </div>
   <div style="display:flex;gap:4px;background:#E5E7EB;padding:4px;border-radius:8px;margin-bottom:12px">
     <button class="main-tab active" id="ftab-reporte" style="flex:1;font-size:11px;padding:7px 4px" onclick="switchFaenaTab('reporte');renderReporte()">Tabla</button>
@@ -501,7 +538,11 @@ function calcETA(salida,tipo){
 }
 function getSup(){return document.getElementById('sup-sel').value||'Supervisor de turno';}
 function getTipoLabel(){return document.getElementById('f-tipo').value==='bateas'?'Transporte de Concentrado / Catodos de Cobre':'Transporte Catodo / Molibdeno — Ramplas';}
-function getN(id){return parseInt(document.getElementById(id).textContent)||0;}
+function getN(id){
+  const el=document.getElementById(id);
+  if(!el)return 0;
+  return parseInt(el.value!==undefined?el.value:el.textContent)||0;
+}
 function getDestino(tipo){return tipo==='bateas'?'Puerto Totoralillo':'Base INCOM Copiapó';}
 function getUltimoPunto(tipo){return tipo==='ramplas'?'BASE INCOM COPIAPÓ':'TOTORALILLO';}
 
@@ -513,6 +554,19 @@ function switchFaenaTab(t){
   ['reporte','llegadas'].forEach(id=>document.getElementById('fsub-'+id).classList.toggle('hidden',id!==t));
   ['ftab-reporte','ftab-llegadas'].forEach((id,i)=>document.getElementById(id).classList.toggle('active',['reporte','llegadas'][i]===t));
 }
+function setTipoFaena(tipo,btn){
+  document.getElementById('f-tipo').value=tipo;
+  const batBtn=document.getElementById('tipo-bat-btn');
+  const ramBtn=document.getElementById('tipo-ram-btn');
+  if(tipo==='bateas'){
+    batBtn.style.background='#003DA5';batBtn.style.color='#fff';batBtn.style.borderColor='#003DA5';
+    ramBtn.style.background='#fff';ramBtn.style.color='#374151';ramBtn.style.borderColor='#D1D5DB';
+  } else {
+    ramBtn.style.background='#1D4ED8';ramBtn.style.color='#fff';ramBtn.style.borderColor='#1D4ED8';
+    batBtn.style.background='#fff';batBtn.style.color='#374151';batBtn.style.borderColor='#D1D5DB';
+  }
+}
+
 function setCond(c,btn){
   condicion=c;
   document.querySelectorAll('.cond-btn').forEach(b=>b.className='cond-btn');
@@ -525,21 +579,49 @@ function setCond(c,btn){
 function adj(id,d){const el=document.getElementById(id);el.textContent=Math.max(0,parseInt(el.textContent)+d);}
 function adjM(id,d){adj(id,d);updateTot();}
 
+function importarPlanAFaena(){
+  if(!planActivo){alert('No hay planificación activa. Ve a Planificación y carga una primero.');return;}
+  const tipo=document.getElementById('f-tipo').value;
+  const arr=tipo==='ramplas'?(planActivo.equiposRam||[]):(planActivo.equiposBat||[]);
+  if(!arr.length){alert('No hay equipos planificados para '+(tipo==='ramplas'?'Ramplas':'Bateas'));return;}
+  // Crear un grupo por cada equipo individual de la planificación
+  // Los grupos se arman al salir — aquí precargamos los equipos disponibles
+  // Creamos UN grupo con todos los equipos del día listos para ser asignados a convoys
+  gruposFaena=[];
+  // Agregar cada equipo como grupo individual que el supervisor agrupa manualmente
+  arr.forEach((eq,i)=>{
+    gruposFaena.push({
+      id:gfId++,
+      num:i+1,
+      equipos:[{conductor:eq.conductor||'',tracto:eq.tracto||'',semi:eq.semi||''}],
+      salida:'',llegLoros:'',llegFin:''
+    });
+  });
+  if(planActivo.fecha)document.getElementById('f-fecha').value=planActivo.fecha;
+  document.getElementById('f-total').value=arr.length;
+  renderGruposFaena();
+  // Aviso
+  const aviso=document.createElement('div');
+  aviso.style.cssText='position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#003DA5;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,.2)';
+  aviso.textContent='✓ '+arr.length+' equipos importados — agrupa los convoys y asigna horas de salida';
+  document.body.appendChild(aviso);
+  setTimeout(()=>aviso.remove(),4000);
+}
+
 function cargarTotalesDesdePlan(){
   if(!planActivo){alert('No hay planificación activa. Ve a Planificación y carga una primero.');return;}
   const tBat=(planActivo.equiposBat||[]).length;
   const tRam=(planActivo.equiposRam||[]).length;
   if(!tBat&&!tRam){alert('La planificación no tiene equipos.');return;}
-  document.getElementById('mb-total').textContent=tBat;
-  document.getElementById('mb-base').textContent=0;
-  document.getElementById('mb-rutaf').textContent=0;
-  document.getElementById('mb-faena').textContent=tBat;
-  document.getElementById('mr-total').textContent=tRam;
-  document.getElementById('mr-carga').textContent=0;
-  document.getElementById('mr-desc').textContent=0;
-  document.getElementById('mr-rutaf').textContent=0;
-  document.getElementById('mr-faena').textContent=tRam;
-  document.getElementById('mr-rutab').textContent=0;
+  document.getElementById('mb-total').value=tBat;
+  document.getElementById('mb-base').value=0;
+  document.getElementById('mb-rutaf').value=0;
+  document.getElementById('mb-faena').value=tBat;
+  document.getElementById('mr-total').value=tRam;
+  document.getElementById('mr-carga').value=0;
+  document.getElementById('mr-desc').value=0;
+  document.getElementById('mr-rutaf').value=0;
+  document.getElementById('mr-faena').value=tRam;
   updateTot();
   document.getElementById('f-total').value=tBat;
   // Mostrar confirmación
@@ -552,11 +634,12 @@ function cargarTotalesDesdePlan(){
 function updateTot(){
   function check(total,suma,elId,txtId){
     const el=document.getElementById(elId),txt=document.getElementById(txtId);
+    if(!el||!txt)return;
     if(suma===total){el.className='totalizador tot-ok';txt.textContent=suma+' / '+total+' ✓ Cuadra';}
     else{el.className='totalizador tot-err';const d=total-suma;txt.textContent=suma+' / '+total+' ⚠ '+(d>0?'Faltan '+d:'Sobran '+Math.abs(d));}
   }
   check(getN('mb-total'),getN('mb-base')+getN('mb-rutaf')+getN('mb-faena'),'tot-bat-el','tot-bat-txt');
-  check(getN('mr-total'),getN('mr-carga')+getN('mr-desc')+getN('mr-rutaf')+getN('mr-faena')+getN('mr-rutab'),'tot-ram-el','tot-ram-txt');
+  check(getN('mr-total'),getN('mr-carga')+getN('mr-desc')+getN('mr-rutaf')+getN('mr-faena'),'tot-ram-el','tot-ram-txt');
 }
 
 // ── SELECTORES RÁPIDOS (botones) ──────────────────────
@@ -871,8 +954,8 @@ function renderReporte(){
 function genMatutino(){
   const hora=getNow();
   const bT=getN('mb-total'),bB=getN('mb-base'),bRF=getN('mb-rutaf'),bF=getN('mb-faena');
-  const rT=getN('mr-total'),rC=getN('mr-carga'),rD=getN('mr-desc'),rRF=getN('mr-rutaf'),rF=getN('mr-faena'),rRB=getN('mr-rutab');
-  const bOk=bB+bRF+bF===bT,rOk=rC+rD+rRF+rF+rRB===rT;
+  const rT=getN('mr-total'),rC=getN('mr-carga'),rD=getN('mr-desc'),rRF=getN('mr-rutaf'),rF=getN('mr-faena');
+  const bOk=bB+bRF+bF===bT,rOk=rC+rD+rRF+rF===rT;
   function fila(label,val){return'<div class="rpt-row"><span class="rpt-row-label">'+label+'</span><span class="rpt-row-val">'+val+'</span></div>';}
   const html=
     '<div style="background:var(--blue);padding:16px 20px;display:flex;align-items:center;gap:12px;border-radius:16px 16px 0 0">'+
@@ -890,7 +973,7 @@ function genMatutino(){
         '<span style="font-size:13px;font-weight:700;color:#1E3A5F">Total equipos del día</span>'+
         '<span style="font-family:Barlow Condensed,sans-serif;font-size:28px;font-weight:700;color:#003DA5">'+bT+'</span>'+
       '</div>'+
-      fila('En base',bB)+fila('En ruta a faena',bRF)+fila('En faena (KM1)',bF)+
+      fila('En base',bB)+fila('En ruta a faena',bRF)+fila('En faena',bF)+
       (!bOk?'<div style="margin-top:6px;background:#FEE2E2;border-radius:7px;padding:5px 10px;font-size:12px;color:#991B1B;font-weight:500">⚠ No cuadra — verificar conteo</div>':'')+
     '</div>'+
 
@@ -901,7 +984,7 @@ function genMatutino(){
         '<span style="font-size:13px;font-weight:700;color:#1E3A5F">Total equipos del día</span>'+
         '<span style="font-family:Barlow Condensed,sans-serif;font-size:28px;font-weight:700;color:#003DA5">'+rT+'</span>'+
       '</div>'+
-      fila('En carga',rC)+fila('En descarga',rD)+fila('En ruta a faena',rRF)+fila('En faena',rF)+fila('En ruta a base',rRB)+
+      fila('En carga',rC)+fila('En descarga',rD)+fila('En ruta a faena',rRF)+fila('En faena',rF)+
       (!rOk?'<div style="margin-top:6px;background:#FEE2E2;border-radius:7px;padding:5px 10px;font-size:12px;color:#991B1B;font-weight:500">⚠ No cuadra — verificar conteo</div>':'')+
     '</div>'+
 
