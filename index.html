@@ -1451,33 +1451,9 @@ function genPosicion(){
 
 
 
-// ── GOOGLE SHEETS ─────────────────────────────────────
-
-async function guardarEnSheets(plan){
-  try{
-    const resp=await fetch(APPS_URL,{
-      method:'POST',
-      body:JSON.stringify({plan}),
-      headers:{'Content-Type':'application/json'}
-    });
-    const data=await resp.json();
-    return data.ok;
-  }catch(e){console.error('Error guardando en Sheets:',e);return false;}
-}
-
-async function leerDesdeSheets(){
-  try{
-    const resp=await fetch(APPS_URL+'?action=leer');
-    const data=await resp.json();
-    if(!data.ok||!data.data||data.data.length<2)return null;
-    const rows=data.data.slice(1); // saltar encabezado
-    const equiposBat=rows.filter(r=>r[0]==='BATEA').map(r=>({conductor:r[1],tracto:r[2],semi:r[3]}));
-    const equiposRam=rows.filter(r=>r[0]==='RAMPLA').map(r=>({conductor:r[1],tracto:r[2],semi:r[3]}));
-    const fecha=rows[0]?rows[0][4]:'';
-    const nombre=rows[0]?rows[0][5]:'';
-    return{id:'sheet_plan',nombre,fecha,equiposBat,equiposRam};
-  }catch(e){console.error('Error leyendo Sheets:',e);return null;}
-}
+// ── GOOGLE SHEETS (deshabilitado) ─────────────────────
+async function guardarEnSheets(plan){return false;}
+async function leerDesdeSheets(){return null;}
 
 
 // Estructura: {id, nombre, fecha, equiposBat:[{conductor,tracto,semi}], equiposRam:[...]}
@@ -1603,17 +1579,9 @@ function guardarPlan(){
     localStorage.setItem('incom_planes',JSON.stringify(planes));
     if(planActivo)localStorage.setItem('incom_plan_activo',planActivo.id);
   }catch(e){}
-  // Guardar en Google Sheets
-  if(planActivo){
-    const btn=document.querySelector('button[onclick="guardarPlan()"]');
-    if(btn){btn.textContent='💾 Guardando...';btn.disabled=true;}
-    guardarEnSheets(planActivo).then(ok=>{
-      if(btn){btn.textContent='💾 Guardar';btn.disabled=false;}
-      if(ok){mostrarAviso('✓ Guardado en Google Sheets — disponible para todos los supervisores');}
-      else{mostrarAviso('⚠ Guardado localmente. Sin conexión a Sheets.');}
-    });
-  }
   renderPlanSel();actualizarResumen();
+  mostrarAviso('✓ Planificación guardada. Usa ⬇ Exportar para compartir con supervisores.');
+}
 }
 
 function exportarPlan(){
