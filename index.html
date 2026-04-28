@@ -796,10 +796,23 @@ function setTipoFaena(tipo){
 
 function importarDisponibles(){
   const tipo=document.getElementById('f-tipo').value;
-  if(!planActivo){alert('No hay planificación activa. Ve a Planificación primero.');return;}
+  if(!planActivo){
+    // Ofrecer cargar desde archivo JSON
+    const cont=document.getElementById('armador-lista');
+    cont.innerHTML=
+      '<div style="background:#FEF3E2;border:1px solid #FCD34D;border-radius:10px;padding:14px;text-align:center">'+
+        '<div style="font-size:13px;font-weight:600;color:#92550A;margin-bottom:8px">No hay planificación cargada en esta sesión</div>'+
+        '<div style="font-size:12px;color:#78350F;margin-bottom:12px">Ve a la pestaña <strong>📋 Planificación</strong>, importa el archivo JSON y luego vuelve aquí.</div>'+
+        '<button class="btn-import" onclick="switchTab(\'plan\')" style="width:100%">→ Ir a Planificación</button>'+
+      '</div>';
+    return;
+  }
   const arr=tipo==='ramplas'?(planActivo.equiposRam||[]):(planActivo.equiposBat||[]);
-  if(!arr.length){alert('No hay equipos planificados para este tipo.');return;}
-  equiposDisponibles=arr.map((eq,i)=>({...eq,id:'eq_'+i,seleccionado:false}));
+  if(!arr.length){
+    alert('No hay equipos planificados para '+(tipo==='ramplas'?'Ramplas':'Bateas')+'. Revisa la planificación.');
+    return;
+  }
+  equiposDisponibles=arr.map((eq,i)=>({...eq,id:'eq_'+i,seleccionado:false,asignado:false}));
   equiposSeleccionados=[];
   gruposFaena=[];
   if(planActivo.fecha)document.getElementById('f-fecha').value=planActivo.fecha;
