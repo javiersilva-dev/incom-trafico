@@ -466,38 +466,47 @@ input.time-ok{border-color:var(--green)!important;background:#F0FDF4!important}
 <script>
 // ── FLOTA ────────────────────────────────────────────
 const CONDUCTORES_BAT=[
-  'JAVIER CORTES','DAMM CRUZ','MARTIN VITALI','JUAN MUÑOZ','RICARDO RAMIREZ',
-  'FRANCISCO HANSHING','FELIPE CORTES','RICARDO CONTRERAS','LUIS MUÑOZ','JOSE GONZALEZ',
-  'RENE PAEZ','MARCO QUIROGA','ABELINO CARRIZO','CRISTIAN OLIVARES','ENRIQUE ROJAS',
-  'DANIEL VEGA PEREIRA','BRAYAN GUEVARA','EDUARDO LEDESMA','PEDRO SAEZ','MARCO RIQUELME',
-  'WILFREDO OLIVARES','UBER ZAMORA','ALBERTO ASTORGA','BORIS ROJAS','LUIS MADARIAGA',
-  'PEDRO ARRIAGADA','JOSE URIZAR','ROBERTO FAJARDO','CRISTIAN LANAS','JUAN VALENZUELA',
-  'ROLANDO GUZMAN','JAVIER SANCHEZ','ORLANDO BUGUEÑO',
+  'ABELINO CARRIZO','ALBERTO ASTORGA','BORIS ROJAS','BRAYAN GUEVARA',
+  'CRISTIAN LANAS','CRISTIAN OLIVARES','DAMM CRUZ','DANIEL VEGA PEREIRA',
+  'EDUARDO LEDESMA','ENRIQUE ROJAS','FELIPE CORTES','FRANCISCO HANSHING',
+  'JAVIER CORTES','JAVIER SANCHEZ','JOSE GONZALEZ','JOSE URIZAR',
+  'JUAN MUÑOZ','JUAN VALENZUELA','LUIS MADARIAGA','LUIS MUÑOZ',
+  'MARCO QUIROGA','MARCO RIQUELME','MARTIN VITALI','ORLANDO BUGUEÑO',
+  'PEDRO ARRIAGADA','PEDRO SAEZ','RICARDO CONTRERAS','RICARDO RAMIREZ',
+  'ROBERTO FAJARDO','ROLANDO GUZMAN','RENE PAEZ','UBER ZAMORA',
+  'WILFREDO OLIVARES',
 ];
 const CONDUCTORES_RAM=CONDUCTORES_BAT;
 const BATEAS=[
-  {p:'KDKS-88',c:'JAVIER CORTES'},{p:'KDKS-89',c:'DAMM CRUZ'},{p:'KYRG-46',c:'MARTIN VITALI'},
-  {p:'KYPR-55',c:'JUAN MUÑOZ'},{p:'KDKS-72',c:'RICARDO RAMIREZ'},{p:'KDKS-71',c:'FRANCISCO HANSHING'},
-  {p:'KYPV-88',c:'FELIPE CORTES'},{p:'KYPV-87',c:'RICARDO CONTRERAS'},{p:'KYLG-17',c:'LUIS MUÑOZ'},
-  {p:'KYPT-47',c:'JOSE GONZALEZ'},{p:'KDKS-57',c:'RENE PAEZ'},{p:'KDKS-78',c:'MARCO QUIROGA'},
-  {p:'KYRG-45',c:'ABELINO CARRIZO'},{p:'PWVW-83',c:'CRISTIAN OLIVARES'},{p:'KYRH-78',c:'ENRIQUE ROJAS'},
-  {p:'PTXP-75',c:'DANIEL VEGA PEREIRA'},{p:'HGKS-91',c:'BRAYAN GUEVARA'},{p:'KYPJ-52',c:'EDUARDO LEDESMA'},
-  {p:'HGKS-68',c:'PEDRO SAEZ'},{p:'KYPJ-54',c:'MARCO RIQUELME'},{p:'KYPJ-53',c:'WILFREDO OLIVARES'},
+  {p:'HGKS-68',c:'PEDRO SAEZ'},{p:'HGKS-91',c:'BRAYAN GUEVARA'},
+  {p:'KDKS-57',c:'RENE PAEZ'},{p:'KDKS-71',c:'FRANCISCO HANSHING'},
+  {p:'KDKS-72',c:'RICARDO RAMIREZ'},{p:'KDKS-78',c:'MARCO QUIROGA'},
+  {p:'KDKS-88',c:'JAVIER CORTES'},{p:'KDKS-89',c:'DAMM CRUZ'},
+  {p:'KYLG-17',c:'LUIS MUÑOZ'},{p:'KYPJ-52',c:'EDUARDO LEDESMA'},
+  {p:'KYPJ-53',c:'WILFREDO OLIVARES'},{p:'KYPJ-54',c:'MARCO RIQUELME'},
+  {p:'KYPR-55',c:'JUAN MUÑOZ'},{p:'KYPT-47',c:'JOSE GONZALEZ'},
+  {p:'KYPV-87',c:'RICARDO CONTRERAS'},{p:'KYPV-88',c:'FELIPE CORTES'},
+  {p:'KYRG-45',c:'ABELINO CARRIZO'},{p:'KYRG-46',c:'MARTIN VITALI'},
+  {p:'KYRH-78',c:'ENRIQUE ROJAS'},
+  {p:'PTXP-75',c:'DANIEL VEGA PEREIRA'},{p:'PWVW-83',c:'CRISTIAN OLIVARES'},
 ];
 const RAMPLAS=[
-  {p:'PWVX-90',c:'ALBERTO ASTORGA'},{p:'PWVX-89',c:'BORIS ROJAS'},{p:'PWVW-81',c:'LUIS MADARIAGA'},
-  {p:'PWVW-56',c:'PEDRO ARRIAGADA'},{p:'PWVW-82',c:'JOSE URIZAR'},{p:'PWVW-58',c:'ROBERTO FAJARDO'},
-  {p:'PWVW-57',c:'CRISTIAN LANAS'},
+  {p:'PWVW-56',c:'PEDRO ARRIAGADA'},{p:'PWVW-57',c:'CRISTIAN LANAS'},
+  {p:'PWVW-58',c:'ROBERTO FAJARDO'},{p:'PWVW-81',c:'LUIS MADARIAGA'},
+  {p:'PWVW-82',c:'JOSE URIZAR'},{p:'PWVX-89',c:'BORIS ROJAS'},
+  {p:'PWVX-90',c:'ALBERTO ASTORGA'},
 ];
 const CAMA_BAJA=[
   {p:'KDKS-69',c:'UBER ZAMORA'},
 ];
 const TRACTOS=[
-  {p:'PJBP-94'},{p:'PPPW-79'},{p:'RVXB-98'},{p:'RVFK-47'},{p:'LXXL-81'},{p:'RVFK-46'},
-  {p:'SHLL-37'},{p:'LRVV-86'},{p:'SYPL-10'},{p:'LRVV-85'},{p:'RJBV-34'},{p:'RJBV-35'},
-  {p:'SPSH-74'},{p:'RVXC-10'},{p:'PJFD-98'},{p:'RVFF-14'},{p:'RVFF-13'},{p:'RTRJ-40'},
-  {p:'PJFD-81'},{p:'SSHY-46'},{p:'PJFD-83'},{p:'PPPW-78'},{p:'RVFK-45'},{p:'RKGC-82'},
-  {p:'PJFD-76'},{p:'PJBP-95'},
+  {p:'LRVV-85'},{p:'LRVV-86'},{p:'LXXL-81'},
+  {p:'PJBP-94'},{p:'PJBP-95'},{p:'PJFD-76'},{p:'PJFD-81'},{p:'PJFD-83'},{p:'PJFD-98'},
+  {p:'PPPW-78'},{p:'PPPW-79'},
+  {p:'RJBV-34'},{p:'RJBV-35'},{p:'RKGC-82'},{p:'RTRJ-40'},
+  {p:'RVFK-45'},{p:'RVFK-46'},{p:'RVFK-47'},{p:'RVFF-13'},{p:'RVFF-14'},
+  {p:'RVXB-98'},{p:'RVXC-10'},
+  {p:'SHLL-37'},{p:'SPSH-74'},{p:'SSHY-46'},{p:'SYPL-10'},
 ];
 
 // ── SEGMENTOS ────────────────────────────────────────
@@ -1719,6 +1728,18 @@ function actualizarResumen(){
   if(re)re.textContent=rE+' equipo'+(rE!==1?'s':'');
 }
 
+function setEstadoRampla(inputId,estado,btn){
+  const inp=document.getElementById(inputId);
+  if(inp)inp.value=estado;
+  btn.closest('div').querySelectorAll('button').forEach(b=>{
+    const sel=b.textContent.trim()===estado;
+    b.style.background=sel?'#1D4ED8':'#fff';
+    b.style.color=sel?'#fff':'#374151';
+    b.style.borderColor=sel?'#1D4ED8':'#D1D5DB';
+    b.style.fontWeight=sel?'600':'400';
+  });
+}
+
 function renderPlanEquipos(tipo){
   if(!planActivo)return;
   const arr=tipo==='bat'?(planActivo.equiposBat||[]):(planActivo.equiposRam||[]);
@@ -1726,27 +1747,56 @@ function renderPlanEquipos(tipo){
   if(!cont)return;
   if(!arr.length){cont.innerHTML='<div style="text-align:center;padding:1rem;color:#9CA3AF;font-size:13px">Sin equipos agregados</div>';return;}
   cont.innerHTML='';
-  // Tabla compacta
   const tabla=document.createElement('div');
   tabla.style.cssText='border:1px solid #E5E7EB;border-radius:10px;overflow:hidden;margin-bottom:8px';
-  const header='<div style="display:grid;grid-template-columns:auto 1fr auto auto auto;gap:0;background:#F9FAFB;border-bottom:1px solid #E5E7EB;padding:6px 12px">'+
+
+  const ESTADOS_RAM=['Carga en faena','Descarga en puerto','En tránsito a base','Carga de neumáticos'];
+  const colsHeader=tipo==='ram'?
     '<span style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;width:28px">#</span>'+
     '<span style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase">Conductor</span>'+
     '<span style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;min-width:72px;text-align:center">Tracto</span>'+
     '<span style="font-size:10px;font-weight:700;color:#4338CA;text-transform:uppercase;min-width:72px;text-align:center">Semi</span>'+
-    '<span style="width:32px"></span>'+
-  '</div>';
-  const filas=arr.map((eq,i)=>
-    '<div style="display:grid;grid-template-columns:auto 1fr auto auto auto;gap:0;align-items:center;padding:8px 12px;border-bottom:1px solid #F3F4F6;'+(i%2===0?'':'background:#FAFAFA')+'" >'+
+    '<span style="font-size:10px;font-weight:700;color:#92550A;text-transform:uppercase;flex:1;text-align:center">Movimiento</span>'+
+    '<span style="width:32px"></span>'
+    :
+    '<span style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;width:28px">#</span>'+
+    '<span style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase">Conductor</span>'+
+    '<span style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;min-width:72px;text-align:center">Tracto</span>'+
+    '<span style="font-size:10px;font-weight:700;color:#4338CA;text-transform:uppercase;min-width:72px;text-align:center">Semi</span>'+
+    '<span style="width:32px"></span>';
+
+  const gridCols=tipo==='ram'?'auto 1fr auto auto 1fr auto':'auto 1fr auto auto auto';
+  const header='<div style="display:grid;grid-template-columns:'+gridCols+';gap:0;background:#F9FAFB;border-bottom:1px solid #E5E7EB;padding:6px 12px">'+colsHeader+'</div>';
+
+  const filas=arr.map((eq,i)=>{
+    const estadoBtns=tipo==='ram'?
+      '<div style="display:flex;flex-wrap:wrap;gap:3px;padding:0 4px">'+
+        ESTADOS_RAM.map(est=>
+          '<button id="pe-ram-est-btn-'+i+'-'+est.replace(/\s/g,'_')+'" '+
+          'onclick="setEstadoPlanRam('+i+',\''+est+'\')" '+
+          'style="padding:3px 6px;font-size:10px;border-radius:5px;border:1px solid '+(eq.estado===est?'#1D4ED8':'#D1D5DB')+';'+
+          'background:'+(eq.estado===est?'#1D4ED8':'#fff')+';color:'+(eq.estado===est?'#fff':'#374151')+';cursor:pointer;white-space:nowrap">'+est+'</button>'
+        ).join('')+
+      '</div>':'';
+
+    return'<div style="display:grid;grid-template-columns:'+gridCols+';gap:0;align-items:center;padding:8px 12px;border-bottom:1px solid #F3F4F6;'+(i%2===0?'':'background:#FAFAFA')+'">'+
       '<span style="font-size:12px;font-weight:700;color:#003DA5;width:28px">'+(i+1)+'</span>'+
       '<span style="font-size:12px;font-weight:600;color:#111">'+(eq.conductor||'—')+'</span>'+
       '<span style="font-size:11px;color:#374151;min-width:72px;text-align:center;background:#F3F4F6;padding:2px 8px;border-radius:5px;margin:0 4px">'+(eq.tracto||'—')+'</span>'+
       '<span style="font-size:11px;color:#4338CA;min-width:72px;text-align:center;background:#EEF2FF;padding:2px 8px;border-radius:5px;margin:0 4px">'+(eq.semi||'—')+'</span>'+
+      (tipo==='ram'?estadoBtns:'')+
       '<button onclick="removePlanEquipo(\''+tipo+'\','+i+')" style="background:transparent;border:none;color:#EF4444;cursor:pointer;font-size:16px;padding:0 4px;width:28px">✕</button>'+
-    '</div>'
-  ).join('');
+    '</div>';
+  }).join('');
+
   tabla.innerHTML=header+filas;
   cont.appendChild(tabla);
+}
+
+function setEstadoPlanRam(idx,estado){
+  if(!planActivo||!planActivo.equiposRam)return;
+  planActivo.equiposRam[idx].estado=estado;
+  renderPlanEquipos('ram');
 }
 
 function genTarjetaConductores(){
@@ -1771,12 +1821,13 @@ function genTarjetaConductores(){
   }
   function filasRam(){
     if(!ram.length)return'';
-    return'<tr style="background:#1D4ED8"><td colspan="3" style="padding:7px 12px;color:#fff;font-size:11px;font-weight:700">🔵 RAMPLAS — Base INCOM Copiapó ('+ram.length+' equipos)</td></tr>'+
+    return'<tr style="background:#1D4ED8"><td colspan="4" style="padding:7px 12px;color:#fff;font-size:11px;font-weight:700">🔵 RAMPLAS — Base INCOM Copiapó ('+ram.length+' equipos)</td></tr>'+
       ram.map((eq,i)=>
         '<tr style="border-bottom:1px solid #F3F4F6">'+
           '<td style="padding:8px 12px;font-size:13px;font-weight:600;color:#111">'+(eq.conductor||'—')+'</td>'+
           '<td style="padding:8px 10px;font-size:12px;color:#374151;text-align:center">'+(eq.tracto||'—')+'</td>'+
           '<td style="padding:8px 10px;font-size:12px;color:#4338CA;text-align:center">'+(eq.semi||'—')+'</td>'+
+          '<td style="padding:8px 10px;font-size:11px;color:#92550A;text-align:center;background:#FEF3E2">'+(eq.estado||'—')+'</td>'+
         '</tr>'
       ).join('');
   }
@@ -1799,6 +1850,7 @@ function genTarjetaConductores(){
           '<th style="padding:8px 12px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.4px">Conductor</th>'+
           '<th style="padding:8px 10px;text-align:center;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.4px">Tracto</th>'+
           '<th style="padding:8px 10px;text-align:center;font-size:10px;font-weight:700;color:#4338CA;text-transform:uppercase;letter-spacing:.4px">Semirremolque</th>'+
+          '<th style="padding:8px 10px;text-align:center;font-size:10px;font-weight:700;color:#92550A;text-transform:uppercase;letter-spacing:.4px">Movimiento</th>'+
         '</tr></thead>'+
         '<tbody>'+filasBat()+filasRam()+'</tbody>'+
       '</table>'+
