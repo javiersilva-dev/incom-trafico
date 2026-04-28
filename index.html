@@ -417,6 +417,9 @@ const RAMPLAS=[
   {p:'PWVW-56',c:'PEDRO ARRIAGADA'},{p:'PWVW-82',c:'JOSE URIZAR'},{p:'PWVW-58',c:'ROBERTO FAJARDO'},
   {p:'PWVW-57',c:'CRISTIAN LANAS'},
 ];
+const CAMA_BAJA=[
+  {p:'KDKS-69',c:'UBER ZAMORA'},
+];
 const TRACTOS=[
   {p:'PJBP-94'},{p:'PPPW-79'},{p:'RVXB-98'},{p:'RVFK-47'},{p:'LXXL-81'},{p:'RVFK-46'},
   {p:'SHLL-37'},{p:'LRVV-86'},{p:'SYPL-10'},{p:'LRVV-85'},{p:'RJBV-34'},{p:'RJBV-35'},
@@ -614,8 +617,14 @@ function selTracto(id,val){
   return btnGroup(TRACTOS.map(t=>t.p),id,val,'selBtn',true);
 }
 function selSemi(tipo,id,val){
-  const lista=tipo==='ramplas'?RAMPLAS:BATEAS;
-  return btnGroup(lista.map(b=>b.p),id,val,'selBtn',true);
+  const lista=tipo==='ramplas'?RAMPLAS:tipo==='cama'?CAMA_BAJA:BATEAS;
+  return btnGroup(lista.map(b=>b.p),id,val,'selPlanBtn',true);
+}
+
+function getSemiLista(tipo){
+  if(tipo==='ram')return RAMPLAS;
+  if(tipo==='cama')return CAMA_BAJA;
+  return BATEAS;
 }
 
 // leer valor desde hidden input en vez de select
@@ -1278,20 +1287,20 @@ function readPlanForm(){
 }
 
 function initSelectorPlan(){
-  // Renderizar botones en los selectores activos
   ['bat','ram'].forEach(tipo=>{
-    const tipoSel=tipo==='bat'?'bateas':'ramplas';
-    // Conductor
+    // Conductor — lista completa
     const cw=document.getElementById('sel-'+tipo+'-cond-wrap');
     if(cw)cw.innerHTML=btnGroup(CONDUCTORES_BAT,'sel-'+tipo+'-cond','','selPlanBtn',false);
-    // Tracto
+    // Tracto — lista completa compartida
     const tw=document.getElementById('sel-'+tipo+'-tr-wrap');
     if(tw)tw.innerHTML=btnGroup(TRACTOS.map(t=>t.p),'sel-'+tipo+'-tr','','selPlanBtn',true);
-    // Semi
-    const lista=tipo==='bat'?BATEAS:RAMPLAS;
+    // Semi — según tipo
+    const lista=tipo==='ram'?RAMPLAS:BATEAS;
     const sw=document.getElementById('sel-'+tipo+'-sm-wrap');
     if(sw)sw.innerHTML=btnGroup(lista.map(b=>b.p),'sel-'+tipo+'-sm','','selPlanBtn',true);
   });
+  // Ocultar ya usados si hay equipos cargados
+  if(planActivo){ocultarUsados('bat');ocultarUsados('ram');}
 }
 
 function selPlanBtn(id,val){
@@ -1333,15 +1342,56 @@ function confirmarEquipo(tipo){
   });
   const prev=document.getElementById('sel-'+tipo+'-preview');
   if(prev)prev.style.display='none';
+  // Ocultar botones ya usados
+  ocultarUsados(tipo);
   renderPlanEquipos(tipo);
   actualizarResumen();
+}
+
+function ocultarUsados(tipo){
+  if(!planActivo)return;
+  const arrBat=planActivo.equiposBat||[];
+  const arrRam=planActivo.equiposRam||[];
+
+  // Conductores — cada tipo oculta los suyos
+  const cUsadosBat=arrBat.map(e=>e.conductor).filter(Boolean);
+  const cUsadosRam=arrRam.map(e=>e.conductor).filter(Boolean);
+  ['bat','ram'].forEach(t=>{
+    const usados=t==='bat'?cUsadosBat:cUsadosRam;
+    const grp=document.getElementById('grp-sel-'+t+'-cond');
+    if(grp)grp.querySelectorAll('button').forEach(b=>{
+      b.style.display=usados.includes(b.textContent.trim())?'none':'inline-block';
+    });
+  });
+
+  // Tractos — compartidos, ocultar en AMBOS si ya fue usado en cualquiera
+  const tractosUsados=[...arrBat,...arrRam].map(e=>e.tracto).filter(Boolean);
+  ['bat','ram'].forEach(t=>{
+    const grp=document.getElementById('grp-sel-'+t+'-tr');
+    if(grp)grp.querySelectorAll('button').forEach(b=>{
+      b.style.display=tractosUsados.includes(b.textContent.trim())?'none':'inline-block';
+    });
+  });
+
+  // Semis — cada tipo oculta los suyos independientemente
+  const sUsadosBat=arrBat.map(e=>e.semi).filter(Boolean);
+  const sUsadosRam=arrRam.map(e=>e.semi).filter(Boolean);
+  ['bat','ram'].forEach(t=>{
+    const usados=t==='bat'?sUsadosBat:sUsadosRam;
+    const grp=document.getElementById('grp-sel-'+t+'-sm');
+    if(grp)grp.querySelectorAll('button').forEach(b=>{
+      b.style.display=usados.includes(b.textContent.trim())?'none':'inline-block';
+    });
+  });
 }
 
 function removePlanEquipo(tipo,i){
   if(!planActivo)return;
   const arr=tipo==='bat'?planActivo.equiposBat:planActivo.equiposRam;
   arr.splice(i,1);
-  renderPlanEquipos(tipo);actualizarResumen();
+  renderPlanEquipos(tipo);
+  actualizarResumen();
+  ocultarUsados(tipo);
 }
 
 function actualizarResumen(){
