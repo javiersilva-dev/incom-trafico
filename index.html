@@ -114,6 +114,18 @@ input[type=number]{width:70px;text-align:center}
 /* SEGMENTOS */
 .seg-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;margin-bottom:8px}
 
+/* ARMADOR DE CONVOY */
+.eq-disponible{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1.5px solid var(--gray-border);border-radius:8px;margin-bottom:6px;cursor:pointer;transition:all .15s;background:#fff}
+.eq-disponible:hover{border-color:#003DA5;background:#EFF6FF}
+.eq-disponible.sel{border-color:#003DA5;background:#003DA5;color:#fff}
+.eq-disponible.sel .eq-d-pat{background:rgba(255,255,255,.2);color:#fff}
+.eq-disponible.sel .eq-d-semi{background:rgba(255,255,255,.15);color:#fff}
+.eq-d-num{width:24px;height:24px;border-radius:50%;background:#E5E7EB;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#374151;flex-shrink:0}
+.eq-disponible.sel .eq-d-num{background:rgba(255,255,255,.25);color:#fff}
+.eq-d-nombre{flex:1;font-size:13px;font-weight:600}
+.eq-d-pat{background:#F3F4F6;color:#374151;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:500}
+.eq-d-semi{background:#EEF2FF;color:#4338CA;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:500}
+
 input.time-ok{border-color:var(--green)!important;background:#F0FDF4!important}
 .llegada-item{padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--gray-border)}
 
@@ -344,13 +356,13 @@ input.time-ok{border-color:var(--green)!important;background:#F0FDF4!important}
       <button class="cond-btn" onclick="setCond('critica',this)">🔴 Crítica</button>
     </div>
     <div class="cond-info" id="cond-info-txt">Normal — tiempos de ruta estándar</div>
-    <div class="card-title">Tipo de transporte</div>
+    <div class="card-title" style="margin-top:8px">Tipo de transporte</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-      <button id="tipo-bat-btn" onclick="setTipoFaena('bateas',this)"
+      <button id="tipo-bat-btn" onclick="setTipoFaena('bateas')"
         style="padding:12px;border-radius:10px;border:2px solid #003DA5;background:#003DA5;color:#fff;font-family:Inter,sans-serif;font-size:13px;font-weight:700;cursor:pointer">
         🟢 Bateas
       </button>
-      <button id="tipo-ram-btn" onclick="setTipoFaena('ramplas',this)"
+      <button id="tipo-ram-btn" onclick="setTipoFaena('ramplas')"
         style="padding:12px;border-radius:10px;border:2px solid #D1D5DB;background:#fff;color:#374151;font-family:Inter,sans-serif;font-size:13px;font-weight:600;cursor:pointer">
         🔵 Ramplas
       </button>
@@ -365,15 +377,31 @@ input.time-ok{border-color:var(--green)!important;background:#F0FDF4!important}
       <input type="date" id="f-fecha" style="flex:1">
     </div>
   </div>
-  <div class="card">
-    <div class="card-title">Grupos / Convoys</div>
-    <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:10px 12px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
-      <span style="font-size:12px;color:#1E40AF;font-weight:500">Importar desde planificación</span>
-      <button class="btn-import" style="padding:5px 12px;font-size:12px" onclick="importarPlanAFaena()">↓ Importar</button>
+
+  <!-- ARMADOR DE CONVOY -->
+  <div class="card" id="armador-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div>
+        <div class="card-title" style="margin-bottom:2px">Armar convoy / grupo</div>
+        <div style="font-size:11px;color:var(--gray-text)" id="armador-disponibles-txt">Sin equipos — importa desde planificación</div>
+      </div>
+      <button class="btn-import" style="padding:5px 12px;font-size:12px" onclick="importarDisponibles()">↓ Importar</button>
     </div>
-    <div id="grupos-faena-cont"></div>
-    <button class="btn-outline" style="margin-top:4px" onclick="addGrupoFaena()">+ Agregar grupo manual</button>
+
+    <!-- Lista de equipos disponibles para seleccionar -->
+    <div id="armador-lista" style="margin-bottom:12px"></div>
+
+    <!-- Hora de salida y confirmar -->
+    <div id="armador-confirmar" class="hidden">
+      <div class="field-row">
+        <span class="lbl">Salida KM1</span>
+        <input type="time" id="armador-hora" style="width:120px">
+      </div>
+      <button class="btn-primary" onclick="confirmarConvoy()">✓ Confirmar convoy y agregar al reporte</button>
+    </div>
   </div>
+
+  <!-- GRUPOS CONFIRMADOS Y TABLA -->
   <div style="display:flex;gap:4px;background:#E5E7EB;padding:4px;border-radius:8px;margin-bottom:12px">
     <button class="main-tab active" id="ftab-reporte" style="flex:1;font-size:11px;padding:7px 4px" onclick="switchFaenaTab('reporte');renderReporte()">Tabla</button>
     <button class="main-tab" id="ftab-llegadas" style="flex:1;font-size:11px;padding:7px 4px" onclick="switchFaenaTab('llegadas');renderLlegadas()">Llegadas reales</button>
@@ -386,7 +414,7 @@ input.time-ok{border-color:var(--green)!important;background:#F0FDF4!important}
     </div>
     <button class="btn-primary" onclick="switchFaenaTab('reporte');renderReporte()">Actualizar tabla</button>
   </div>
-  <p style="font-size:11px;color:var(--gray-text);text-align:center;margin-top:8px">📸 Captura la tabla con screenshot y envía por WhatsApp</p>
+  <p style="font-size:11px;color:var(--gray-text);text-align:center;margin-top:8px">📸 Captura la tabla con screenshot y envíala por WhatsApp</p>
 </div>
 
 <!-- ════ TAB POSICION ════ -->
@@ -746,154 +774,188 @@ function getSemiLista(tipo){
 function getVal(id){const el=document.getElementById(id);return el?el.value:'';}
 
 
-// ── GRUPOS FAENA ──────────────────────────────────────
-function addGrupoFaena(){
-  gruposFaena.push({id:gfId++,num:gruposFaena.length+1,equipos:[{conductor:'',tracto:'',semi:''}],salida:'',llegLoros:'',llegFin:''});
-  renderGruposFaena();
+// ── ARMADOR DE CONVOYS ────────────────────────────────
+let equiposDisponibles=[]; // equipos planificados aún no asignados a convoy
+let equiposSeleccionados=[]; // equipos seleccionados para el convoy actual
+
+function setTipoFaena(tipo){
+  document.getElementById('f-tipo').value=tipo;
+  const batBtn=document.getElementById('tipo-bat-btn');
+  const ramBtn=document.getElementById('tipo-ram-btn');
+  if(tipo==='bateas'){
+    batBtn.style.cssText='padding:12px;border-radius:10px;border:2px solid #003DA5;background:#003DA5;color:#fff;font-family:Inter,sans-serif;font-size:13px;font-weight:700;cursor:pointer';
+    ramBtn.style.cssText='padding:12px;border-radius:10px;border:2px solid #D1D5DB;background:#fff;color:#374151;font-family:Inter,sans-serif;font-size:13px;font-weight:600;cursor:pointer';
+  }else{
+    ramBtn.style.cssText='padding:12px;border-radius:10px;border:2px solid #1D4ED8;background:#1D4ED8;color:#fff;font-family:Inter,sans-serif;font-size:13px;font-weight:700;cursor:pointer';
+    batBtn.style.cssText='padding:12px;border-radius:10px;border:2px solid #D1D5DB;background:#fff;color:#374151;font-family:Inter,sans-serif;font-size:13px;font-weight:600;cursor:pointer';
+  }
+  // Resetear si cambia el tipo
+  equiposDisponibles=[];equiposSeleccionados=[];gruposFaena=[];
+  renderArmador();renderReporteVacio();
 }
-function removeGrupoFaena(id){gruposFaena=gruposFaena.filter(g=>g.id!==id);gruposFaena.forEach((g,i)=>g.num=i+1);renderGruposFaena();}
-function addEqF(gid){const g=gruposFaena.find(x=>x.id===gid);if(g&&g.equipos.length<3){readGruposFaena();g.equipos.push({conductor:'',tracto:'',semi:''});}renderGruposFaena();}
-function removeEqF(gid,ei){const g=gruposFaena.find(x=>x.id===gid);if(g&&g.equipos.length>1){readGruposFaena();g.equipos.splice(ei,1);}renderGruposFaena();}
+
+function importarDisponibles(){
+  const tipo=document.getElementById('f-tipo').value;
+  if(!planActivo){alert('No hay planificación activa. Ve a Planificación primero.');return;}
+  const arr=tipo==='ramplas'?(planActivo.equiposRam||[]):(planActivo.equiposBat||[]);
+  if(!arr.length){alert('No hay equipos planificados para este tipo.');return;}
+  equiposDisponibles=arr.map((eq,i)=>({...eq,id:'eq_'+i,seleccionado:false}));
+  equiposSeleccionados=[];
+  gruposFaena=[];
+  if(planActivo.fecha)document.getElementById('f-fecha').value=planActivo.fecha;
+  document.getElementById('f-total').value=arr.length;
+  renderArmador();
+  renderReporteVacio();
+}
+
+function toggleEquipoArmador(id){
+  const eq=equiposDisponibles.find(e=>e.id===id);
+  if(!eq)return;
+  eq.seleccionado=!eq.seleccionado;
+  if(eq.seleccionado){
+    equiposSeleccionados.push(id);
+  } else {
+    equiposSeleccionados=equiposSeleccionados.filter(x=>x!==id);
+  }
+  renderArmador();
+}
+
+function renderArmador(){
+  const cont=document.getElementById('armador-lista');
+  const confirmar=document.getElementById('armador-confirmar');
+  const txt=document.getElementById('armador-disponibles-txt');
+  const disponibles=equiposDisponibles.filter(e=>!e.asignado);
+  const nSel=equiposSeleccionados.filter(id=>disponibles.find(e=>e.id===id)).length;
+
+  if(!disponibles.length&&!equiposDisponibles.length){
+    cont.innerHTML='<div class="empty">Importa los equipos desde la planificación</div>';
+    if(confirmar)confirmar.classList.add('hidden');
+    return;
+  }
+  if(!disponibles.length){
+    cont.innerHTML='<div style="text-align:center;padding:1rem;color:#16A34A;font-size:13px;font-weight:600">✓ Todos los equipos han sido asignados a convoys</div>';
+    if(confirmar)confirmar.classList.add('hidden');
+    if(txt)txt.textContent='Todos asignados — '+gruposFaena.length+' grupos formados';
+    return;
+  }
+
+  if(txt)txt.textContent=disponibles.length+' disponibles · '+nSel+' seleccionados para este convoy';
+
+  cont.innerHTML='<div style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Selecciona los equipos del Grupo '+(gruposFaena.length+1)+':</div>'+
+    disponibles.map(eq=>
+      '<div class="eq-disponible'+(eq.seleccionado?' sel':'')+'" onclick="toggleEquipoArmador(\''+eq.id+'\')">'+
+        '<div class="eq-d-num">'+(equiposDisponibles.indexOf(eq)+1)+'</div>'+
+        '<span class="eq-d-nombre">'+(eq.conductor||'Sin conductor')+'</span>'+
+        '<span class="eq-d-pat">'+(eq.tracto||'—')+'</span>'+
+        '<span class="eq-d-semi">'+(eq.semi||'—')+'</span>'+
+      '</div>'
+    ).join('');
+
+  if(confirmar){
+    if(nSel>0)confirmar.classList.remove('hidden');
+    else confirmar.classList.add('hidden');
+  }
+}
+
+function confirmarConvoy(){
+  const hora=document.getElementById('armador-hora').value;
+  if(!hora){alert('Ingresa la hora de salida KM1');return;}
+  const selIds=equiposSeleccionados.filter(id=>equiposDisponibles.find(e=>e.id===id&&!e.asignado));
+  if(!selIds.length){alert('Selecciona al menos un equipo');return;}
+  const equipos=selIds.map(id=>{
+    const eq=equiposDisponibles.find(e=>e.id===id);
+    eq.asignado=true;
+    return{conductor:eq.conductor,tracto:eq.tracto,semi:eq.semi,falla:false};
+  });
+  gruposFaena.push({id:gfId++,num:gruposFaena.length+1,equipos,salida:hora,llegLoros:'',llegFin:'',historialCambios:[]});
+  equiposSeleccionados=[];
+  document.getElementById('armador-hora').value='';
+  renderArmador();
+  renderReporte();
+}
+
+function removeGrupoFaena(id){
+  const g=gruposFaena.find(x=>x.id===id);
+  if(g){
+    // Devolver equipos al pool disponible
+    g.equipos.forEach(eq=>{
+      const orig=equiposDisponibles.find(e=>e.conductor===eq.conductor&&e.tracto===eq.tracto);
+      if(orig)orig.asignado=false;
+    });
+  }
+  gruposFaena=gruposFaena.filter(x=>x.id!==id);
+  gruposFaena.forEach((g,i)=>g.num=i+1);
+  renderArmador();renderReporte();
+}
+
+function renderReporteVacio(){
+  const wrap=document.getElementById('rpt-wrap');
+  if(wrap)wrap.innerHTML='<div class="empty">Los grupos aparecerán aquí a medida que se van confirmando</div>';
+}
 
 function readGruposFaena(){
+  // Los grupos ya están en memoria — solo leer salidas si existen inputs
   gruposFaena.forEach(g=>{
     const s=document.getElementById('fsal-'+g.id);if(s)g.salida=s.value;
-    g.equipos.forEach((eq,ei)=>{
-      eq.conductor=getVal('fcond-'+g.id+'-'+ei);
-      eq.tracto=getVal('ftr-'+g.id+'-'+ei);
-      eq.semi=getVal('fsm-'+g.id+'-'+ei);
-    });
   });
 }
 
-// ── CAMBIO DE EQUIPO POR FALLA MECÁNICA ───────────────
+// ── CAMBIO DE EQUIPO POR FALLA ─────────────────────────
 function abrirCambioEquipo(gid,ei){
-  readGruposFaena();
   const g=gruposFaena.find(x=>x.id===gid);
   if(!g)return;
   const eq=g.equipos[ei];
   const tipo=document.getElementById('f-tipo').value;
-  // Guardar historial del equipo original si no existe
-  if(!eq.original){
-    eq.original={conductor:eq.conductor,tracto:eq.tracto,semi:eq.semi};
-  }
-  // Mostrar modal simple
+  if(!eq.original)eq.original={conductor:eq.conductor,tracto:eq.tracto,semi:eq.semi};
   const modal=document.createElement('div');
   modal.id='modal-cambio';
   modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:flex;align-items:center;justify-content:center;padding:1rem';
   modal.innerHTML=
     '<div style="background:#fff;border-radius:14px;padding:1.5rem;width:100%;max-width:420px;box-shadow:0 8px 32px rgba(0,0,0,.2)">'+
-      '<div style="font-size:15px;font-weight:700;color:#B91C1C;margin-bottom:4px">🔧 Cambio de equipo por falla</div>'+
-      '<div style="font-size:12px;color:#6B7280;margin-bottom:16px">Grupo '+g.num+' — Equipo '+(ei+1)+'</div>'+
-      (eq.original?
-        '<div style="background:#FEF3E2;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px">'+
-          '<div style="font-weight:600;color:#92550A;margin-bottom:4px">Equipo original:</div>'+
-          '<div style="color:#78350F">'+(eq.original.conductor||'—')+' · '+(eq.original.tracto||'—')+' / '+(eq.original.semi||'—')+'</div>'+
-        '</div>':'')+
-      '<div style="font-size:11px;font-weight:700;color:#374151;margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px">Equipo de reemplazo:</div>'+
-      '<div style="margin-bottom:8px"><div class="eq-label">👤 Conductor reemplazo</div>'+selConductor(tipo,'cambio-cond','')+'</div>'+
-      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">'+
+      '<div style="font-size:15px;font-weight:700;color:#B91C1C;margin-bottom:4px">🔧 Cambio por eventualidad</div>'+
+      '<div style="font-size:12px;color:#6B7280;margin-bottom:12px">Grupo '+g.num+' — '+(eq.conductor||'Equipo '+(ei+1))+'</div>'+
+      '<div style="background:#FEF3E2;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px">'+
+        '<div style="font-weight:600;color:#92550A">Original: </div>'+
+        '<div style="color:#78350F">'+(eq.original.conductor||'—')+' · '+(eq.original.tracto||'—')+' · '+(eq.original.semi||'—')+'</div>'+
+      '</div>'+
+      '<div style="margin-bottom:8px"><div class="eq-label">👤 Nuevo conductor</div>'+selConductor(tipo,'cambio-cond','')+'</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">'+
         '<div><div class="eq-label">🚛 Tracto</div>'+selTracto('cambio-tr','')+'</div>'+
         '<div><div class="eq-label">🔗 Semi</div>'+selSemi(tipo,'cambio-sm','')+'</div>'+
       '</div>'+
-      '<div style="margin-bottom:12px"><div class="eq-label">📝 Motivo de la falla</div>'+
-        '<input type="text" id="cambio-motivo" placeholder="Ej: Falla motor, pinchazo, etc." style="font-size:13px">'+
+      '<div style="margin-bottom:14px"><div class="eq-label">📝 Motivo</div>'+
+        '<input type="text" id="cambio-motivo" placeholder="Ej: Falla motor, pinchazo..." style="font-size:13px">'+
       '</div>'+
       '<div style="display:flex;gap:8px">'+
         '<button class="btn-outline" style="flex:1" onclick="cerrarModal()">Cancelar</button>'+
-        '<button class="btn-primary" style="flex:1;background:#B91C1C" onclick="confirmarCambio('+gid+','+ei+')">Confirmar cambio</button>'+
+        '<button class="btn-primary" style="flex:1;background:#B91C1C" onclick="confirmarCambio('+gid+','+ei+')">Confirmar</button>'+
       '</div>'+
     '</div>';
   document.body.appendChild(modal);
 }
 
-function cerrarModal(){
-  const m=document.getElementById('modal-cambio');
-  if(m)m.remove();
-}
+function cerrarModal(){const m=document.getElementById('modal-cambio');if(m)m.remove();}
 
 function confirmarCambio(gid,ei){
-  const g=gruposFaena.find(x=>x.id===gid);
-  if(!g)return;
-  const nuevoC=document.getElementById('cambio-cond').value;
-  const nuevoT=document.getElementById('cambio-tr').value;
-  const nuevoS=document.getElementById('cambio-sm').value;
-  const motivo=document.getElementById('cambio-motivo').value;
-  if(!nuevoC&&!nuevoT){alert('Selecciona al menos el conductor o tracto de reemplazo');return;}
-  // Guardar historial
+  const g=gruposFaena.find(x=>x.id===gid);if(!g)return;
+  const eq=g.equipos[ei];
+  const nuevoC=getVal('cambio-cond');
+  const nuevoT=getVal('cambio-tr');
+  const nuevoS=getVal('cambio-sm');
+  const motivo=document.getElementById('cambio-motivo').value||'Sin especificar';
+  if(!nuevoC&&!nuevoT){alert('Selecciona al menos conductor o tracto de reemplazo');return;}
   if(!g.historialCambios)g.historialCambios=[];
-  g.historialCambios.push({
-    equipo:ei+1,
-    hora:getNow(),
-    original:{...g.equipos[ei].original||g.equipos[ei]},
-    motivo:motivo||'Sin especificar'
-  });
-  // Aplicar reemplazo
-  g.equipos[ei].conductor=nuevoC||g.equipos[ei].conductor;
-  g.equipos[ei].tracto=nuevoT||g.equipos[ei].tracto;
-  g.equipos[ei].semi=nuevoS||g.equipos[ei].semi;
-  g.equipos[ei].falla=true;
+  g.historialCambios.push({equipo:ei+1,hora:getNow(),original:{...eq.original||eq},motivo});
+  if(nuevoC)eq.conductor=nuevoC;
+  if(nuevoT)eq.tracto=nuevoT;
+  if(nuevoS)eq.semi=nuevoS;
+  eq.falla=true;
   cerrarModal();
-  renderGruposFaena();
+  renderReporte();
 }
 
-function renderGruposFaena(){
-  const tipo=document.getElementById('f-tipo').value;
-  const cont=document.getElementById('grupos-faena-cont');
-  if(!gruposFaena.length){cont.innerHTML='<div class="empty">Agrega grupos a medida que salen de KM1</div>';return;}
-  cont.innerHTML='';
-  gruposFaena.forEach(g=>{
-    const div=document.createElement('div');div.className='grupo-card';
-    const eqHTML=g.equipos.map((eq,ei)=>
-      '<div class="eq-block" style="'+(eq.falla?'border-color:#F59E0B;background:#FFFBEB':'')+'">'+
-        '<div class="eq-block-header">'+
-          '<span style="font-size:11px;font-weight:700;color:'+(eq.falla?'#92550A':'#003DA5')+'">'+
-            (eq.falla?'🔄 Reemplazo ':'')+'Equipo '+(ei+1)+
-          '</span>'+
-          '<div style="display:flex;gap:4px">'+
-            '<button style="background:transparent;color:#B91C1C;border:1px solid #FECACA;padding:3px 7px;border-radius:5px;font-size:10px;cursor:pointer" onclick="abrirCambioEquipo('+g.id+','+ei+')">🔧 Cambio</button>'+
-            (g.equipos.length>1?'<button class="btn-danger" onclick="readGruposFaena();removeEqF('+g.id+','+ei+')">✕</button>':'')+
-          '</div>'+
-        '</div>'+
-        (eq.original?
-          '<div style="font-size:10px;color:#92550A;background:#FEF3E2;padding:3px 8px;border-radius:5px;margin-bottom:6px">'+
-            'Original: '+(eq.original.conductor||'—')+' · '+(eq.original.tracto||'—')+
-          '</div>':'')+
-        '<div style="margin-bottom:6px"><div class="eq-label">👤 Conductor</div>'+
-          selConductor(tipo,'fcond-'+g.id+'-'+ei,eq.conductor)+'</div>'+
-        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+
-          '<div><div class="eq-label">🚛 Tracto</div>'+selTracto('ftr-'+g.id+'-'+ei,eq.tracto)+'</div>'+
-          '<div><div class="eq-label">🔗 Semi</div>'+selSemi(tipo,'fsm-'+g.id+'-'+ei,eq.semi)+'</div>'+
-        '</div>'+
-      '</div>'
-    ).join('');
-    // Historial de cambios
-    const histHTML=(g.historialCambios||[]).length?
-      '<div style="background:#FEF3E2;border:1px solid #FCD34D;border-radius:8px;padding:8px 12px;margin-bottom:8px">'+
-        '<div style="font-size:11px;font-weight:700;color:#92550A;margin-bottom:4px">🔧 Historial de cambios</div>'+
-        (g.historialCambios||[]).map(h=>
-          '<div style="font-size:11px;color:#78350F;padding:3px 0;border-bottom:1px solid #FDE68A">'+
-            '⏱ '+h.hora+' hrs · Eq.'+h.equipo+' · '+h.motivo+
-            (h.original.conductor?' · Ant: '+h.original.conductor:'')+
-          '</div>'
-        ).join('')+
-      '</div>':'';
-    div.innerHTML=
-      '<div class="grupo-header">'+
-        '<div class="grupo-num">'+g.num+'</div>'+
-        '<span style="font-size:13px;font-weight:600;flex:1">Grupo '+g.num+'</span>'+
-        '<button class="btn-danger" onclick="removeGrupoFaena('+g.id+')">Quitar</button>'+
-      '</div>'+
-      histHTML+
-      eqHTML+
-      (g.equipos.length<3?'<button class="btn-outline" style="font-size:11px;padding:5px 10px;width:auto;margin-bottom:8px" onclick="readGruposFaena();addEqF('+g.id+')">+ Agregar equipo</button>':'')+
-      '<div class="field-row" style="margin-top:4px">'+
-        '<span class="lbl">Salida KM1</span>'+
-        '<input type="time" id="fsal-'+g.id+'" value="'+g.salida+'" style="width:120px">'+
-      '</div>';
-    cont.appendChild(div);
-  });
-}
+function renderGruposFaena(){renderArmador();} // compatibilidad
+
 
 // ── LLEGADAS ─────────────────────────────────────────
 function renderLlegadas(){
@@ -947,7 +1009,30 @@ function renderReporte(){
     rows+='<tr><td class="td-nombre">'+(e1?e1.nom:'')+'</td><td style="font-size:9px">'+(e1?e1.pat:'')+'</td><td class="td-tramo">'+destinoLabel+'</td><td class="td-proy">'+pFin+'</td><td class="'+(tFin?'td-llegada-ok':'td-llegada-empty')+'">'+tFin+'</td></tr>';
     if(eqV[2])rows+='<tr><td class="td-nombre">'+e2.nom+'</td><td style="font-size:9px">'+e2.pat+'</td><td colspan="3" style="background:#F9FAFB"></td></tr>';
   });
-  wrap.innerHTML='<div class="rpt-outer"><div class="rpt-title-bar">'+getTipoLabel()+'&nbsp;&nbsp;'+getFecha()+'</div><div class="rpt-scroll"><table class="rpt-table"><thead></thead><tbody>'+rows+'</tbody></table></div></div>';
+  wrap.innerHTML='<div class="rpt-outer"><div class="rpt-title-bar">'+getTipoLabel()+'&nbsp;&nbsp;'+getFecha()+'</div><div class="rpt-scroll"><table class="rpt-table"><thead></thead><tbody>'+rows+'</tbody></table></div></div>'+
+    // Botones de cambio por eventualidad debajo de la tabla
+    (gruposFaena.length?'<div style="margin-top:12px"><div style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Cambios por eventualidad en ruta:</div>'+
+      gruposFaena.map(g=>
+        '<div style="background:#fff;border:1px solid #E5E7EB;border-radius:10px;padding:10px 14px;margin-bottom:8px">'+
+          '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'+
+            '<div style="font-size:13px;font-weight:700;color:#003DA5">Grupo '+g.num+'</div>'+
+            '<button onclick="removeGrupoFaena('+g.id+')" style="background:transparent;color:#EF4444;border:1px solid #FECACA;padding:3px 8px;border-radius:5px;font-size:11px;cursor:pointer">✕ Quitar</button>'+
+          '</div>'+
+          g.equipos.map((eq,ei)=>
+            '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #F3F4F6">'+
+              '<span style="font-size:12px;font-weight:600;flex:1;color:'+(eq.falla?'#92550A':'#111')+'">'+(eq.falla?'🔄 ':'')+eq.conductor+'</span>'+
+              '<span style="background:#F3F4F6;padding:2px 8px;border-radius:5px;font-size:11px">'+eq.tracto+'</span>'+
+              '<span style="background:#EEF2FF;padding:2px 8px;border-radius:5px;font-size:11px;color:#4338CA">'+eq.semi+'</span>'+
+              '<button onclick="abrirCambioEquipo('+g.id+','+ei+')" style="background:transparent;color:#B91C1C;border:1px solid #FECACA;padding:3px 7px;border-radius:5px;font-size:10px;cursor:pointer;white-space:nowrap">🔧 Cambio</button>'+
+            '</div>'
+          ).join('')+
+          ((g.historialCambios||[]).length?
+            '<div style="margin-top:6px;background:#FEF3E2;border-radius:6px;padding:6px 10px">'+
+              (g.historialCambios||[]).map(h=>'<div style="font-size:10px;color:#92550A">⏱ '+h.hora+' · '+h.motivo+(h.original.conductor?' · Ant: '+h.original.conductor:'')+'</div>').join('')+
+            '</div>':'')+
+        '</div>'
+      ).join('')+
+    '</div>':'');
 }
 
 // ── TARJETA MATUTINO ──────────────────────────────────
