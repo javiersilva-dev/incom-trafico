@@ -1249,34 +1249,38 @@ function analizarTiempo(salida, tramoActual, tipo){
   const nowMin=toMin(horaActual);
   const salidaMin=toMin(salida);
 
-  // Buscar índice del tramo actual
-  // El tramo es "ORIGEN → DESTINO", el origen es la clave
-  const tramoOrigen=tramoActual.split('→')[0].trim();
+  // Buscar índice del tramo actual por origen
+  const tramoOrigen=tramoActual.split('→')[0].trim().toUpperCase();
   let idxTramo=-1;
-  segs.forEach((s,i)=>{if(s.o.toUpperCase()===tramoOrigen.toUpperCase())idxTramo=i;});
-
+  segs.forEach((s,i)=>{if(s.o.toUpperCase()===tramoOrigen)idxTramo=i;});
   if(idxTramo<0) return null;
 
-  // Calcular ETA acumulada hasta el inicio del tramo actual (= cuándo debería haber partido ese tramo)
-  let minAcum=0;
-  for(let i=0;i<idxTramo;i++) minAcum+=Math.round(segs[i].min*factor);
-  const etaInicioTramoMin=salidaMin+minAcum;
-  const etaInicioTramo=String(Math.floor(etaInicioTramoMin/60)%24).padStart(2,'0')+':'+String(etaInicioTramoMin%60).padStart(2,'0');
+  // ETA al FINAL del tramo actual (cuándo debería llegar al destino de este tramo)
+  let minAcumFin=0;
+  for(let i=0;i<=idxTramo;i++) minAcumFin+=Math.round(segs[i].min*factor);
+  const etaFinTramoMin=salidaMin+minAcumFin;
+  const etaInicioTramo=String(Math.floor(etaFinTramoMin/60)%24).padStart(2,'0')+':'+String(etaFinTramoMin%60).padStart(2,'0');
 
-  // Diferencia: hora actual vs hora proyectada de inicio del tramo
-  const diffMin=nowMin-etaInicioTramoMin;
+  // Diferencia: hora actual vs ETA fin del tramo actual
+  // Si nowMin < etaFinTramoMin → va en tiempo dentro del tramo (diffMin negativo = bien)
+  // Si nowMin > etaFinTramoMin → ya debería haber pasado ese tramo = demora
+  const diffMin=nowMin-etaFinTramoMin;
 
-  // ETA al destino final desde ahora: tiempo restante desde tramo actual en adelante
+  // ETA al destino final desde ahora
   let minRestante=0;
-  for(let i=idxTramo;i<segs.length;i++) minRestante+=Math.round(segs[i].min*factor);
-  const etaFinMin=nowMin+minRestante;
+  for(let i=idxTramo+1;i<segs.length;i++) minRestante+=Math.round(segs[i].min*factor);
+  // Si aún no termina el tramo actual, agregar tiempo restante del tramo
+  const tiempoTramoActual=Math.round(segs[idxTramo].min*factor);
+  const etaInicioTramoMin=salidaMin+minAcumFin-tiempoTramoActual;
+  const tiempoEnTramo=nowMin-etaInicioTramoMin;
+  const tiempoRestanteTramo=Math.max(0,tiempoTramoActual-tiempoEnTramo);
+  const etaFinMin=nowMin+tiempoRestanteTramo+minRestante;
   const etaFin=String(Math.floor(etaFinMin/60)%24).padStart(2,'0')+':'+String(etaFinMin%60).padStart(2,'0');
 
-  // ETA final proyectada desde salida
+  // ETA final proyectada desde salida (sin demoras)
   let minTotal=0;
   segs.forEach(s=>minTotal+=Math.round(s.min*factor));
-  const etaFinProyMin=salidaMin+minTotal;
-  const etaFinProy=String(Math.floor(etaFinProyMin/60)%24).padStart(2,'0')+':'+String(etaFinProyMin%60).padStart(2,'0');
+  const etaFinProy=String(Math.floor((salidaMin+minTotal)/60)%24).padStart(2,'0')+':'+String((salidaMin+minTotal)%60).padStart(2,'0');
 
   return{diffMin,etaInicioTramo,etaFin,etaFinProy,destino:segs[segs.length-1].d};
 }
@@ -1286,13 +1290,19 @@ function semaforoHTML(analisis){
   const{diffMin,etaInicioTramo,etaFin,etaFinProy,destino}=analisis;
   const abs=Math.abs(diffMin);
   let icono,color,bg,border,texto;
-  if(diffMin<=-1){
+  if(diffMin<-5){
     icono='🟢';color='#166534';bg='#DCFCE7';border='#86EFAC';
-    texto='Adelantado '+abs+' min';
+    texto='En tiempo · '+abs+' min antes de lo proyectado';
+  } else if(diffMin<=0){
+    icono='🟢';color='#166534';bg='#DCFCE7';border='#86EFAC';
+    texto='En tiempo';
   } else if(diffMin<=15){
     icono='🟡';color='#854D0E';bg='#FEF9C3';border='#FDE047';
-    texto=diffMin===0?'En tiempo exacto':'Demora leve: +'+diffMin+' min';
+    texto='Demora leve: +'+diffMin+' min';
   } else {
+    icono='🔴';color='#991B1B';bg='#FEE2E2';border='#FCA5A5';
+    texto='Demora: +'+diffMin+' min sobre lo proyectado';
+  }
     icono='🔴';color='#991B1B';bg='#FEE2E2';border='#FCA5A5';
     texto='Demora: +'+diffMin+' min sobre lo proyectado';
   }
@@ -1303,7 +1313,7 @@ function semaforoHTML(analisis){
     '</div>'+
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+
       '<div style="background:rgba(255,255,255,.7);border-radius:7px;padding:6px 10px">'+
-        '<div style="font-size:10px;color:#6B7280;font-weight:600;text-transform:uppercase;letter-spacing:.4px">Proyectado en tramo</div>'+
+        '<div style="font-size:10px;color:#6B7280;font-weight:600;text-transform:uppercase;letter-spacing:.4px">Proyectado fin de tramo</div>'+
         '<div style="font-size:14px;font-weight:700;color:#111;margin-top:2px">'+etaInicioTramo+' hrs</div>'+
       '</div>'+
       '<div style="background:rgba(255,255,255,.7);border-radius:7px;padding:6px 10px">'+
