@@ -798,19 +798,39 @@ function importarDisponibles(){
   const tipo=document.getElementById('f-tipo').value;
   const cont=document.getElementById('armador-lista');
 
-  if(!planActivo){
-    cont.innerHTML=
-      '<div style="background:#FEF3E2;border:1px solid #FCD34D;border-radius:10px;padding:14px;text-align:center">'+
-        '<div style="font-size:13px;font-weight:600;color:#92550A;margin-bottom:8px">No hay planificación cargada</div>'+
-        '<button class="btn-import" onclick="switchTab(\'plan\')" style="width:100%">→ Ir a Planificación</button>'+
-      '</div>';
+  if(!planActivo||(!( planActivo.equiposBat||[]).length&&!(planActivo.equiposRam||[]).length)){
+    // Intentar cargar desde Sheets
+    cont.innerHTML='<div style="text-align:center;padding:1rem;color:#6B7280;font-size:13px">⏳ Cargando desde Google Sheets...</div>';
+    leerDesdeSheets().then(planSheets=>{
+      if(planSheets&&(planSheets.equiposBat.length||planSheets.equiposRam.length)){
+        planActivo=planSheets;
+        if(!planes.find(p=>p.id==='sheet_plan'))planes.unshift(planSheets);
+        try{localStorage.setItem('incom_planes',JSON.stringify(planes));localStorage.setItem('incom_plan_activo','sheet_plan');}catch(e){}
+        cargarEquiposArmador(tipo,cont);
+      } else {
+        cont.innerHTML=
+          '<div style="background:#FEF3E2;border:1px solid #FCD34D;border-radius:10px;padding:14px;text-align:center">'+
+            '<div style="font-size:13px;font-weight:600;color:#92550A;margin-bottom:8px">Sin planificación guardada</div>'+
+            '<div style="font-size:12px;color:#78350F;margin-bottom:10px">Crea y guarda la planificación primero</div>'+
+            '<button class="btn-import" onclick="switchTab(\'plan\')" style="width:100%">→ Ir a Planificación</button>'+
+          '</div>';
+      }
+    }).catch(()=>{
+      cont.innerHTML=
+        '<div style="background:#FEF3E2;border:1px solid #FCD34D;border-radius:10px;padding:14px;text-align:center">'+
+          '<div style="font-size:13px;font-weight:600;color:#92550A;margin-bottom:8px">Sin conexión a Sheets</div>'+
+          '<button class="btn-import" onclick="switchTab(\'plan\')" style="width:100%">→ Ir a Planificación</button>'+
+        '</div>';
+    });
     return;
   }
+  cargarEquiposArmador(tipo,cont);
+}
 
+function cargarEquiposArmador(tipo,cont){
   const bateas=planActivo.equiposBat||[];
   const ramplas=planActivo.equiposRam||[];
   const arr=tipo==='ramplas'?ramplas:bateas;
-
   if(!arr.length){
     cont.innerHTML=
       '<div style="background:#FEF3E2;border:1px solid #FCD34D;border-radius:10px;padding:14px">'+
@@ -823,7 +843,6 @@ function importarDisponibles(){
       '</div>';
     return;
   }
-
   equiposDisponibles=arr.map((eq,i)=>({...eq,id:'eq_'+i,seleccionado:false,asignado:false}));
   equiposSeleccionados=[];
   gruposFaena=[];
@@ -1375,7 +1394,36 @@ function genPosicion(){
 
 
 
-// ── PLANIFICACIÓN ─────────────────────────────────────
+// ── GOOGLE SHEETS ─────────────────────────────────────
+const APPS_URL='https://script.google.com/macros/s/AKfycbxyQGoXaePo7FakfUf1PWkybt-SWpLzcHCnN-AGiLDAzDQA_edK3-Z-Nu4dsDULF1oU/exec';
+
+async function guardarEnSheets(plan){
+  try{
+    const resp=await fetch(APPS_URL,{
+      method:'POST',
+      body:JSON.stringify({plan}),
+      headers:{'Content-Type':'application/json'}
+    });
+    const data=await resp.json();
+    return data.ok;
+  }catch(e){console.error('Error guardando en Sheets:',e);return false;}
+}
+
+async function leerDesdeSheets(){
+  try{
+    const resp=await fetch(APPS_URL+'?action=leer');
+    const data=await resp.json();
+    if(!data.ok||!data.data||data.data.length<2)return null;
+    const rows=data.data.slice(1); // saltar encabezado
+    const equiposBat=rows.filter(r=>r[0]==='BATEA').map(r=>({conductor:r[1],tracto:r[2],semi:r[3]}));
+    const equiposRam=rows.filter(r=>r[0]==='RAMPLA').map(r=>({conductor:r[1],tracto:r[2],semi:r[3]}));
+    const fecha=rows[0]?rows[0][4]:'';
+    const nombre=rows[0]?rows[0][5]:'';
+    return{id:'sheet_plan',nombre,fecha,equiposBat,equiposRam};
+  }catch(e){console.error('Error leyendo Sheets:',e);return null;}
+}
+
+
 // Estructura: {id, nombre, fecha, equiposBat:[{conductor,tracto,semi}], equiposRam:[...]}
 
 function initPlan(){
@@ -1389,11 +1437,28 @@ function initPlan(){
       }
     } else {planes=[];planActivo=null;}
   }catch(e){planes=[];planActivo=null;}
-  renderPlanSel();
-  if(planActivo){
-    document.getElementById('plan-sel').value=planActivo.id;
-    cargarPlan();
-  }
+
+  // Intentar cargar desde Google Sheets
+  leerDesdeSheets().then(planSheets=>{
+    if(planSheets&&planSheets.equiposBat&&(planSheets.equiposBat.length||planSheets.equiposRam.length)){
+      // Actualizar planActivo con datos frescos de Sheets
+      planActivo=planSheets;
+      if(!planes.find(p=>p.id==='sheet_plan'))planes.unshift(planSheets);
+      else planes=planes.map(p=>p.id==='sheet_plan'?planSheets:p);
+      try{localStorage.setItem('incom_planes',JSON.stringify(planes));localStorage.setItem('incom_plan_activo','sheet_plan');}catch(e){}
+    }
+    renderPlanSel();
+    if(planActivo){
+      document.getElementById('plan-sel').value=planActivo.id;
+      cargarPlan();
+    }
+  }).catch(()=>{
+    renderPlanSel();
+    if(planActivo){
+      document.getElementById('plan-sel').value=planActivo.id;
+      cargarPlan();
+    }
+  });
 }
 
 function renderPlanSel(){
@@ -1478,13 +1543,21 @@ function eliminarPlan(){
 
 function guardarPlan(){
   readPlanForm();
-  // Guardar en sessionStorage
   try{
     localStorage.setItem('incom_planes',JSON.stringify(planes));
     if(planActivo)localStorage.setItem('incom_plan_activo',planActivo.id);
   }catch(e){}
+  // Guardar en Google Sheets
+  if(planActivo){
+    const btn=document.querySelector('button[onclick="guardarPlan()"]');
+    if(btn){btn.textContent='💾 Guardando...';btn.disabled=true;}
+    guardarEnSheets(planActivo).then(ok=>{
+      if(btn){btn.textContent='💾 Guardar';btn.disabled=false;}
+      if(ok){mostrarAviso('✓ Guardado en Google Sheets — disponible para todos los supervisores');}
+      else{mostrarAviso('⚠ Guardado localmente. Sin conexión a Sheets.');}
+    });
+  }
   renderPlanSel();actualizarResumen();
-  mostrarAviso('✓ Guardado. Usa ⬇ Exportar para guardar el archivo permanentemente.');
 }
 
 function exportarPlan(){
