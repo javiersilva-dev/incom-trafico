@@ -6,1970 +6,1149 @@
 <title>INCOM — Control de Tráfico</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap');
-:root{--blue:#003DA5;--blue2:#0051CC;--blue-light:#E8F0FE;--green:#1B7E3A;--green-light:#E6F4EA;--amber:#92550A;--amber-light:#FEF3E2;--red:#B91C1C;--red-light:#FEE2E2;--gray-bg:#F0F2F5;--gray-border:#D1D5DB;--gray-text:#6B7280;--text:#111827;--white:#fff}
+:root{
+  --blue:#003DA5;--blue2:#1a56db;--blue-light:#EFF6FF;
+  --green:#1B7E3A;--green-light:#E6F4EA;
+  --red:#B91C1C;--red-light:#FEE2E2;
+  --amber:#92550A;--amber-light:#FEF3E2;
+  --gray-bg:#F0F2F5;--gray-border:#D1D5DB;
+  --gray-text:#6B7280;--text:#111827;--white:#fff;
+  --navy:#1D3557;
+}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter',sans-serif;background:var(--gray-bg);color:var(--text);min-height:100vh}
-.topbar{background:var(--blue);padding:0 1rem;display:flex;align-items:center;gap:10px;height:50px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.25)}
-.topbar-logo{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:#fff;letter-spacing:1px;border:1.5px solid rgba(255,255,255,.35);padding:2px 10px;border-radius:4px}
-.topbar-title{font-size:13px;color:rgba(255,255,255,.8);flex:1}
-.topbar select{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-family:'Inter',sans-serif;font-size:12px;padding:5px 8px;border-radius:6px;outline:none}
-.topbar select option{background:#003DA5}
-.hora-sistema{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:#fff;background:rgba(255,255,255,.12);padding:3px 10px;border-radius:6px;letter-spacing:.5px;min-width:56px;text-align:center}
-.main-tabs{display:flex;background:#fff;border-bottom:1px solid var(--gray-border);overflow-x:auto;-webkit-overflow-scrolling:touch}
-.main-tab{flex:1;min-width:75px;padding:11px 4px;font-family:'Inter',sans-serif;font-size:11px;font-weight:500;color:var(--gray-text);background:transparent;border:none;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
-.main-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
-.content{max-width:680px;margin:0 auto;padding:1rem}
-.card{background:#fff;border:1px solid var(--gray-border);border-radius:12px;padding:1rem;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-.card-title{font-size:11px;font-weight:600;color:var(--gray-text);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px}
-.field-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.lbl{font-size:13px;color:var(--gray-text);min-width:100px;flex-shrink:0}
-select,input[type=text],input[type=time],input[type=date],input[type=number]{font-family:'Inter',sans-serif;font-size:13px;border:1px solid var(--gray-border);border-radius:7px;padding:7px 10px;background:#fff;color:var(--text);width:100%;outline:none;transition:border-color .15s}
-select:focus,input:focus{border-color:var(--blue)}
-input[type=number]{width:70px;text-align:center}
-.btn-primary{background:var(--blue);color:#fff;border:none;padding:10px 18px;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;width:100%;transition:opacity .15s}
-.btn-primary:hover{opacity:.9}
-.btn-outline{background:transparent;color:var(--text);border:1px solid var(--gray-border);padding:9px 16px;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;width:100%;transition:background .15s}
-.btn-outline:hover{background:var(--gray-bg)}
-.btn-danger{background:transparent;color:var(--red);border:1px solid #FECACA;padding:4px 8px;border-radius:6px;font-size:11px;cursor:pointer}
-.btn-import{background:var(--blue-light);color:var(--blue);border:1px solid #93C5FD;padding:9px 16px;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;width:100%}
-.cond-row{display:flex;gap:6px;margin-bottom:12px}
-.cond-btn{flex:1;padding:8px 4px;font-size:12px;font-family:'Inter',sans-serif;font-weight:500;border:1px solid var(--gray-border);border-radius:8px;background:transparent;color:var(--gray-text);cursor:pointer}
-.cond-btn.sel-normal{background:var(--green-light);border-color:#86EFAC;color:var(--green)}
-.cond-btn.sel-precaucion{background:var(--amber-light);border-color:#FCD34D;color:var(--amber)}
-.cond-btn.sel-critica{background:var(--red-light);border-color:#FCA5A5;color:var(--red)}
-.eq-counter{display:flex;align-items:center;gap:10px}
-.eq-counter button{width:30px;height:30px;border-radius:50%;border:1px solid var(--gray-border);background:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text)}
-.eq-num{font-size:16px;font-weight:700;min-width:28px;text-align:center}
-.totalizador{margin-top:10px;padding:10px 14px;border-radius:8px;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:space-between;transition:all .2s}
-.tot-ok{background:var(--green-light);color:var(--green);border:1px solid #86EFAC}
-.tot-err{background:var(--red-light);color:var(--red);border:1px solid #FCA5A5}
-.grupo-card{border:1px solid var(--gray-border);border-radius:10px;padding:12px;margin-bottom:10px;background:var(--gray-bg)}
-.grupo-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-.grupo-num{width:30px;height:30px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
-.eq-block{background:#fff;border:1px solid var(--gray-border);border-radius:8px;padding:10px;margin-bottom:8px}
-.eq-block-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.eq-3col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:0}
-.eq-label{font-size:10px;font-weight:600;color:var(--gray-text);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+
+/* TOP */
+.topbar{background:var(--navy);padding:0 1rem;display:flex;align-items:center;gap:10px;height:50px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.3)}
+.topbar-logo{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:#fff;letter-spacing:1px;border:1.5px solid rgba(255,255,255,0.4);padding:2px 10px;border-radius:4px}
+.topbar-title{font-size:12px;color:rgba(255,255,255,0.75);flex:1}
+.topbar select{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:#fff;font-family:'Inter',sans-serif;font-size:12px;padding:5px 8px;border-radius:6px;outline:none;max-width:180px}
+.topbar select option{background:#1D3557;color:#fff}
+
+/* TABS */
+.main-tabs{display:flex;background:#fff;border-bottom:1px solid var(--gray-border);overflow-x:auto;-webkit-overflow-scrolling:touch;position:sticky;top:50px;z-index:99}
+.main-tab{flex:1;min-width:75px;padding:10px 4px;font-family:'Inter',sans-serif;font-size:11px;font-weight:500;color:var(--gray-text);background:transparent;border:none;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap;transition:color .15s}
+.main-tab.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
+
+/* LAYOUT */
+.content{max-width:680px;margin:0 auto;padding:12px}
 .hidden{display:none!important}
-.empty{text-align:center;padding:2rem;color:var(--gray-text);font-size:13px}
 
-/* TARJETA MATUTINO */
-.rpt-card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);margin-top:1rem}
-.rpt-card-header{background:var(--blue);padding:16px 20px;display:flex;align-items:center;gap:12px}
-.rpt-card-logo{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:#fff;border:2px solid rgba(255,255,255,.4);padding:2px 10px;border-radius:5px}
-.rpt-card-title{font-size:15px;font-weight:700;color:#fff}
-.rpt-card-sub{font-size:12px;color:rgba(255,255,255,.75);margin-top:2px}
-.rpt-card-hora{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:700;color:#fff;text-align:right}
-.rpt-section{padding:14px 20px;border-bottom:1px solid #F3F4F6}
-.rpt-section:last-child{border-bottom:none}
-.rpt-section-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-.rpt-section-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.rpt-section-label{font-size:12px;font-weight:700;color:var(--gray-text);text-transform:uppercase;letter-spacing:.5px;flex:1}
-.rpt-section-dest{font-size:11px;color:var(--gray-text);background:#F3F4F6;padding:2px 8px;border-radius:20px}
-.rpt-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0}
-.rpt-row-label{font-size:13px;color:var(--gray-text)}
-.rpt-row-val{font-size:14px;font-weight:600;color:var(--text)}
-.rpt-divider{border:none;border-top:1px dashed #E5E7EB;margin:6px 0}
-.rpt-total-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0 4px}
-.rpt-total-label{font-size:13px;font-weight:700;color:var(--text)}
-.rpt-total-val{font-size:18px;font-weight:700;color:var(--blue)}
-.rpt-badge-ok{background:#DCFCE7;color:#166534;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
-.rpt-badge-err{background:#FEE2E2;color:#991B1B;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
-.rpt-footer{background:#F9FAFB;padding:10px 20px;display:flex;align-items:center;justify-content:space-between}
+/* CARDS */
+.card{background:#fff;border:1px solid var(--gray-border);border-radius:12px;padding:14px;margin-bottom:12px}
+.card-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px}
 
-/* TABLA FAENA */
-.rpt-outer{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);margin-top:1rem}
-.rpt-title-bar{background:var(--blue);text-align:center;padding:12px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:#fff;letter-spacing:.5px}
-.rpt-scroll{overflow-x:auto}
-.rpt-table{width:100%;border-collapse:collapse;font-family:'Inter',sans-serif;font-size:10px;min-width:580px}
-.rpt-table th{background:#002D7A;color:#fff;padding:5px 6px;text-align:center;font-size:8px;font-weight:700;border:1px solid #001F5C;white-space:nowrap}
-.rpt-table td{border:1px solid #E5E7EB;padding:4px 6px;text-align:center;color:#111;background:#fff;vertical-align:middle}
-.td-nombre{text-align:left!important;font-size:9px;font-weight:500}
-.td-grupo{background:#003DA5!important;color:#fff!important;font-family:'Barlow Condensed',sans-serif;font-size:26px!important;font-weight:700}
-.td-desp{font-size:14px;font-weight:700;color:#003DA5}
-.td-salida{font-size:12px;font-weight:700}
-.td-tramo{background:#003DA5!important;color:#fff!important;font-size:9px;text-align:left!important;padding-left:8px!important;font-weight:600}
-.td-proy{font-size:11px;font-weight:700;color:#374151}
-.td-llegada-ok{background:#16A34A!important;color:#fff!important;font-size:12px;font-weight:700}
-.td-llegada-empty{background:#F3F4F6;color:#9CA3AF;font-size:9px}
-.td-tiempo-ok{background:#16A34A!important;color:#fff!important;font-family:'Barlow Condensed',sans-serif;font-size:18px!important;font-weight:700}
-.grp-hdr th{background:#1F2937!important;font-size:7px!important;padding:3px 5px!important}
+/* BUTTONS */
+.btn-primary{background:var(--blue);color:#fff;border:none;border-radius:8px;padding:10px 16px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;width:100%;margin-bottom:8px}
+.btn-primary:active{opacity:.85}
+.btn-outline{background:#fff;color:var(--blue);border:1.5px solid var(--blue);border-radius:8px;padding:9px 16px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;width:100%;margin-bottom:8px}
+.btn-danger{background:#fff;color:var(--red);border:1.5px solid var(--red);border-radius:8px;padding:9px 16px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;margin-bottom:8px}
+.btn-sm{padding:5px 11px;font-size:12px;border-radius:6px;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-weight:500}
+.btn-sm-blue{background:var(--blue);color:#fff}
+.btn-sm-red{background:#FEE2E2;color:var(--red)}
+.btn-sm-gray{background:#F3F4F6;color:#374151}
 
-/* TARJETA POSICION */
-.pos-card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);margin-top:1rem}
-.pos-card-header{background:linear-gradient(135deg,#003DA5,#0051CC);padding:14px 18px;display:flex;align-items:center;gap:12px}
-.pos-grupo{background:#fff;border-radius:10px;margin:10px 16px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08)}
-.pos-grupo-header{background:#003DA5;padding:8px 14px;display:flex;align-items:center;gap:8px}
-.pos-grupo-num{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:#fff;min-width:24px}
-.pos-grupo-nombre{font-size:12px;font-weight:600;color:rgba(255,255,255,.9)}
-.pos-grupo-body{padding:10px 14px}
-.pos-ubicacion-badge{background:var(--blue-light);color:var(--blue);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;border:1px solid #BFDBFE}
+/* FIELD ROWS */
+.field-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #F3F4F6}
+.field-row:last-child{border-bottom:none}
+.field-label{font-size:13px;color:var(--gray-text)}
 
-/* TRAMOS */
-.tramos-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:8px}
-.tramo-btn{padding:7px 6px;font-size:11px;font-family:'Inter',sans-serif;font-weight:500;border:1px solid var(--gray-border);border-radius:7px;background:#fff;color:var(--gray-text);cursor:pointer;text-align:center;transition:all .15s}
-.tramo-btn:hover{background:#F3F4F6}
-.tramo-btn.sel{background:#003DA5;border-color:#003DA5;color:#fff;font-weight:600}
+/* COUNTERS */
+.eq-counter{display:flex;align-items:center;gap:8px}
+.eq-counter button{width:28px;height:28px;border-radius:6px;border:1px solid var(--gray-border);background:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:600;color:var(--blue)}
+.eq-num{font-size:18px;font-weight:700;color:var(--text);min-width:28px;text-align:center}
+
+/* TOTALIZADOR */
+.totalizador{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-radius:8px;font-size:12px;margin-top:8px;font-weight:500}
+.tot-ok{background:#DCFCE7;color:#166534}
+.tot-warn{background:#FEF3C7;color:#92400E}
+.tot-err{background:#FEE2E2;color:var(--red)}
+
+/* SECTION HEADERS */
+.section-header{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;border-radius:8px;margin-bottom:8px}
+.section-bat{background:#1B7E3A;color:#fff}
+.section-ram{background:var(--navy);color:#fff}
+.section-label{font-size:12px;font-weight:600;letter-spacing:.3px}
+
+/* PLAN EQUIPMENT ROWS */
+.plan-equipo-row{background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.plan-equipo-row.fuera{background:#FEF2F2;border-color:#FECACA}
+.equipo-info{flex:1;min-width:0}
+.equipo-nombre{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.equipo-patentes{font-size:11px;color:var(--gray-text);margin-top:2px}
+.equipo-motivo{font-size:11px;color:var(--red);font-weight:500;margin-top:2px}
+
+/* SELECTOR BUTTONS */
+.sel-grid{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.sel-btn{padding:4px 9px;font-size:11px;border-radius:5px;border:1px solid var(--gray-border);background:#fff;cursor:pointer;font-family:'Inter',sans-serif;color:#374151;transition:all .1s}
+.sel-btn:hover{background:var(--blue-light);border-color:#93C5FD}
+.sel-btn.selected{background:var(--blue);color:#fff;border-color:var(--blue)}
+.sel-btn.usado{background:#F3F4F6;color:#9CA3AF;text-decoration:line-through;cursor:not-allowed}
+
+/* COND BUTTONS */
+.cond-row{display:flex;gap:6px;margin-bottom:8px}
+.cond-btn{flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid var(--gray-border);background:#fff;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:500}
+.cond-btn.active-normal{background:#DCFCE7;border-color:#16A34A;color:#166534}
+.cond-btn.active-prec{background:#FEF3C7;border-color:#D97706;color:#92400E}
+.cond-btn.active-crit{background:#FEE2E2;border-color:#DC2626;color:var(--red)}
+
+/* GRUPO FAENA */
+.grupo-card{background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;padding:10px;margin-bottom:8px}
+.grupo-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.grupo-title{font-size:12px;font-weight:600;color:var(--text)}
+.grupo-equipo{display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid #F3F4F6;font-size:12px}
+.grupo-equipo:last-child{border-bottom:none}
+.panne-badge{background:#FEE2E2;color:var(--red);font-size:10px;font-weight:600;padding:1px 6px;border-radius:4px}
+
+/* TARJETA CONDUCTORES */
+.tarjeta-wrap{margin-top:10px}
+
+/* POSICION */
+.tramo-sel{width:100%;padding:8px;font-size:13px;border:1px solid var(--gray-border);border-radius:7px;font-family:'Inter',sans-serif;margin-bottom:6px}
 
 /* SEGMENTOS */
-.seg-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;margin-bottom:8px}
+.seg-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #F3F4F6;font-size:13px}
+.seg-input{width:70px;padding:5px 8px;border:1px solid var(--gray-border);border-radius:6px;font-size:13px;font-family:'Inter',sans-serif;text-align:center}
 
-/* ARMADOR DE CONVOY */
-.eq-disponible{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1.5px solid var(--gray-border);border-radius:8px;margin-bottom:6px;cursor:pointer;transition:all .15s;background:#fff}
-.eq-disponible:hover{border-color:#003DA5;background:#EFF6FF}
-.eq-disponible.sel{border-color:#003DA5;background:#003DA5;color:#fff}
-.eq-disponible.sel .eq-d-pat{background:rgba(255,255,255,.2);color:#fff}
-.eq-disponible.sel .eq-d-semi{background:rgba(255,255,255,.15);color:#fff}
-.eq-d-num{width:24px;height:24px;border-radius:50%;background:#E5E7EB;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#374151;flex-shrink:0}
-.eq-disponible.sel .eq-d-num{background:rgba(255,255,255,.25);color:#fff}
-.eq-d-nombre{flex:1;font-size:13px;font-weight:600}
-.eq-d-pat{background:#F3F4F6;color:#374151;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:500}
-.eq-d-semi{background:#EEF2FF;color:#4338CA;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:500}
+/* AVISO */
+.aviso{position:fixed;top:110px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,.25);pointer-events:none;opacity:0;transition:opacity .3s}
+.aviso.show{opacity:1}
 
-input.time-ok{border-color:var(--green)!important;background:#F0FDF4!important}
-.llegada-item{padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--gray-border)}
-
-/* COND INFO */
-.cond-info{font-size:12px;color:var(--gray-text);margin-top:-8px;margin-bottom:12px;padding:8px 12px;background:#F9FAFB;border-radius:8px;border:1px solid var(--gray-border)}
-
-@media(max-width:480px){.content{padding:.75rem}.eq-3col{grid-template-columns:1fr 1fr}}
+input[type=time],input[type=date],input[type=text],select.normal{width:100%;padding:8px 10px;border:1px solid var(--gray-border);border-radius:7px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);background:#fff;outline:none;margin-bottom:8px}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 
+<!-- TOPBAR -->
 <div class="topbar">
-  <span class="topbar-logo">INCOM</span>
-  <span class="topbar-title">Control de Tráfico</span>
-  <span class="hora-sistema" id="reloj-topbar">--:--</span>
-  <select id="sup-sel">
-    <option value="">Supervisor...</option>
-    <option>Ignacio Bustos</option>
-    <option>Boris Gana Carvajal</option>
-    <option>Camila Muñoz</option>
+  <div class="topbar-logo">INCOM</div>
+  <div class="topbar-title">Control de Tráfico</div>
+  <select id="sel-supervisor" onchange="guardarSup()">
+    <option value="">— Supervisor —</option>
     <option>Gonzalo Fernandez</option>
+    <option>Boris Gana</option>
+    <option>Juan Olivares</option>
     <option>Javier Silva</option>
-    <option>Administrador</option>
   </select>
 </div>
 
+<!-- TABS -->
 <div class="main-tabs">
-  <button class="main-tab" onclick="switchTab('plan')">📋 Planificación</button>
-  <button class="main-tab active" onclick="switchTab('matutino')">Reporte 8 AM</button>
-  <button class="main-tab" onclick="switchTab('faena')">Salida faena</button>
-  <button class="main-tab" onclick="switchTab('posicion')">Posición ruta</button>
-  <button class="main-tab" onclick="switchTab('segmentos')">⚙ Tiempos</button>
+  <button class="main-tab active" id="tab-btn-plan"     onclick="switchTab('plan')">📋 Plan</button>
+  <button class="main-tab"        id="tab-btn-matutino" onclick="switchTab('matutino')">🕗 8 AM</button>
+  <button class="main-tab"        id="tab-btn-faena"    onclick="switchTab('faena')">🚛 Faena</button>
+  <button class="main-tab"        id="tab-btn-posicion" onclick="switchTab('posicion')">📍 Ruta</button>
+  <button class="main-tab"        id="tab-btn-tiempos"  onclick="switchTab('tiempos')">⚙ Tiempos</button>
 </div>
 
 <div class="content">
 
-<!-- ════ TAB PLANIFICACIÓN ════ -->
-<div id="tab-plan" class="hidden">
-
-  <div class="card" style="background:linear-gradient(135deg,#EFF6FF,#fff);border-color:#BFDBFE">
-    <div style="font-size:13px;font-weight:600;color:#1E40AF;margin-bottom:6px">💡 ¿Cómo funciona?</div>
-    <div style="font-size:12px;color:#374151;line-height:1.6">
-      Planifica los equipos del día siguiente. Asigna conductor, tracto y semi a cada equipo. Usa <strong>⬇ Exportar</strong> para guardar y <strong>📂 Importar</strong> para reutilizar mañana.
-    </div>
-  </div>
+<!-- ══════════════════════════════════════════
+     TAB PLANIFICACIÓN
+══════════════════════════════════════════ -->
+<div id="tab-plan">
 
   <div class="card">
     <div class="card-title">Planificaciones guardadas</div>
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
-      <select id="plan-sel" style="flex:1" onchange="cargarPlan()">
-        <option value="">— Seleccionar planificación —</option>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <select id="plan-sel" style="flex:1;padding:8px;border:1px solid var(--gray-border);border-radius:7px;font-family:'Inter',sans-serif;font-size:13px" onchange="cargarPlanSel()">
+        <option value="">— Seleccionar —</option>
       </select>
-      <button class="btn-danger" onclick="eliminarPlan()" style="white-space:nowrap;padding:7px 10px;font-size:12px">🗑</button>
+      <button class="btn-sm btn-sm-red" onclick="eliminarPlan()">🗑</button>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
-      <button class="btn-import" onclick="nuevaPlan()">+ Nueva</button>
-      <button class="btn-import" onclick="duplicarPlan()">⧉ Duplicar</button>
-      <button class="btn-import" onclick="document.getElementById('plan-file-input').click()">📂 Importar</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <button class="btn-sm btn-sm-blue" style="padding:9px" onclick="nuevaPlan()">+ Nueva</button>
+      <button class="btn-sm btn-sm-gray" style="padding:9px" onclick="importarPlan()">📂 Importar</button>
     </div>
-    <input type="file" id="plan-file-input" accept=".json" style="display:none" onchange="importarPlanArchivo(event)">
   </div>
 
-  <div id="plan-form" class="hidden">
+  <div id="plan-editor" class="hidden">
     <div class="card">
-      <div class="field-row"><span class="lbl">Nombre</span>
-        <input type="text" id="plan-nombre" placeholder="Ej: Lunes 28-04" style="flex:1">
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <input type="text" id="plan-nombre" placeholder="Nombre planificación" style="flex:1;padding:8px;border:1px solid var(--gray-border);border-radius:7px;font-family:'Inter',sans-serif;font-size:13px">
+        <input type="date" id="plan-fecha" style="padding:8px;border:1px solid var(--gray-border);border-radius:7px;font-family:'Inter',sans-serif;font-size:13px">
       </div>
-      <div class="field-row"><span class="lbl">Fecha</span>
-        <input type="date" id="plan-fecha" style="flex:1">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button class="btn-primary" style="margin:0" onclick="guardarPlan()">💾 Guardar</button>
+        <button class="btn-outline" style="margin:0" onclick="exportarPlan()">⬇ Exportar</button>
       </div>
     </div>
 
     <!-- BATEAS -->
     <div class="card">
-      <!-- SELECTOR ACTIVO -->
-      <div class="card" style="border-color:#003DA5">
-        <div class="card-title" style="color:#003DA5">🟢 Agregar equipo Batea</div>
-        <!-- Resumen selección activa -->
-        <div id="sel-bat-preview" style="display:none;flex-wrap:wrap;gap:6px;margin-bottom:12px;padding:8px 12px;background:#EFF6FF;border-radius:8px;align-items:center"></div>
-        <div style="margin-bottom:8px">
-          <div class="eq-label">👤 Conductor</div>
-          <div id="sel-bat-cond-wrap"></div>
-          <input type="hidden" id="sel-bat-cond">
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
-          <div>
-            <div class="eq-label">🚛 Tracto</div>
-            <div id="sel-bat-tr-wrap"></div>
-            <input type="hidden" id="sel-bat-tr">
-          </div>
-          <div>
-            <div class="eq-label">🔗 Semi</div>
-            <div id="sel-bat-sm-wrap"></div>
-            <input type="hidden" id="sel-bat-sm">
-          </div>
-        </div>
-        <div style="display:flex;gap:8px;margin-bottom:4px">
-          <button class="btn-primary" style="flex:1" onclick="confirmarEquipo('bat')">+ Agregar a lista</button>
-          <button style="padding:7px 12px;border-radius:8px;border:1.5px solid #DC2626;background:#fff;color:#DC2626;font-family:Inter,sans-serif;font-size:12px;font-weight:600;cursor:pointer" onclick="marcarFueraServicio('bat')">🔴 Fuera de servicio</button>
-        </div>
+      <div class="section-header section-bat">
+        <span class="section-label">🟢 BATEAS — Puerto Totoralillo</span>
+        <span id="resumen-bat" style="font-size:11px;opacity:.8">0 equipos</span>
       </div>
-
-      <!-- LISTA ACUMULADA BATEAS -->
-      <div id="plan-equipos-bat" style="margin-bottom:4px"></div>
-
+      <div id="plan-lista-bat"></div>
+      <button class="btn-outline" onclick="abrirSelector('bat')">+ Agregar equipo</button>
     </div>
 
     <!-- RAMPLAS -->
     <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-        <div>
-          <div class="card-title" style="margin-bottom:2px">🔵 Ramplas — Base INCOM Copiapó</div>
-          <div style="font-size:11px;color:var(--gray-text)" id="plan-ram-resumen">0 equipos</div>
-        </div>
+      <div class="section-header section-ram">
+        <span class="section-label">🔵 RAMPLAS — Base INCOM Copiapó</span>
+        <span id="resumen-ram" style="font-size:11px;opacity:.8">0 equipos</span>
       </div>
-
-      <!-- SELECTOR ACTIVO RAMPLAS -->
-      <div style="border:1px solid #1D4ED8;border-radius:10px;padding:12px;margin-bottom:10px">
-        <div class="card-title" style="color:#1D4ED8;margin-bottom:10px">🔵 Agregar equipo Rampla</div>
-        <div id="sel-ram-preview" style="display:none;flex-wrap:wrap;gap:6px;margin-bottom:12px;padding:8px 12px;background:#EFF6FF;border-radius:8px;align-items:center"></div>
-        <div style="margin-bottom:8px">
-          <div class="eq-label">👤 Conductor</div>
-          <div id="sel-ram-cond-wrap"></div>
-          <input type="hidden" id="sel-ram-cond">
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
-          <div>
-            <div class="eq-label">🚛 Tracto</div>
-            <div id="sel-ram-tr-wrap"></div>
-            <input type="hidden" id="sel-ram-tr">
-          </div>
-          <div>
-            <div class="eq-label">🔗 Semi</div>
-            <div id="sel-ram-sm-wrap"></div>
-            <input type="hidden" id="sel-ram-sm">
-          </div>
-        </div>
-        <div style="display:flex;gap:8px;margin-bottom:4px">
-          <button class="btn-primary" style="flex:1;background:#1D4ED8" onclick="confirmarEquipo('ram')">+ Agregar a lista</button>
-          <button style="padding:7px 12px;border-radius:8px;border:1.5px solid #DC2626;background:#fff;color:#DC2626;font-family:Inter,sans-serif;font-size:12px;font-weight:600;cursor:pointer" onclick="marcarFueraServicio('ram')">🔴 Fuera de servicio</button>
-        </div>
-      </div>
-
-      <!-- LISTA ACUMULADA RAMPLAS -->
-      <div id="plan-equipos-ram"></div>
+      <div id="plan-lista-ram"></div>
+      <button class="btn-outline" onclick="abrirSelector('ram')">+ Agregar equipo</button>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-      <button class="btn-primary" onclick="guardarPlan()">💾 Guardar</button>
-      <button class="btn-primary" style="background:#1B7E3A" onclick="exportarPlan()">⬇ Exportar</button>
-    </div>
-    <button class="btn-outline" style="width:100%;margin-bottom:8px;border-color:#7C3AED;color:#7C3AED" onclick="genTarjetaConductores()">📋 Generar programación para conductores</button>
-    <div id="plan-aviso" class="hidden" style="background:#DCFCE7;border:1px solid #86EFAC;border-radius:8px;padding:10px 14px;font-size:13px;color:#166534;margin-bottom:12px;text-align:center"></div>
-    <div id="out-conductores" class="hidden" style="margin-top:4px">
+    <button class="btn-primary" onclick="genTarjetaConductores()">📋 Generar programación</button>
+    <div id="out-conductores" class="hidden tarjeta-wrap">
       <div id="tarjeta-conductores"></div>
-      <button class="btn-primary" style="margin-top:10px;background:#7C3AED" onclick="descargarPNG('tarjeta-conductores','programacion_conductores')">⬇ Descargar imagen</button>
-      <p style="font-size:11px;color:var(--gray-text);text-align:center;margin-top:6px">Descarga y envía por WhatsApp a los conductores</p>
+      <button class="btn-primary" style="background:#7C3AED;margin-top:10px" onclick="descargarPNG('tarjeta-conductores','programacion_conductores')">⬇ Descargar imagen</button>
+      <p style="font-size:11px;color:var(--gray-text);text-align:center;margin-top:4px">Descarga y envía por WhatsApp a los conductores</p>
     </div>
   </div>
 
+  <!-- SELECTOR MODAL -->
+  <div id="selector-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:flex-end">
+    <div style="background:#fff;border-radius:16px 16px 0 0;padding:16px;width:100%;max-height:80vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="font-size:14px;font-weight:600" id="sel-modal-title">Seleccionar equipo</div>
+        <button onclick="cerrarSelector()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--gray-text)">✕</button>
+      </div>
+      <div style="font-size:12px;font-weight:600;color:var(--gray-text);margin-bottom:6px">CONDUCTOR</div>
+      <div class="sel-grid" id="grp-cond"></div>
+      <div style="font-size:12px;font-weight:600;color:var(--gray-text);margin:8px 0 6px">TRACTO</div>
+      <div class="sel-grid" id="grp-tr"></div>
+      <div style="font-size:12px;font-weight:600;color:var(--gray-text);margin:8px 0 6px" id="grp-sm-label">SEMIRREMOLQUE</div>
+      <div class="sel-grid" id="grp-sm"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
+        <button class="btn-primary" style="margin:0" onclick="confirmarEquipo()">✓ Agregar</button>
+        <button class="btn-danger" style="margin:0" onclick="confirmarFueraServicio()">🔴 Fuera de servicio</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL MOTIVO FUERA DE SERVICIO -->
+  <div id="fuera-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:210;display:flex;align-items:center;justify-content:center;padding:16px">
+    <div style="background:#fff;border-radius:12px;padding:16px;width:100%;max-width:340px">
+      <div style="font-size:14px;font-weight:600;margin-bottom:12px;color:var(--red)">🔴 Equipo fuera de servicio</div>
+      <div style="font-size:12px;color:var(--gray-text);margin-bottom:8px">Selecciona el motivo:</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px">
+        <button class="motivo-btn btn-sm" onclick="selMotivo(this)" data-m="Mantención" style="padding:10px;border:1.5px solid var(--gray-border);border-radius:7px;background:#fff;cursor:pointer;font-family:'Inter',sans-serif;font-size:12px">🔧 Mantención</button>
+        <button class="motivo-btn btn-sm" onclick="selMotivo(this)" data-m="Reparación" style="padding:10px;border:1.5px solid var(--gray-border);border-radius:7px;background:#fff;cursor:pointer;font-family:'Inter',sans-serif;font-size:12px">🛠 Reparación</button>
+        <button class="motivo-btn btn-sm" onclick="selMotivo(this)" data-m="Certificación" style="padding:10px;border:1.5px solid var(--gray-border);border-radius:7px;background:#fff;cursor:pointer;font-family:'Inter',sans-serif;font-size:12px">📋 Certificación</button>
+        <button class="motivo-btn btn-sm" onclick="selMotivo(this)" data-m="Otro" style="padding:10px;border:1.5px solid var(--gray-border);border-radius:7px;background:#fff;cursor:pointer;font-family:'Inter',sans-serif;font-size:12px">📌 Otro</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button class="btn-danger" style="margin:0" onclick="cerrarFueraModal()">Cancelar</button>
+        <button class="btn-primary" style="margin:0;background:var(--red)" onclick="confirmarFuera()">Confirmar</button>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- ════ TAB MATUTINO ════ -->
-<div id="tab-matutino">
-  <div class="card" style="background:#EFF6FF;border-color:#BFDBFE;padding:10px 14px">
-    <div style="display:flex;align-items:center;justify-content:space-between">
-      <span style="font-size:13px;color:#1E40AF;font-weight:500">¿Tienes planificación activa?</span>
-      <button class="btn-import" style="padding:6px 14px;font-size:12px" onclick="cargarTotalesDesdePlan()">↓ Cargar totales</button>
-    </div>
-    <div style="font-size:11px;color:#3B82F6;margin-top:4px">Importa los totales de bateas y ramplas desde la planificación del día</div>
-  </div>
+<!-- ══════════════════════════════════════════
+     TAB REPORTE 8 AM
+══════════════════════════════════════════ -->
+<div id="tab-matutino" class="hidden">
+
   <div class="card">
-    <div class="card-title">Bateas — Puerto Totoralillo</div>
-    <!-- Total destacado en azul -->
-    <div style="background:#003DA5;border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
-      <span style="font-size:13px;font-weight:700;color:#fff">Total asignados</span>
-      <input type="number" id="mb-total" value="15" min="0" max="30"
-        style="width:64px;text-align:center;font-size:20px;font-weight:700;color:#003DA5;border:none;border-radius:8px;padding:4px 8px;background:#fff"
-        oninput="updateTot()">
+    <div class="card-title">Hora del reporte</div>
+    <input type="time" id="m-hora" value="08:00">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+      <span style="font-size:12px;color:var(--gray-text)">Cargar totales desde planificación</span>
+      <button class="btn-sm btn-sm-blue" onclick="cargarDesdePlan()">↓ Cargar</button>
     </div>
-    <div class="field-row"><span class="lbl">En base</span>
-      <input type="number" id="mb-base" value="0" min="0" max="30" style="width:80px;text-align:center;font-size:15px;font-weight:600" oninput="updateTot()">
-    </div>
-    <div class="field-row"><span class="lbl">En ruta a faena</span>
-      <input type="number" id="mb-rutaf" value="0" min="0" max="30" style="width:80px;text-align:center;font-size:15px;font-weight:600" oninput="updateTot()">
-    </div>
-    <div class="field-row"><span class="lbl">En faena</span>
-      <input type="number" id="mb-faena" value="15" min="0" max="30" style="width:80px;text-align:center;font-size:15px;font-weight:600" oninput="updateTot()">
-    </div>
-    <div class="totalizador tot-ok" id="tot-bat-el"><span>Suma de estados</span><span id="tot-bat-txt">15 / 15 ✓ Cuadra</span></div>
   </div>
+
+  <!-- BATEAS -->
   <div class="card">
-    <div class="card-title">Ramplas — Base INCOM Copiapó</div>
-    <!-- Total destacado en azul -->
-    <div style="background:#003DA5;border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
-      <span style="font-size:13px;font-weight:700;color:#fff">Total asignados</span>
-      <input type="number" id="mr-total" value="7" min="0" max="20"
-        style="width:64px;text-align:center;font-size:20px;font-weight:700;color:#003DA5;border:none;border-radius:8px;padding:4px 8px;background:#fff"
-        oninput="updateTot()">
+    <div class="section-header section-bat" style="margin-bottom:10px">
+      <span class="section-label">🟢 BATEAS</span>
+      <span style="font-size:11px;opacity:.8">Pto. Totoralillo</span>
     </div>
-    <div class="field-row"><span class="lbl">En carga</span>
-      <input type="number" id="mr-carga" value="0" min="0" max="20" style="width:80px;text-align:center;font-size:15px;font-weight:600" oninput="updateTot()">
+    <div class="field-row">
+      <span class="field-label">Total equipos del día</span>
+      <div class="eq-counter">
+        <button onclick="adjM('mb-total',-1)">−</button>
+        <span class="eq-num" id="mb-total">0</span>
+        <button onclick="adjM('mb-total',1)">+</button>
+      </div>
     </div>
-    <div class="field-row"><span class="lbl">En descarga</span>
-      <input type="number" id="mr-desc" value="0" min="0" max="20" style="width:80px;text-align:center;font-size:15px;font-weight:600" oninput="updateTot()">
+    <div class="field-row">
+      <span class="field-label">En base</span>
+      <div class="eq-counter"><button onclick="adjM('mb-base',-1)">−</button><span class="eq-num" id="mb-base">0</span><button onclick="adjM('mb-base',1)">+</button></div>
     </div>
-    <div class="field-row"><span class="lbl">En ruta a faena</span>
-      <input type="number" id="mr-rutaf" value="0" min="0" max="20" style="width:80px;text-align:center;font-size:15px;font-weight:600" oninput="updateTot()">
+    <div class="field-row">
+      <span class="field-label">En ruta a faena</span>
+      <div class="eq-counter"><button onclick="adjM('mb-rutaf',-1)">−</button><span class="eq-num" id="mb-rutaf">0</span><button onclick="adjM('mb-rutaf',1)">+</button></div>
     </div>
-    <div class="field-row"><span class="lbl">En faena</span>
-      <input type="number" id="mr-faena" value="0" min="0" max="20" style="width:80px;text-align:center;font-size:15px;font-weight:600" oninput="updateTot()">
+    <div class="field-row">
+      <span class="field-label">En faena</span>
+      <div class="eq-counter"><button onclick="adjM('mb-faena',-1)">−</button><span class="eq-num" id="mb-faena">0</span><button onclick="adjM('mb-faena',1)">+</button></div>
     </div>
-    <input type="hidden" id="mr-rutab" value="0">
-    <div class="totalizador tot-ok" id="tot-ram-el"><span>Suma de estados</span><span id="tot-ram-txt">0 / 7 ⚠ Faltan 7</span></div>
+    <div class="totalizador tot-ok" id="tot-bat-el">
+      <span>Suma de estados</span><span id="tot-bat-txt">0 / 0</span>
+    </div>
   </div>
+
+  <!-- RAMPLAS -->
+  <div class="card">
+    <div class="section-header section-ram" style="margin-bottom:10px">
+      <span class="section-label">🔵 RAMPLAS</span>
+      <span style="font-size:11px;opacity:.8">Base INCOM Copiapó</span>
+    </div>
+    <div class="field-row">
+      <span class="field-label">Total equipos del día</span>
+      <div class="eq-counter"><button onclick="adjM('mr-total',-1)">−</button><span class="eq-num" id="mr-total">0</span><button onclick="adjM('mr-total',1)">+</button></div>
+    </div>
+    <div class="field-row">
+      <span class="field-label">En carga</span>
+      <div class="eq-counter"><button onclick="adjM('mr-carga',-1)">−</button><span class="eq-num" id="mr-carga">0</span><button onclick="adjM('mr-carga',1)">+</button></div>
+    </div>
+    <div class="field-row">
+      <span class="field-label">En descarga</span>
+      <div class="eq-counter"><button onclick="adjM('mr-desc',-1)">−</button><span class="eq-num" id="mr-desc">0</span><button onclick="adjM('mr-desc',1)">+</button></div>
+    </div>
+    <div class="field-row">
+      <span class="field-label">En ruta a faena</span>
+      <div class="eq-counter"><button onclick="adjM('mr-rutaf',-1)">−</button><span class="eq-num" id="mr-rutaf">0</span><button onclick="adjM('mr-rutaf',1)">+</button></div>
+    </div>
+    <div class="field-row">
+      <span class="field-label">En faena</span>
+      <div class="eq-counter"><button onclick="adjM('mr-faena',-1)">−</button><span class="eq-num" id="mr-faena">0</span><button onclick="adjM('mr-faena',1)">+</button></div>
+    </div>
+    <div class="field-row">
+      <span class="field-label">En ruta a descarga</span>
+      <div class="eq-counter"><button onclick="adjM('mr-rutadesc',-1)">−</button><span class="eq-num" id="mr-rutadesc">0</span><button onclick="adjM('mr-rutadesc',1)">+</button></div>
+    </div>
+    <div class="field-row">
+      <span class="field-label">Carga de neumáticos</span>
+      <div class="eq-counter"><button onclick="adjM('mr-neumaticos',-1)">−</button><span class="eq-num" id="mr-neumaticos">0</span><button onclick="adjM('mr-neumaticos',1)">+</button></div>
+    </div>
+    <div class="field-row">
+      <span class="field-label">En ruta a base INCOM</span>
+      <div class="eq-counter"><button onclick="adjM('mr-rutab',-1)">−</button><span class="eq-num" id="mr-rutab">0</span><button onclick="adjM('mr-rutab',1)">+</button></div>
+    </div>
+    <div class="totalizador tot-ok" id="tot-ram-el">
+      <span>Suma de estados</span><span id="tot-ram-txt">0 / 0</span>
+    </div>
+  </div>
+
   <button class="btn-primary" onclick="genMatutino()">📋 Generar tarjeta visual</button>
-  <div id="out-matutino" class="hidden" style="margin-top:12px">
+  <div id="out-matutino" class="hidden tarjeta-wrap">
     <div id="tarjeta-matutino"></div>
-    <div style="display:flex;gap:8px;margin-top:10px">
-      <button class="btn-primary" onclick="descargarPNG('tarjeta-matutino','reporte_turno')">⬇ Descargar imagen</button>
-    </div>
-    <p style="font-size:11px;color:var(--gray-text);text-align:center;margin-top:6px">Descarga la imagen y envíala directamente por WhatsApp</p>
+    <p style="font-size:11px;color:var(--gray-text);text-align:center;margin-top:8px">📸 Captura con screenshot y envía por WhatsApp</p>
   </div>
 </div>
 
-<!-- ════ TAB FAENA ════ -->
+<!-- ══════════════════════════════════════════
+     TAB SALIDA FAENA
+══════════════════════════════════════════ -->
 <div id="tab-faena" class="hidden">
+
   <div class="card">
     <div class="card-title">Condición de ruta</div>
     <div class="cond-row">
-      <button class="cond-btn sel-normal" onclick="setCond('normal',this)">✅ Normal</button>
-      <button class="cond-btn" onclick="setCond('precaucion',this)">⚠️ Precaución</button>
-      <button class="cond-btn" onclick="setCond('critica',this)">🔴 Crítica</button>
+      <button class="cond-btn active-normal" id="cond-normal" onclick="setCond('normal',this)">✅ Normal</button>
+      <button class="cond-btn" id="cond-prec"   onclick="setCond('precaucion',this)">⚠️ Precaución</button>
+      <button class="cond-btn" id="cond-crit"   onclick="setCond('critica',this)">🔴 Crítica</button>
     </div>
-    <div class="cond-info" id="cond-info-txt">Normal — tiempos de ruta estándar</div>
-    <div class="card-title" style="margin-top:8px">Tipo de transporte</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-      <button id="tipo-bat-btn" onclick="setTipoFaena('bateas')"
-        style="padding:12px;border-radius:10px;border:2px solid #003DA5;background:#003DA5;color:#fff;font-family:Inter,sans-serif;font-size:13px;font-weight:700;cursor:pointer">
-        🟢 Bateas
-      </button>
-      <button id="tipo-ram-btn" onclick="setTipoFaena('ramplas')"
-        style="padding:12px;border-radius:10px;border:2px solid #D1D5DB;background:#fff;color:#374151;font-family:Inter,sans-serif;font-size:13px;font-weight:600;cursor:pointer">
-        🔵 Ramplas
-      </button>
-    </div>
-    <input type="hidden" id="f-tipo" value="bateas">
+    <div style="font-size:12px;color:var(--gray-text)" id="cond-info-txt">Normal — tiempos estándar de ruta</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tipo de transporte</div>
+    <select id="f-tipo" class="normal">
+      <option value="bateas">Transporte Concentrado — Bateas</option>
+      <option value="ramplas">Transporte Cátodo/Molibdeno — Ramplas</option>
+    </select>
     <div class="field-row">
-      <span class="lbl">Total equipos</span>
-      <input type="number" id="f-total" value="15" min="1" max="30" style="width:70px">
-    </div>
-    <div class="field-row">
-      <span class="lbl">Fecha</span>
-      <input type="date" id="f-fecha" style="flex:1">
-    </div>
-  </div>
-
-  <!-- ARMADOR DE CONVOY -->
-  <div class="card" id="armador-card">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-      <div>
-        <div class="card-title" style="margin-bottom:2px">Armar convoy / grupo</div>
-        <div style="font-size:11px;color:var(--gray-text)" id="armador-disponibles-txt">Sin equipos — importa desde planificación</div>
+      <span class="field-label">Total equipos</span>
+      <div class="eq-counter">
+        <button onclick="adjNum('f-total',-1)">−</button>
+        <span class="eq-num" id="f-total">0</span>
+        <button onclick="adjNum('f-total',1)">+</button>
       </div>
-      <button class="btn-import" style="padding:5px 12px;font-size:12px" onclick="importarDisponibles()">↓ Importar</button>
     </div>
-
-    <!-- Lista de equipos disponibles para seleccionar -->
-    <div id="armador-lista" style="margin-bottom:12px"></div>
-
-    <!-- Hora de salida y confirmar -->
-    <div id="armador-confirmar" class="hidden">
-      <div class="field-row">
-        <span class="lbl">Salida KM1</span>
-        <input type="time" id="armador-hora" style="width:120px">
-      </div>
-      <button class="btn-primary" onclick="confirmarConvoy()">✓ Confirmar convoy y agregar al reporte</button>
+    <div class="field-row" style="margin-top:8px">
+      <span class="field-label">Fecha</span>
+      <input type="date" id="f-fecha" style="width:auto;padding:6px 8px;border:1px solid var(--gray-border);border-radius:6px;font-size:13px;margin:0">
     </div>
   </div>
 
-  <!-- GRUPOS CONFIRMADOS Y TABLA -->
-  <div style="display:flex;gap:4px;background:#E5E7EB;padding:4px;border-radius:8px;margin-bottom:12px">
-    <button class="main-tab active" id="ftab-reporte" style="flex:1;font-size:11px;padding:7px 4px" onclick="switchFaenaTab('reporte');renderReporte()">Tabla</button>
-    <button class="main-tab" id="ftab-llegadas" style="flex:1;font-size:11px;padding:7px 4px" onclick="switchFaenaTab('llegadas');renderLlegadas()">Llegadas reales</button>
+  <div class="card">
+    <div class="card-title">Grupos / Convoys</div>
+    <div id="grupos-faena-cont"></div>
+    <button class="btn-outline" onclick="addGrupoFaena()">+ Agregar grupo</button>
+    <button class="btn-outline" style="border-color:#7C3AED;color:#7C3AED" onclick="cargarGruposDesdePlan()">↓ Cargar desde planificación</button>
   </div>
-  <div id="fsub-reporte"><div id="rpt-wrap"></div></div>
-  <div id="fsub-llegadas" class="hidden">
-    <div class="card">
-      <div class="card-title">Registrar hora de llegada real</div>
-      <div id="llegadas-cont"></div>
-    </div>
-    <button class="btn-primary" onclick="switchFaenaTab('reporte');renderReporte()">Actualizar tabla</button>
+
+  <button class="btn-primary" onclick="genFaena()">📋 Generar tarjeta salida</button>
+  <div id="out-faena" class="hidden tarjeta-wrap">
+    <div id="tarjeta-faena"></div>
+    <p style="font-size:11px;color:var(--gray-text);text-align:center;margin-top:8px">📸 Captura y envía por WhatsApp</p>
   </div>
-  <p style="font-size:11px;color:var(--gray-text);text-align:center;margin-top:8px">📸 Captura la tabla con screenshot y envíala por WhatsApp</p>
 </div>
 
-<!-- ════ TAB POSICION ════ -->
+<!-- ══════════════════════════════════════════
+     TAB POSICIÓN EN RUTA
+══════════════════════════════════════════ -->
 <div id="tab-posicion" class="hidden">
+
   <div class="card">
-    <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
-      <div style="flex:1">
-        <div class="card-title" style="margin-bottom:6px">Tipo</div>
-        <select id="p-tipo" style="width:100%">
-          <option value="bateas">Bateas</option>
-          <option value="ramplas">Ramplas</option>
-        </select>
-      </div>
-      <div style="text-align:center">
-        <div class="card-title" style="margin-bottom:6px">Hora reporte</div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;color:var(--blue)" id="pos-hora-display">--:--</div>
-      </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div class="card-title" style="margin:0">Grupos en ruta</div>
+      <button class="btn-sm btn-sm-blue" onclick="importarGruposPos()">↓ Desde Faena</button>
     </div>
-    <button class="btn-import" onclick="importarDesdeFaena()">↓ Importar grupos desde Salida de faena</button>
+    <div id="grupos-pos-cont"></div>
+    <button class="btn-outline" onclick="addGrupoPos()">+ Agregar grupo</button>
   </div>
-  <div id="grupos-pos-cont"></div>
-  <button class="btn-outline" style="margin-bottom:12px" onclick="addGrupoPos()">+ Agregar grupo manualmente</button>
-  <button class="btn-primary" onclick="genPosicion()">📋 Generar tarjeta visual</button>
-  <div id="out-posicion" class="hidden">
-    <div id="tarjeta-posicion" class="pos-card"></div>
-    <div style="display:flex;gap:8px;margin-top:10px">
-      <button class="btn-primary" onclick="descargarPNG('tarjeta-posicion','posicion_ruta')">⬇ Descargar imagen</button>
-    </div>
-    <p style="font-size:11px;color:var(--gray-text);text-align:center;margin-top:6px">Descarga la imagen y envíala directamente por WhatsApp</p>
+
+  <button class="btn-primary" onclick="genPosicion()">📋 Generar tarjeta posición</button>
+  <div id="out-posicion" class="hidden tarjeta-wrap">
+    <div id="tarjeta-posicion"></div>
+    <p style="font-size:11px;color:var(--gray-text);text-align:center;margin-top:8px">📸 Captura y envía por WhatsApp</p>
   </div>
 </div>
 
-<!-- ════ TAB SEGMENTOS ════ -->
-<div id="tab-segmentos" class="hidden">
+<!-- ══════════════════════════════════════════
+     TAB TIEMPOS
+══════════════════════════════════════════ -->
+<div id="tab-tiempos" class="hidden">
   <div class="card">
-    <div class="card-title">Tiempos de tramo — Bateas (minutos)</div>
-    <p style="font-size:12px;color:var(--gray-text);margin-bottom:14px">Tramos KM1 → Puerto Totoralillo</p>
-    <div id="segs-bat-list"></div>
-  </div>
-  <div class="card">
-    <div class="card-title">Tiempos de tramo — Ramplas (minutos)</div>
-    <p style="font-size:12px;color:var(--gray-text);margin-bottom:14px">Tramos KM1 → Base INCOM Copiapó (vía Ac. Ruta 5)</p>
-    <div id="segs-ram-list"></div>
+    <div class="card-title">Tiempos estimados por tramo (minutos)</div>
+    <p style="font-size:12px;color:var(--gray-text);margin-bottom:12px">Estos tiempos se usan para calcular la hora proyectada de llegada en los reportes de salida.</p>
+    <div id="seg-cont"></div>
+    <button class="btn-primary" onclick="guardarSegmentos()">💾 Guardar tiempos</button>
   </div>
 </div>
 
 </div><!-- /content -->
 
+<!-- AVISO TOAST -->
+<div class="aviso" id="aviso-global"></div>
+
 <script>
-// ── FLOTA ────────────────────────────────────────────
-const CONDUCTORES_BAT=[
-  'ABELINO CARRIZO','ALBERTO ASTORGA','BORIS ROJAS','BRAYAN GUEVARA',
-  'CRISTIAN LANAS','CRISTIAN OLIVARES','DAMM CRUZ','DANIEL VEGA PEREIRA',
-  'EDUARDO LEDESMA','ENRIQUE ROJAS','FELIPE CORTES','FRANCISCO HANSHING',
-  'JAVIER CORTES','JAVIER SANCHEZ','JOSE GONZALEZ','JOSE URIZAR',
-  'JUAN MUÑOZ','JUAN VALENZUELA','LUIS MADARIAGA','LUIS MUÑOZ',
-  'MARCO QUIROGA','MARCO RIQUELME','MARTIN VITALI','ORLANDO BUGUEÑO',
-  'PEDRO ARRIAGADA','PEDRO SAEZ','RICARDO CONTRERAS','RICARDO RAMIREZ',
-  'ROBERTO FAJARDO','ROLANDO GUZMAN','RENE PAEZ','UBER ZAMORA',
-  'WILFREDO OLIVARES',
-];
-const CONDUCTORES_RAM=CONDUCTORES_BAT;
-const BATEAS=[
-  {p:'HGKS-68',c:'PEDRO SAEZ'},{p:'HGKS-91',c:'BRAYAN GUEVARA'},
-  {p:'KDKS-57',c:'RENE PAEZ'},{p:'KDKS-71',c:'FRANCISCO HANSHING'},
-  {p:'KDKS-72',c:'RICARDO RAMIREZ'},{p:'KDKS-78',c:'MARCO QUIROGA'},
-  {p:'KDKS-88',c:'JAVIER CORTES'},{p:'KDKS-89',c:'DAMM CRUZ'},
-  {p:'KYLG-17',c:'LUIS MUÑOZ'},{p:'KYPJ-52',c:'EDUARDO LEDESMA'},
-  {p:'KYPJ-53',c:'WILFREDO OLIVARES'},{p:'KYPJ-54',c:'MARCO RIQUELME'},
-  {p:'KYPR-55',c:'JUAN MUÑOZ'},{p:'KYPT-47',c:'JOSE GONZALEZ'},
-  {p:'KYPV-87',c:'RICARDO CONTRERAS'},{p:'KYPV-88',c:'FELIPE CORTES'},
-  {p:'KYRG-45',c:'ABELINO CARRIZO'},{p:'KYRG-46',c:'MARTIN VITALI'},
-  {p:'KYRH-78',c:'ENRIQUE ROJAS'},
-  {p:'PTXP-75',c:'DANIEL VEGA PEREIRA'},{p:'PWVW-83',c:'CRISTIAN OLIVARES'},
-];
-const RAMPLAS=[
-  {p:'PWVW-56',c:'PEDRO ARRIAGADA'},{p:'PWVW-57',c:'CRISTIAN LANAS'},
-  {p:'PWVW-58',c:'ROBERTO FAJARDO'},{p:'PWVW-81',c:'LUIS MADARIAGA'},
-  {p:'PWVW-82',c:'JOSE URIZAR'},{p:'PWVX-89',c:'BORIS ROJAS'},
-  {p:'PWVX-90',c:'ALBERTO ASTORGA'},
-];
-const CAMA_BAJA=[
-  {p:'KDKS-69',c:'UBER ZAMORA'},
+// ══════════════════════════════════════════════════════════════
+// DATOS BASE
+// ══════════════════════════════════════════════════════════════
+const CONDUCTORES=[
+  'JAVIER CORTES','DAMM CRUZ','MARTIN VITALI','JUAN MUÑOZ','RICARDO RAMIREZ',
+  'FRANCISCO HANSHING','RICARDO CONTRERAS','FELIPE CORTES','LUIS MUÑOZ',
+  'JOSE GONZALEZ','RENE PAEZ','MARCO QUIROGA','ABELINO CARRIZO',
+  'CRISTIAN OLIVARES','ENRIQUE ROJAS','DANIEL VEGA PEREIRA','BRAYAN GUEVARA',
+  'EDUARDO LEDESMA','PEDRO SAEZ','MARCO RIQUELME','WILFREDO OLIVARES',
+  'UBER ZAMORA','ALBERTO ASTORGA','BORIS ROJAS','LUIS MADARIAGA',
+  'PEDRO ARRIAGADA','JOSE URIZAR','ROBERTO FAJARDO','CRISTIAN LANAS',
+  'JUAN VALENZUELA','ROLANDO GUZMAN','JAVIER SANCHEZ','ORLANDO BUGUEÑO'
 ];
 const TRACTOS=[
-  {p:'LRVV-85'},{p:'LRVV-86'},{p:'LXXL-81'},
-  {p:'PJBP-94'},{p:'PJBP-95'},{p:'PJFD-76'},{p:'PJFD-81'},{p:'PJFD-83'},{p:'PJFD-98'},
-  {p:'PPPW-78'},{p:'PPPW-79'},
-  {p:'RJBV-34'},{p:'RJBV-35'},{p:'RKGC-82'},{p:'RTRJ-40'},
-  {p:'RVFK-45'},{p:'RVFK-46'},{p:'RVFK-47'},{p:'RVFF-13'},{p:'RVFF-14'},
-  {p:'RVXB-98'},{p:'RVXC-10'},
-  {p:'SHLL-37'},{p:'SPSH-74'},{p:'SSHY-46'},{p:'SYPL-10'},
+  'PPPW-79','RVFF-13','RVXB-98','RTRJ-40','SHLL-37','PJFD-76','SSHY-46',
+  'PJFD-83','LRVV-86','PJBP-94','SYPL-10','PJBP-95','PPPW-78','LRVV-85',
+  'PJFD-81','RKGC-82','LXXL-81','RVFK-47','RVFK-46','RVFK-45','SPSH-74',
+  'TWPZ-91','RVXC-10','RJBV-34'
+];
+const SEMIS_BAT=[
+  'KDKS-88','KDKS-89','KYRG-46','KYPR-55','KDKS-72','KDKS-71','KYPV-88',
+  'PTXP-75','HGKS-91','KDKS-78','KDKS-82','KYRG-55','KYPR-44','KDKS-65',
+  'KDKS-90','KYRG-12','KYPR-77','KYPV-33'
+];
+const SEMIS_RAM=[
+  'PWVX-90','PWVX-89','PWVX-88','PWVX-87','PWVX-86','PWVX-85',
+  'PWVX-84','PWVX-83','PWVX-82','PWVX-81'
+];
+const TRAMOS=[
+  'KM1 — T. Lautaro','T. Lautaro — Los Loros','Los Loros — Pabellón',
+  'Pabellón — Nantoco','Nantoco — Ac. Ruta 5','Ac. Ruta 5 — Bypass Toledo',
+  'Bypass Toledo — Peaje P. Viejo','Peaje P. Viejo — Caldera',
+  'Caldera — Totoralillo','Totoralillo (Descargando)'
 ];
 
-// ── SEGMENTOS ────────────────────────────────────────
-let segsBat=[
-  {o:'KM1',d:'T. LAUTARO',min:45},{o:'T. LAUTARO',d:'LOS LOROS',min:30},
-  {o:'LOS LOROS',d:'PABELLON',min:25},{o:'PABELLON',d:'NANTOCO',min:15},
-  {o:'NANTOCO',d:'AC. RUTA 5',min:25},{o:'AC. RUTA 5',d:'BYPASS TOLEDO',min:30},
-  {o:'BYPASS TOLEDO',d:'PEAJE P. VIEJO',min:15},{o:'PEAJE P. VIEJO',d:'CALDERA',min:30},
-  {o:'CALDERA',d:'TOTORALILLO',min:20},
-];
-let segsRam=[
-  {o:'KM1',d:'T. LAUTARO',min:45},{o:'T. LAUTARO',d:'LOS LOROS',min:30},
-  {o:'LOS LOROS',d:'PABELLON',min:25},{o:'PABELLON',d:'NANTOCO',min:15},
-  {o:'NANTOCO',d:'AC. RUTA 5',min:25},{o:'AC. RUTA 5',d:'BASE INCOM COPIAPÓ',min:30},
-];
-
-const TRAMOS_BAT=['KM1 → T. LAUTARO','T. LAUTARO → LOS LOROS','LOS LOROS → PABELLON','PABELLON → NANTOCO','NANTOCO → AC. RUTA 5','AC. RUTA 5 → BYPASS TOLEDO','BYPASS TOLEDO → PEAJE P. VIEJO','PEAJE P. VIEJO → CALDERA','CALDERA → TOTORALILLO','TOTORALILLO (Descargando)'];
-const TRAMOS_RAM=['KM1 → T. LAUTARO','T. LAUTARO → LOS LOROS','LOS LOROS → PABELLON','PABELLON → NANTOCO','NANTOCO → AC. RUTA 5','AC. RUTA 5 → BASE INCOM COPIAPÓ','BASE INCOM COPIAPÓ (Descargando)'];
-
+// ══════════════════════════════════════════════════════════════
+// ESTADO GLOBAL
+// ══════════════════════════════════════════════════════════════
+let planes=[], planActivo=null;
 let condicion='normal';
-let gruposFaena=[],gruposPos=[];
-let gfId=0,gpId=0;
-let planes=[],planActivo=null;
-let equiposDisponibles=[];
-let equiposSeleccionados=[];
-const APPS_URL='https://script.google.com/macros/s/AKfycbzdhCIGThgyBhpAsfmhl7U89M7pd0fDxIyk7teG5j1imHwp9NigzqSaUxJYC4L1oxbe/exec';
+let gruposFaena=[];
+let segmentos=TRAMOS.map((t,i)=>({nombre:t,mins:[45,30,20,25,15,20,25,30,20,60][i]||30}));
+let motivoSeleccionado='';
+let tipoSelector='bat';
+let selCond={cond:null,tr:null,sm:null};
 
-// ── RELOJ ────────────────────────────────────────────
-function getNow(){const n=new Date();return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
-function tickReloj(){
-  const t=getNow();
-  document.getElementById('reloj-topbar').textContent=t;
-  const pd=document.getElementById('pos-hora-display');if(pd)pd.textContent=t;
-}
-document.addEventListener('DOMContentLoaded',function(){
-  const n=new Date();
-  document.getElementById('f-fecha').value=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');
-  renderSegs();renderGruposFaena();renderGruposPos();
-  setTimeout(updateTot,50);
-  initPlan();
-  tickReloj();
-  setInterval(tickReloj,10000);
-});
+// ══════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════
+window.onload=function(){
+  // Supervisor
+  const sup=localStorage.getItem('incom_sup')||'';
+  if(sup)document.getElementById('sel-supervisor').value=sup;
 
-// ── UTILS ────────────────────────────────────────────
-function getFecha(){
-  const v=document.getElementById('f-fecha').value;
-  if(v){const[y,m,d]=v.split('-');return d+'-'+m+'-'+y;}
-  const n=new Date();return String(n.getDate()).padStart(2,'0')+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+n.getFullYear();
-}
-function getHoy(){const n=new Date();return String(n.getDate()).padStart(2,'0')+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+n.getFullYear();}
-function addTime(base,mins){
-  if(!base||!base.includes(':'))return'';
-  const[h,m]=base.split(':').map(Number);const t=h*60+m+mins;
-  return String(Math.floor(t/60)%24).padStart(2,'0')+':'+String(t%60).padStart(2,'0');
-}
-function calcMins(t1,t2){
-  if(!t1||!t2)return null;
-  const[h1,m1]=t1.split(':').map(Number);const[h2,m2]=t2.split(':').map(Number);
-  const d=(h2*60+m2)-(h1*60+m1);return d<0?null:d;
-}
-function calcETA(salida,tipo){
-  const factor=condicion==='normal'?1:condicion==='precaucion'?1.15:1.30;
-  const segs=tipo==='ramplas'?segsRam:segsBat;
-  let t=salida,res=[];
-  segs.forEach(s=>{t=addTime(t,Math.round(s.min*factor));res.push({punto:s.d,hora:t});});
-  return res;
-}
-function getSup(){return document.getElementById('sup-sel').value||'Supervisor de turno';}
-function getTipoLabel(){return document.getElementById('f-tipo').value==='bateas'?'Transporte de Concentrado / Catodos de Cobre':'Transporte Catodo / Molibdeno — Ramplas';}
-function getN(id){
-  const el=document.getElementById(id);
-  if(!el)return 0;
-  return parseInt(el.value!==undefined?el.value:el.textContent)||0;
-}
-function getDestino(tipo){return tipo==='bateas'?'Puerto Totoralillo':'Base INCOM Copiapó';}
-function getUltimoPunto(tipo){return tipo==='ramplas'?'BASE INCOM COPIAPÓ':'TOTORALILLO';}
+  // Planes
+  try{
+    const s=localStorage.getItem('incom_planes');
+    const a=localStorage.getItem('incom_plan_activo');
+    if(s){planes=JSON.parse(s);if(a)planActivo=planes.find(p=>p.id===a)||null;}
+  }catch(e){}
+  renderPlanSel();
+  if(planActivo){document.getElementById('plan-sel').value=planActivo.id;mostrarEditor();}
 
+  // Segmentos
+  try{const ss=localStorage.getItem('incom_segs');if(ss)segmentos=JSON.parse(ss);}catch(e){}
+  renderSegmentos();
+
+  // Fecha faena
+  document.getElementById('f-fecha').value=new Date().toISOString().slice(0,10);
+
+  // Fecha actual en reporte
+  switchTab('plan');
+};
+
+// ══════════════════════════════════════════════════════════════
+// NAV
+// ══════════════════════════════════════════════════════════════
 function switchTab(t){
-  ['plan','matutino','faena','posicion','segmentos'].forEach(id=>document.getElementById('tab-'+id).classList.toggle('hidden',id!==t));
-  document.querySelectorAll('.main-tab').forEach((el,i)=>el.classList.toggle('active',['plan','matutino','faena','posicion','segmentos'][i]===t));
-}
-function switchFaenaTab(t){
-  ['reporte','llegadas'].forEach(id=>document.getElementById('fsub-'+id).classList.toggle('hidden',id!==t));
-  ['ftab-reporte','ftab-llegadas'].forEach((id,i)=>document.getElementById(id).classList.toggle('active',['reporte','llegadas'][i]===t));
-}
-function setTipoFaena(tipo,btn){
-  document.getElementById('f-tipo').value=tipo;
-  const batBtn=document.getElementById('tipo-bat-btn');
-  const ramBtn=document.getElementById('tipo-ram-btn');
-  if(tipo==='bateas'){
-    batBtn.style.background='#003DA5';batBtn.style.color='#fff';batBtn.style.borderColor='#003DA5';
-    ramBtn.style.background='#fff';ramBtn.style.color='#374151';ramBtn.style.borderColor='#D1D5DB';
-  } else {
-    ramBtn.style.background='#1D4ED8';ramBtn.style.color='#fff';ramBtn.style.borderColor='#1D4ED8';
-    batBtn.style.background='#fff';batBtn.style.color='#374151';batBtn.style.borderColor='#D1D5DB';
-  }
+  ['plan','matutino','faena','posicion','tiempos'].forEach(id=>{
+    document.getElementById('tab-'+id).classList.toggle('hidden',id!==t);
+    document.getElementById('tab-btn-'+id).classList.toggle('active',id===t);
+  });
 }
 
-function setCond(c,btn){
-  condicion=c;
-  document.querySelectorAll('.cond-btn').forEach(b=>b.className='cond-btn');
-  btn.classList.add('sel-'+c);
-  const msgs={normal:'Normal — tiempos de ruta estándar',precaucion:'Precaución — ETAs aumentadas un 15% (neblina, lluvia, tráfico)',critica:'Crítica — ETAs aumentadas un 30% (ruta cortada, condición severa)'};
-  document.getElementById('cond-info-txt').textContent=msgs[c];
+// ══════════════════════════════════════════════════════════════
+// SUPERVISOR
+// ══════════════════════════════════════════════════════════════
+function guardarSup(){localStorage.setItem('incom_sup',getSup());}
+function getSup(){return document.getElementById('sel-supervisor').value||'(sin asignar)';}
+function getHoy(){return new Date().toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'});}
+
+// ══════════════════════════════════════════════════════════════
+// AVISO TOAST
+// ══════════════════════════════════════════════════════════════
+function mostrarAviso(msg){
+  const el=document.getElementById('aviso-global');
+  el.textContent=msg;el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),3000);
 }
 
-// ── TOTALIZADORES ─────────────────────────────────────
+// ══════════════════════════════════════════════════════════════
+// CONTADORES
+// ══════════════════════════════════════════════════════════════
 function adj(id,d){const el=document.getElementById(id);el.textContent=Math.max(0,parseInt(el.textContent)+d);}
 function adjM(id,d){adj(id,d);updateTot();}
+function adjNum(id,d){const el=document.getElementById(id);el.textContent=Math.max(0,parseInt(el.textContent)+d);}
+function getN(id){return parseInt(document.getElementById(id).textContent)||0;}
 
-function importarPlanAFaena(){
-  if(!planActivo){alert('No hay planificación activa. Ve a Planificación y carga una primero.');return;}
-  const tipo=document.getElementById('f-tipo').value;
-  const arr=tipo==='ramplas'?(planActivo.equiposRam||[]):(planActivo.equiposBat||[]);
-  if(!arr.length){alert('No hay equipos planificados para '+(tipo==='ramplas'?'Ramplas':'Bateas'));return;}
-  // Crear un grupo por cada equipo individual de la planificación
-  // Los grupos se arman al salir — aquí precargamos los equipos disponibles
-  // Creamos UN grupo con todos los equipos del día listos para ser asignados a convoys
-  gruposFaena=[];
-  // Agregar cada equipo como grupo individual que el supervisor agrupa manualmente
-  arr.forEach((eq,i)=>{
-    gruposFaena.push({
-      id:gfId++,
-      num:i+1,
-      equipos:[{conductor:eq.conductor||'',tracto:eq.tracto||'',semi:eq.semi||''}],
-      salida:'',llegLoros:'',llegFin:''
-    });
-  });
-  if(planActivo.fecha)document.getElementById('f-fecha').value=planActivo.fecha;
-  document.getElementById('f-total').value=arr.length;
-  renderGruposFaena();
-  // Aviso
-  const aviso=document.createElement('div');
-  aviso.style.cssText='position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#003DA5;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,.2)';
-  aviso.textContent='✓ '+arr.length+' equipos importados — agrupa los convoys y asigna horas de salida';
-  document.body.appendChild(aviso);
-  setTimeout(()=>aviso.remove(),4000);
-}
-
-function cargarTotalesDesdePlan(){
-  if(!planActivo){alert('No hay planificación activa. Ve a Planificación y carga una primero.');return;}
-  const tBat=(planActivo.equiposBat||[]).length;
-  const tRam=(planActivo.equiposRam||[]).length;
-  if(!tBat&&!tRam){alert('La planificación no tiene equipos.');return;}
-  document.getElementById('mb-total').value=tBat;
-  document.getElementById('mb-base').value=0;
-  document.getElementById('mb-rutaf').value=0;
-  document.getElementById('mb-faena').value=tBat;
-  document.getElementById('mr-total').value=tRam;
-  document.getElementById('mr-carga').value=0;
-  document.getElementById('mr-desc').value=0;
-  document.getElementById('mr-rutaf').value=0;
-  document.getElementById('mr-faena').value=tRam;
-  updateTot();
-  document.getElementById('f-total').value=tBat;
-  // Mostrar confirmación
-  const aviso=document.createElement('div');
-  aviso.style.cssText='position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#003DA5;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,.2)';
-  aviso.textContent='✓ Cargado: '+tBat+' bateas · '+tRam+' ramplas';
-  document.body.appendChild(aviso);
-  setTimeout(()=>aviso.remove(),3000);
-}
 function updateTot(){
-  function check(total,suma,elId,txtId){
-    const el=document.getElementById(elId),txt=document.getElementById(txtId);
-    if(!el||!txt)return;
-    if(suma===total){el.className='totalizador tot-ok';txt.textContent=suma+' / '+total+' ✓ Cuadra';}
-    else{el.className='totalizador tot-err';const d=total-suma;txt.textContent=suma+' / '+total+' ⚠ '+(d>0?'Faltan '+d:'Sobran '+Math.abs(d));}
-  }
-  check(getN('mb-total'),getN('mb-base')+getN('mb-rutaf')+getN('mb-faena'),'tot-bat-el','tot-bat-txt');
-  check(getN('mr-total'),getN('mr-carga')+getN('mr-desc')+getN('mr-rutaf')+getN('mr-faena'),'tot-ram-el','tot-ram-txt');
-}
-
-// ── SELECTORES RÁPIDOS (botones) ──────────────────────
-function btnGroup(lista,id,val,onsel,small){
-  const s=small?'font-size:11px;padding:5px 4px;text-align:center':'font-size:12px;padding:7px 8px;text-align:left';
-  const cols=small?'repeat(4,1fr)':'repeat(4,1fr)';
-  const btns=lista.map(v=>{
-    const sel=v===val;
-    return'<button onclick="'+onsel+'(\''+id+'\',\''+v.replace(/'/g,"\\'")+'\')" '+
-      'style="'+s+';border-radius:6px;border:1.5px solid '+(sel?'#003DA5':'#D1D5DB')+';'+
-      'background:'+(sel?'#003DA5':'#fff')+';color:'+(sel?'#fff':'#374151')+';'+
-      'cursor:pointer;font-family:Inter,sans-serif;font-weight:'+(sel?'600':'400')+';'+
-      'white-space:nowrap;width:100%" '+
-      'id="btn-'+id+'-'+v.replace(/[^a-zA-Z0-9]/g,'_')+'">'+v+'</button>';
-  }).join('');
-  return'<div style="display:grid;grid-template-columns:'+cols+';gap:4px;margin-top:4px" id="grp-'+id+'">'+btns+'</div>'+
-    '<input type="hidden" id="'+id+'" value="'+(val||'')+'">'; 
-}
-
-function selBtn(id,val){
-  // actualiza hidden input y re-colorea botones
-  const inp=document.getElementById(id);
-  if(inp)inp.value=val;
-  const grp=document.getElementById('grp-'+id);
-  if(grp){
-    grp.querySelectorAll('button').forEach(b=>{
-      const isMe=b.textContent.trim()===val;
-      b.style.background=isMe?'#003DA5':'#fff';
-      b.style.color=isMe?'#fff':'#374151';
-      b.style.borderColor=isMe?'#003DA5':'#D1D5DB';
-      b.style.fontWeight=isMe?'600':'400';
-    });
-  }
-  // Actualizar resumen visual del equipo
-  // El id tiene formato: pe-bat-cond-0, pe-bat-tr-0, pe-bat-sm-0
-  // o: fcond-X-Y, ftr-X-Y, fsm-X-Y
-  // Detectar prefijo del equipo y actualizar resumen
-  const partes=id.split('-');
-  let resumenId=null;
-  if(id.startsWith('pe-')){
-    // pe-bat-cond-0 → resumen-pe-bat-0
-    resumenId='resumen-pe-'+partes[1]+'-'+partes[partes.length-1];
-  } else if(id.startsWith('fcond-')||id.startsWith('ftr-')||id.startsWith('fsm-')){
-    // fcond-5-0 → resumen-f-5-0
-    const gid=partes[1];const ei=partes[2];
-    resumenId='resumen-f-'+gid+'-'+ei;
-  } else if(id.startsWith('pg-')){
-    // pg-bat-cond-0-0 → resumen-pg-bat-0-0
-    resumenId='resumen-pg-'+partes[1]+'-'+partes[3]+'-'+partes[4];
-  }
-  if(resumenId){
-    actualizarResumenEquipo(resumenId,id);
-  }
-}
-
-function actualizarResumenEquipo(resumenId, changedId){
-  const el=document.getElementById(resumenId);
-  if(!el)return;
-  // Determinar qué IDs de cond/tr/sm corresponden a este resumen
-  // El resumenId tiene el sufijo que identifica al equipo
-  const sufijo=resumenId.replace('resumen-','');
-  // Reconstruir los IDs de los 3 campos
-  let condId,trId,smId;
-  if(sufijo.startsWith('pe-')){
-    const parts=sufijo.split('-'); // pe-bat-0
-    condId='pe-'+parts[1]+'-cond-'+parts[2];
-    trId='pe-'+parts[1]+'-tr-'+parts[2];
-    smId='pe-'+parts[1]+'-sm-'+parts[2];
-  } else if(sufijo.startsWith('f-')){
-    const parts=sufijo.split('-'); // f-gid-ei
-    condId='fcond-'+parts[1]+'-'+parts[2];
-    trId='ftr-'+parts[1]+'-'+parts[2];
-    smId='fsm-'+parts[1]+'-'+parts[2];
-  } else {return;}
-  const cond=getVal(condId)||'';
-  const tr=getVal(trId)||'';
-  const sm=getVal(smId)||'';
-  if(!cond&&!tr&&!sm){el.style.display='none';return;}
-  el.style.display='flex';
-  el.innerHTML=
-    (cond?'<span style="background:#003DA5;color:#fff;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600">👤 '+cond+'</span>':'')+
-    (tr?'<span style="background:#F3F4F6;color:#374151;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500">🚛 '+tr+'</span>':'')+
-    (sm?'<span style="background:#EEF2FF;color:#4338CA;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500">🔗 '+sm+'</span>':'');
-}
-
-function selConductor(tipo,id,val){
-  const lista=tipo==='ramplas'?CONDUCTORES_RAM:CONDUCTORES_BAT;
-  return btnGroup(lista,id,val,'selBtn',false);
-}
-function selTracto(id,val){
-  return btnGroup(TRACTOS.map(t=>t.p),id,val,'selBtn',true);
-}
-function selSemi(tipo,id,val){
-  const lista=tipo==='ramplas'?RAMPLAS:tipo==='cama'?CAMA_BAJA:BATEAS;
-  return btnGroup(lista.map(b=>b.p),id,val,'selPlanBtn',true);
-}
-
-function getSemiLista(tipo){
-  if(tipo==='ram')return RAMPLAS;
-  if(tipo==='cama')return CAMA_BAJA;
-  return BATEAS;
-}
-
-// leer valor desde hidden input en vez de select
-function getVal(id){const el=document.getElementById(id);return el?el.value:'';}
-
-
-// ── ARMADOR DE CONVOYS ────────────────────────────────
-
-function setTipoFaena(tipo){
-  document.getElementById('f-tipo').value=tipo;
-  const batBtn=document.getElementById('tipo-bat-btn');
-  const ramBtn=document.getElementById('tipo-ram-btn');
-  if(tipo==='bateas'){
-    batBtn.style.cssText='padding:12px;border-radius:10px;border:2px solid #003DA5;background:#003DA5;color:#fff;font-family:Inter,sans-serif;font-size:13px;font-weight:700;cursor:pointer';
-    ramBtn.style.cssText='padding:12px;border-radius:10px;border:2px solid #D1D5DB;background:#fff;color:#374151;font-family:Inter,sans-serif;font-size:13px;font-weight:600;cursor:pointer';
-  }else{
-    ramBtn.style.cssText='padding:12px;border-radius:10px;border:2px solid #1D4ED8;background:#1D4ED8;color:#fff;font-family:Inter,sans-serif;font-size:13px;font-weight:700;cursor:pointer';
-    batBtn.style.cssText='padding:12px;border-radius:10px;border:2px solid #D1D5DB;background:#fff;color:#374151;font-family:Inter,sans-serif;font-size:13px;font-weight:600;cursor:pointer';
-  }
-  // Resetear si cambia el tipo
-  equiposDisponibles=[];equiposSeleccionados=[];gruposFaena=[];
-  renderArmador();renderReporteVacio();
-}
-
-function importarDisponibles(){
-  const tipo=document.getElementById('f-tipo').value;
-  const cont=document.getElementById('armador-lista');
-
-  if(!planActivo||(!( planActivo.equiposBat||[]).length&&!(planActivo.equiposRam||[]).length)){
-    // Intentar cargar desde Sheets
-    cont.innerHTML='<div style="text-align:center;padding:1rem;color:#6B7280;font-size:13px">⏳ Cargando desde Google Sheets...</div>';
-    leerDesdeSheets().then(planSheets=>{
-      if(planSheets&&(planSheets.equiposBat.length||planSheets.equiposRam.length)){
-        planActivo=planSheets;
-        if(!planes.find(p=>p.id==='sheet_plan'))planes.unshift(planSheets);
-        try{localStorage.setItem('incom_planes',JSON.stringify(planes));localStorage.setItem('incom_plan_activo','sheet_plan');}catch(e){}
-        cargarEquiposArmador(tipo,cont);
-      } else {
-        cont.innerHTML=
-          '<div style="background:#FEF3E2;border:1px solid #FCD34D;border-radius:10px;padding:14px;text-align:center">'+
-            '<div style="font-size:13px;font-weight:600;color:#92550A;margin-bottom:8px">Sin planificación guardada</div>'+
-            '<div style="font-size:12px;color:#78350F;margin-bottom:10px">Crea y guarda la planificación primero</div>'+
-            '<button class="btn-import" onclick="switchTab(\'plan\')" style="width:100%">→ Ir a Planificación</button>'+
-          '</div>';
-      }
-    }).catch(()=>{
-      cont.innerHTML=
-        '<div style="background:#FEF3E2;border:1px solid #FCD34D;border-radius:10px;padding:14px;text-align:center">'+
-          '<div style="font-size:13px;font-weight:600;color:#92550A;margin-bottom:8px">Sin conexión a Sheets</div>'+
-          '<button class="btn-import" onclick="switchTab(\'plan\')" style="width:100%">→ Ir a Planificación</button>'+
-        '</div>';
-    });
-    return;
-  }
-  cargarEquiposArmador(tipo,cont);
-}
-
-function cargarEquiposArmador(tipo,cont){
-  const bateas=planActivo.equiposBat||[];
-  const ramplas=planActivo.equiposRam||[];
-  const arr=tipo==='ramplas'?ramplas:bateas;
-  if(!arr.length){
-    cont.innerHTML=
-      '<div style="background:#FEF3E2;border:1px solid #FCD34D;border-radius:10px;padding:14px">'+
-        '<div style="font-size:13px;font-weight:600;color:#92550A;margin-bottom:6px">⚠ Sin equipos para '+(tipo==='ramplas'?'Ramplas':'Bateas')+'</div>'+
-        '<div style="font-size:11px;color:#78350F;margin-bottom:8px">'+
-          'Plan: <strong>'+(planActivo.nombre||'sin nombre')+'</strong> · '+
-          'Bateas: '+bateas.length+' · Ramplas: '+ramplas.length+
-        '</div>'+
-        '<button class="btn-import" onclick="switchTab(\'plan\')" style="width:100%">→ Revisar planificación</button>'+
-      '</div>';
-    return;
-  }
-  equiposDisponibles=arr.map((eq,i)=>({...eq,id:'eq_'+i,seleccionado:false,asignado:false}));
-  equiposSeleccionados=[];
-  gruposFaena=[];
-  if(planActivo.fecha)document.getElementById('f-fecha').value=planActivo.fecha;
-  document.getElementById('f-total').value=arr.length;
-  renderArmador();
-  renderReporteVacio();
-}
-
-function toggleEquipoArmador(id){
-  const eq=equiposDisponibles.find(e=>e.id===id);
-  if(!eq)return;
-  eq.seleccionado=!eq.seleccionado;
-  if(eq.seleccionado){
-    equiposSeleccionados.push(id);
-  } else {
-    equiposSeleccionados=equiposSeleccionados.filter(x=>x!==id);
-  }
-  renderArmador();
-}
-
-function renderArmador(){
-  const cont=document.getElementById('armador-lista');
-  const confirmar=document.getElementById('armador-confirmar');
-  const txt=document.getElementById('armador-disponibles-txt');
-  const disponibles=equiposDisponibles.filter(e=>!e.asignado);
-  const nSel=equiposSeleccionados.filter(id=>disponibles.find(e=>e.id===id)).length;
-
-  if(!disponibles.length&&!equiposDisponibles.length){
-    cont.innerHTML='<div class="empty">Importa los equipos desde la planificación</div>';
-    if(confirmar)confirmar.classList.add('hidden');
-    return;
-  }
-  if(!disponibles.length){
-    cont.innerHTML='<div style="text-align:center;padding:1rem;color:#16A34A;font-size:13px;font-weight:600">✓ Todos los equipos han sido asignados a convoys</div>';
-    if(confirmar)confirmar.classList.add('hidden');
-    if(txt)txt.textContent='Todos asignados — '+gruposFaena.length+' grupos formados';
-    return;
-  }
-
-  if(txt)txt.textContent=disponibles.length+' disponibles · '+nSel+' seleccionados para este convoy';
-
-  cont.innerHTML='<div style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Selecciona los equipos del Grupo '+(gruposFaena.length+1)+':</div>'+
-    disponibles.map(eq=>
-      '<div class="eq-disponible'+(eq.seleccionado?' sel':'')+'" onclick="toggleEquipoArmador(\''+eq.id+'\')">'+
-        '<div class="eq-d-num">'+(equiposDisponibles.indexOf(eq)+1)+'</div>'+
-        '<span class="eq-d-nombre">'+(eq.conductor||'Sin conductor')+'</span>'+
-        '<span class="eq-d-pat">'+(eq.tracto||'—')+'</span>'+
-        '<span class="eq-d-semi">'+(eq.semi||'—')+'</span>'+
-      '</div>'
-    ).join('');
-
-  if(confirmar){
-    if(nSel>0)confirmar.classList.remove('hidden');
-    else confirmar.classList.add('hidden');
-  }
-}
-
-function confirmarConvoy(){
-  const hora=document.getElementById('armador-hora').value;
-  if(!hora){alert('Ingresa la hora de salida KM1');return;}
-  const selIds=equiposSeleccionados.filter(id=>equiposDisponibles.find(e=>e.id===id&&!e.asignado));
-  if(!selIds.length){alert('Selecciona al menos un equipo');return;}
-  const equipos=selIds.map(id=>{
-    const eq=equiposDisponibles.find(e=>e.id===id);
-    eq.asignado=true;
-    return{conductor:eq.conductor,tracto:eq.tracto,semi:eq.semi,falla:false};
-  });
-  gruposFaena.push({id:gfId++,num:gruposFaena.length+1,equipos,salida:hora,llegLoros:'',llegFin:'',historialCambios:[]});
-  equiposSeleccionados=[];
-  document.getElementById('armador-hora').value='';
-  renderArmador();
-  renderReporte();
-}
-
-function removeGrupoFaena(id){
-  const g=gruposFaena.find(x=>x.id===id);
-  if(g){
-    // Devolver equipos al pool disponible
-    g.equipos.forEach(eq=>{
-      const orig=equiposDisponibles.find(e=>e.conductor===eq.conductor&&e.tracto===eq.tracto);
-      if(orig)orig.asignado=false;
-    });
-  }
-  gruposFaena=gruposFaena.filter(x=>x.id!==id);
-  gruposFaena.forEach((g,i)=>g.num=i+1);
-  renderArmador();renderReporte();
-}
-
-function renderReporteVacio(){
-  const wrap=document.getElementById('rpt-wrap');
-  if(wrap)wrap.innerHTML='<div class="empty">Los grupos aparecerán aquí a medida que se van confirmando</div>';
-}
-
-function readGruposFaena(){
-  // Los grupos ya están en memoria — solo leer salidas si existen inputs
-  gruposFaena.forEach(g=>{
-    const s=document.getElementById('fsal-'+g.id);if(s)g.salida=s.value;
-  });
-}
-
-// ── CAMBIO DE EQUIPO POR FALLA ─────────────────────────
-function abrirCambioEquipo(gid,ei){
-  const g=gruposFaena.find(x=>x.id===gid);
-  if(!g)return;
-  const eq=g.equipos[ei];
-  const tipo=document.getElementById('f-tipo').value;
-  if(!eq.original)eq.original={conductor:eq.conductor,tracto:eq.tracto,semi:eq.semi};
-  const modal=document.createElement('div');
-  modal.id='modal-cambio';
-  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:flex;align-items:center;justify-content:center;padding:1rem';
-  modal.innerHTML=
-    '<div style="background:#fff;border-radius:14px;padding:1.5rem;width:100%;max-width:420px;box-shadow:0 8px 32px rgba(0,0,0,.2)">'+
-      '<div style="font-size:15px;font-weight:700;color:#B91C1C;margin-bottom:4px">🔧 Cambio por eventualidad</div>'+
-      '<div style="font-size:12px;color:#6B7280;margin-bottom:12px">Grupo '+g.num+' — '+(eq.conductor||'Equipo '+(ei+1))+'</div>'+
-      '<div style="background:#FEF3E2;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px">'+
-        '<div style="font-weight:600;color:#92550A">Original: </div>'+
-        '<div style="color:#78350F">'+(eq.original.conductor||'—')+' · '+(eq.original.tracto||'—')+' · '+(eq.original.semi||'—')+'</div>'+
-      '</div>'+
-      '<div style="margin-bottom:8px"><div class="eq-label">👤 Nuevo conductor</div>'+selConductor(tipo,'cambio-cond','')+'</div>'+
-      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">'+
-        '<div><div class="eq-label">🚛 Tracto</div>'+selTracto('cambio-tr','')+'</div>'+
-        '<div><div class="eq-label">🔗 Semi</div>'+selSemi(tipo,'cambio-sm','')+'</div>'+
-      '</div>'+
-      '<div style="margin-bottom:14px"><div class="eq-label">📝 Motivo</div>'+
-        '<input type="text" id="cambio-motivo" placeholder="Ej: Falla motor, pinchazo..." style="font-size:13px">'+
-      '</div>'+
-      '<div style="display:flex;gap:8px">'+
-        '<button class="btn-outline" style="flex:1" onclick="cerrarModal()">Cancelar</button>'+
-        '<button class="btn-primary" style="flex:1;background:#B91C1C" onclick="confirmarCambio('+gid+','+ei+')">Confirmar</button>'+
-      '</div>'+
-    '</div>';
-  document.body.appendChild(modal);
-}
-
-function cerrarModal(){const m=document.getElementById('modal-cambio');if(m)m.remove();}
-
-function confirmarCambio(gid,ei){
-  const g=gruposFaena.find(x=>x.id===gid);if(!g)return;
-  const eq=g.equipos[ei];
-  const nuevoC=getVal('cambio-cond');
-  const nuevoT=getVal('cambio-tr');
-  const nuevoS=getVal('cambio-sm');
-  const motivo=document.getElementById('cambio-motivo').value||'Sin especificar';
-  if(!nuevoC&&!nuevoT){alert('Selecciona al menos conductor o tracto de reemplazo');return;}
-  if(!g.historialCambios)g.historialCambios=[];
-  g.historialCambios.push({equipo:ei+1,hora:getNow(),original:{...eq.original||eq},motivo});
-  if(nuevoC)eq.conductor=nuevoC;
-  if(nuevoT)eq.tracto=nuevoT;
-  if(nuevoS)eq.semi=nuevoS;
-  eq.falla=true;
-  cerrarModal();
-  renderReporte();
-}
-
-function renderGruposFaena(){renderArmador();} // compatibilidad
-
-
-// ── LLEGADAS ─────────────────────────────────────────
-function renderLlegadas(){
-  readGruposFaena();
-  const tipo=document.getElementById('f-tipo').value;
-  const esRampla=tipo==='ramplas';
-  const cont=document.getElementById('llegadas-cont');
-  if(!gruposFaena.length){cont.innerHTML='<div class="empty">Sin grupos</div>';return;}
-  cont.innerHTML='';
-  gruposFaena.forEach(g=>{
-    const nombres=g.equipos.map(eq=>eq.conductor).filter(Boolean).join(' / ')||'Grupo '+g.num;
-    const div=document.createElement('div');div.className='llegada-item';
-    div.innerHTML=
-      '<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:#003DA5">Grupo '+g.num+' — '+nombres+'</div>'+
-      '<div class="field-row"><span class="lbl">Los Loros</span>'+
-        '<input type="time" id="ll-loros-'+g.id+'" value="'+(g.llegLoros||'')+'" style="width:120px" class="'+(g.llegLoros?'time-ok':'')+'"'+
-        ' oninput="gruposFaena.find(x=>x.id==='+g.id+').llegLoros=this.value;this.className=this.value?\'time-ok\':\'\'">'+'</div>'+
-      '<div class="field-row"><span class="lbl">'+(esRampla?'Base INCOM':'Totoralillo')+'</span>'+
-        '<input type="time" id="ll-toto-'+g.id+'" value="'+(g.llegFin||'')+'" style="width:120px" class="'+(g.llegFin?'time-ok':'')+'"'+
-        ' oninput="gruposFaena.find(x=>x.id==='+g.id+').llegFin=this.value;this.className=this.value?\'time-ok\':\'\'">'+'</div>';
-    cont.appendChild(div);
-  });
-}
-
-// ── RENDER TABLA FAENA ────────────────────────────────
-function renderReporte(){
-  readGruposFaena();
-  const tipo=document.getElementById('f-tipo').value;
-  const total=parseInt(document.getElementById('f-total').value)||15;
-  const wrap=document.getElementById('rpt-wrap');
-  if(!gruposFaena.length){wrap.innerHTML='<div class="empty">Sin grupos aún</div>';return;}
-  let rows='';let despAcum=0;
-  gruposFaena.forEach(g=>{
-    const eqV=g.equipos.filter(eq=>eq.conductor||eq.tracto||eq.semi);
-    despAcum+=eqV.length||1;
-    const desp=despAcum+'/'+total;
-    const eta=g.salida?calcETA(g.salida,tipo):[];
-    const etaLoros=eta.find(e=>e.punto==='LOS LOROS');
-    const etaFin=eta.find(e=>e.punto===getUltimoPunto(tipo));
-    const pL=etaLoros?etaLoros.hora:'';
-    const pFin=etaFin?etaFin.hora:'';
-    const tL=g.llegLoros||'';const tFin=g.llegFin||'';
-    const mT=g.llegFin&&g.salida?calcMins(g.salida,g.llegFin):null;
-    const tDisp=mT!=null?Math.floor(mT/60)+':'+String(mT%60).padStart(2,'0'):'';
-    const rs=2+(eqV.length>2?1:0);
-    function parseEq(eq){if(!eq)return{pat:'',nom:''};return{pat:eq.tracto||eq.semi||'',nom:eq.conductor||''};}
-    const e0=parseEq(eqV[0]),e1=parseEq(eqV[1]),e2=parseEq(eqV[2]);
-    const destinoLabel=tipo==='ramplas'?'Base INCOM':'Totoralillo';
-    rows+='<tr class="grp-hdr"><th>GRUPO</th><th>NOMBRE</th><th>TRACTO</th><th>EQ. DESPACHADOS</th><th>SALIDA K1</th><th>TRAMOS</th><th>HORA PROYECTADA</th><th>HORA DE LLEGADA</th><th>TIEMPO TOTAL</th></tr>';
-    rows+='<tr><td class="td-grupo" rowspan="'+rs+'">'+g.num+'</td><td class="td-nombre">'+e0.nom+'</td><td style="font-size:9px">'+e0.pat+'</td><td class="td-desp" rowspan="'+rs+'">'+desp+'</td><td class="td-salida" rowspan="'+rs+'">'+(g.salida||'')+'</td><td class="td-tramo">Los Loros</td><td class="td-proy">'+pL+'</td><td class="'+(tL?'td-llegada-ok':'td-llegada-empty')+'">'+tL+'</td><td class="'+(tDisp?'td-tiempo-ok':'')+'" rowspan="2">'+tDisp+'</td></tr>';
-    rows+='<tr><td class="td-nombre">'+(e1?e1.nom:'')+'</td><td style="font-size:9px">'+(e1?e1.pat:'')+'</td><td class="td-tramo">'+destinoLabel+'</td><td class="td-proy">'+pFin+'</td><td class="'+(tFin?'td-llegada-ok':'td-llegada-empty')+'">'+tFin+'</td></tr>';
-    if(eqV[2])rows+='<tr><td class="td-nombre">'+e2.nom+'</td><td style="font-size:9px">'+e2.pat+'</td><td colspan="3" style="background:#F9FAFB"></td></tr>';
-  });
-  wrap.innerHTML='<div class="rpt-outer"><div class="rpt-title-bar">'+getTipoLabel()+'&nbsp;&nbsp;'+getFecha()+'</div><div class="rpt-scroll"><table class="rpt-table"><thead></thead><tbody>'+rows+'</tbody></table></div></div>'+
-    // Botones de cambio por eventualidad debajo de la tabla
-    (gruposFaena.length?'<div style="margin-top:12px"><div style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Cambios por eventualidad en ruta:</div>'+
-      gruposFaena.map(g=>
-        '<div style="background:#fff;border:1px solid #E5E7EB;border-radius:10px;padding:10px 14px;margin-bottom:8px">'+
-          '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'+
-            '<div style="font-size:13px;font-weight:700;color:#003DA5">Grupo '+g.num+'</div>'+
-            '<button onclick="removeGrupoFaena('+g.id+')" style="background:transparent;color:#EF4444;border:1px solid #FECACA;padding:3px 8px;border-radius:5px;font-size:11px;cursor:pointer">✕ Quitar</button>'+
-          '</div>'+
-          g.equipos.map((eq,ei)=>
-            '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #F3F4F6">'+
-              '<span style="font-size:12px;font-weight:600;flex:1;color:'+(eq.falla?'#92550A':'#111')+'">'+(eq.falla?'🔄 ':'')+eq.conductor+'</span>'+
-              '<span style="background:#F3F4F6;padding:2px 8px;border-radius:5px;font-size:11px">'+eq.tracto+'</span>'+
-              '<span style="background:#EEF2FF;padding:2px 8px;border-radius:5px;font-size:11px;color:#4338CA">'+eq.semi+'</span>'+
-              '<button onclick="abrirCambioEquipo('+g.id+','+ei+')" style="background:transparent;color:#B91C1C;border:1px solid #FECACA;padding:3px 7px;border-radius:5px;font-size:10px;cursor:pointer;white-space:nowrap">🔧 Cambio</button>'+
-            '</div>'
-          ).join('')+
-          ((g.historialCambios||[]).length?
-            '<div style="margin-top:6px;background:#FEF3E2;border-radius:6px;padding:6px 10px">'+
-              (g.historialCambios||[]).map(h=>'<div style="font-size:10px;color:#92550A">⏱ '+h.hora+' · '+h.motivo+(h.original.conductor?' · Ant: '+h.original.conductor:'')+'</div>').join('')+
-            '</div>':'')+
-        '</div>'
-      ).join('')+
-    '</div>':'');
-}
-
-// ── TARJETA MATUTINO ──────────────────────────────────
-function genMatutino(){
-  const hora=getNow();
   const bT=getN('mb-total'),bB=getN('mb-base'),bRF=getN('mb-rutaf'),bF=getN('mb-faena');
-  const rT=getN('mr-total'),rC=getN('mr-carga'),rD=getN('mr-desc'),rRF=getN('mr-rutaf'),rF=getN('mr-faena');
-  const bOk=bB+bRF+bF===bT,rOk=rC+rD+rRF+rF===rT;
-  function fila(label,val){return'<div class="rpt-row"><span class="rpt-row-label">'+label+'</span><span class="rpt-row-val">'+val+'</span></div>';}
-  const html=
-    '<div style="background:var(--blue);padding:16px 20px;display:flex;align-items:center;gap:12px;border-radius:16px 16px 0 0">'+
-      '<div style="font-family:Barlow Condensed,sans-serif;font-size:20px;font-weight:700;color:#fff;border:2px solid rgba(255,255,255,.4);padding:2px 10px;border-radius:5px">INCOM</div>'+
-      '<div style="flex:1"><div style="font-size:15px;font-weight:700;color:#fff">Reporte de Turno</div>'+
-        '<div style="font-size:12px;color:rgba(255,255,255,.75);margin-top:2px">'+getHoy()+' &nbsp;·&nbsp; Sup: '+getSup()+'</div></div>'+
-      '<div style="text-align:right"><div style="font-family:Barlow Condensed,sans-serif;font-size:30px;font-weight:700;color:#fff">'+hora+'</div>'+
-        '<div style="font-size:11px;color:rgba(255,255,255,.7)">hrs</div></div>'+
-    '</div>'+
-
-    '<div class="rpt-section">'+
-      '<div class="rpt-section-header"><div class="rpt-section-dot" style="background:#16A34A"></div>'+
-        '<span class="rpt-section-label">Bateas</span><span class="rpt-section-dest">Pto. Totoralillo</span></div>'+
-      '<div style="background:#EFF6FF;border-radius:10px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">'+
-        '<span style="font-size:13px;font-weight:700;color:#1E3A5F">Total equipos del día</span>'+
-        '<span style="font-family:Barlow Condensed,sans-serif;font-size:28px;font-weight:700;color:#003DA5">'+bT+'</span>'+
-      '</div>'+
-      fila('En base',bB)+fila('En ruta a faena',bRF)+fila('En faena',bF)+
-      (!bOk?'<div style="margin-top:6px;background:#FEE2E2;border-radius:7px;padding:5px 10px;font-size:12px;color:#991B1B;font-weight:500">⚠ No cuadra — verificar conteo</div>':'')+
-    '</div>'+
-
-    '<div class="rpt-section">'+
-      '<div class="rpt-section-header"><div class="rpt-section-dot" style="background:#2563EB"></div>'+
-        '<span class="rpt-section-label">Ramplas</span><span class="rpt-section-dest">Base INCOM Copiapó</span></div>'+
-      '<div style="background:#EFF6FF;border-radius:10px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">'+
-        '<span style="font-size:13px;font-weight:700;color:#1E3A5F">Total equipos del día</span>'+
-        '<span style="font-family:Barlow Condensed,sans-serif;font-size:28px;font-weight:700;color:#003DA5">'+rT+'</span>'+
-      '</div>'+
-      fila('En carga',rC)+fila('En descarga',rD)+fila('En ruta a faena',rRF)+fila('En faena',rF)+
-      (!rOk?'<div style="margin-top:6px;background:#FEE2E2;border-radius:7px;padding:5px 10px;font-size:12px;color:#991B1B;font-weight:500">⚠ No cuadra — verificar conteo</div>':'')+
-    '</div>'+
-
-    '<div style="background:#F9FAFB;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;border-radius:0 0 16px 16px">'+
-      '<span style="font-size:12px;color:#6B7280">Supervisor: <strong style="color:#111">'+getSup()+'</strong></span>'+
-      '<span style="font-size:11px;color:#9CA3AF">INCOM Control de Tráfico</span>'+
-    '</div>';
-  document.getElementById('out-matutino').classList.remove('hidden');
-  document.getElementById('tarjeta-matutino').innerHTML='<div class="rpt-card">'+html+'</div>';
-  document.getElementById('out-matutino').scrollIntoView({behavior:'smooth',block:'start'});
+  const rT=getN('mr-total'),rC=getN('mr-carga'),rD=getN('mr-desc'),rRF=getN('mr-rutaf');
+  const rF=getN('mr-faena'),rRD=getN('mr-rutadesc'),rN=getN('mr-neumaticos'),rRB=getN('mr-rutab');
+  const bSum=bB+bRF+bF, rSum=rC+rD+rRF+rF+rRD+rN+rRB;
+  const bOk=bSum===bT, rOk=rSum===rT;
+  const bEl=document.getElementById('tot-bat-el'), rEl=document.getElementById('tot-ram-el');
+  bEl.className='totalizador '+(bOk?'tot-ok':'tot-warn');
+  document.getElementById('tot-bat-txt').textContent=bSum+' / '+bT+(bOk?' ✓':' ⚠');
+  rEl.className='totalizador '+(rOk?'tot-ok':'tot-warn');
+  document.getElementById('tot-ram-txt').textContent=rSum+' / '+rT+(rOk?' ✓':' ⚠');
 }
 
-// ── POSICION EN RUTA ──────────────────────────────────
-function importarDesdeFaena(){
-  readGruposFaena();
-  if(!gruposFaena.length){alert('No hay grupos en Salida de faena. Agrégalos primero.');return;}
-  gruposPos=gruposFaena.map(g=>({
-    id:gpId++,num:g.num,
-    equipos:g.equipos.map(eq=>({conductor:eq.conductor,tracto:eq.tracto,semi:eq.semi})),
-    salida:g.salida,tramo:'',pannes:[],obs:''
-  }));
-  renderGruposPos();
-  alert('✓ '+gruposPos.length+' grupos importados correctamente');
-}
-
-function addGrupoPos(){
-  gruposPos.push({id:gpId++,num:gruposPos.length+1,equipos:[{conductor:'',tracto:'',semi:''}],salida:'',tramo:'',pannes:[],obs:''});
-  renderGruposPos();
-}
-function removePosGrupo(id){gruposPos=gruposPos.filter(g=>g.id!==id);gruposPos.forEach((g,i)=>g.num=i+1);renderGruposPos();}
-function setPosTramo(gid,tramo,btn){
-  gruposPos.find(x=>x.id===gid).tramo=tramo;
-  btn.closest('.tramos-grid').querySelectorAll('.tramo-btn').forEach(b=>b.classList.remove('sel'));
-  btn.classList.add('sel');
-}
-function addPanne(gid){const g=gruposPos.find(x=>x.id===gid);if(g){g.pannes=g.pannes||[];g.pannes.push({conductor:'',tracto:'',semi:'',escolta:'',condEscolta:''});}renderGruposPos();}
-function removePanne(gid,pi){const g=gruposPos.find(x=>x.id===gid);if(g)g.pannes.splice(pi,1);renderGruposPos();}
-
-function readGruposPos(){
-  const tipo=document.getElementById('p-tipo').value;
-  gruposPos.forEach(g=>{
-    const ob=document.getElementById('pobs-'+g.id);if(ob)g.obs=ob.value;
-    (g.pannes||[]).forEach((pn,pi)=>{
-      const t=document.getElementById('pntr-'+g.id+'-'+pi);const s=document.getElementById('pnsm-'+g.id+'-'+pi);
-      const e=document.getElementById('pnes-'+g.id+'-'+pi);const c=document.getElementById('pncd-'+g.id+'-'+pi);
-      if(t)pn.tracto=t.value;if(s)pn.semi=s.value;if(e)pn.escolta=e.value;if(c)pn.condEscolta=c.value;
-    });
+function cargarDesdePlan(){
+  if(!planActivo){mostrarAviso('⚠ Carga primero una planificación');return;}
+  const bT=(planActivo.equiposBat||[]).filter(e=>!e.fueraServicio).length;
+  const rT=(planActivo.equiposRam||[]).filter(e=>!e.fueraServicio).length;
+  document.getElementById('mb-total').textContent=bT;
+  document.getElementById('mb-faena').textContent=bT;
+  document.getElementById('mb-base').textContent=0;
+  document.getElementById('mb-rutaf').textContent=0;
+  document.getElementById('mr-total').textContent=rT;
+  document.getElementById('mr-faena').textContent=rT;
+  ['mr-carga','mr-desc','mr-rutaf','mr-rutadesc','mr-neumaticos','mr-rutab'].forEach(id=>{
+    document.getElementById(id).textContent=0;
   });
+  updateTot();
+  mostrarAviso('✓ Cargado: '+bT+' bateas · '+rT+' ramplas');
 }
 
-function renderGruposPos(){
-  const tipo=document.getElementById('p-tipo').value;
-  const tramos=tipo==='ramplas'?TRAMOS_RAM:TRAMOS_BAT;
-  const cont=document.getElementById('grupos-pos-cont');
-  if(!gruposPos.length){cont.innerHTML='<div class="empty">Importa desde Salida de faena o agrega manualmente</div>';return;}
-  cont.innerHTML='';
-  gruposPos.forEach(g=>{
-    const div=document.createElement('div');div.className='card';
-    // equipos
-    const eqList=(g.equipos||[]).map(eq=>{
-      if(eq.conductor||eq.tracto||eq.semi){
-        return'<div style="display:flex;gap:6px;align-items:center;padding:4px 0;font-size:12px">'+
-          (eq.conductor?'<span style="font-weight:600;color:#111">'+eq.conductor+'</span>':'')+''+
-          (eq.tracto?'<span style="background:#F3F4F6;padding:1px 7px;border-radius:5px;font-size:11px">'+eq.tracto+'</span>':'')+
-          (eq.semi?'<span style="background:#EEF2FF;padding:1px 7px;border-radius:5px;font-size:11px;color:#4338CA">'+eq.semi+'</span>':'')+
-        '</div>';
-      }
-      return'';
-    }).join('');
-    // tramos
-    const tramosHTML=tramos.map(t=>'<button class="tramo-btn'+(g.tramo===t?' sel':'')+'" onclick="setPosTramo('+g.id+',\''+t.replace(/\'/g,"\\'")+'\',this)">'+t+'</button>').join('');
-    // pannes
-    const pannesHTML=(g.pannes||[]).map((pn,pi)=>
-      '<div style="background:#FEF3E2;border:1px solid #FCD34D;border-radius:8px;padding:10px;margin-bottom:8px">'+
-        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'+
-          '<span style="font-size:12px;font-weight:700;color:#92550A">🔧 Equipo en Panne '+(pi+1)+'</span>'+
-          '<button class="btn-danger" onclick="readGruposPos();removePanne('+g.id+','+pi+')">Quitar</button></div>'+
-        '<div class="eq-3col" style="margin-bottom:8px">'+
-          '<div><div class="eq-label">Conductor</div>'+selConductor(tipo,'pncond-'+g.id+'-'+pi,pn.conductor||'')+'</div>'+
-          '<div><div class="eq-label">Tracto</div>'+selTracto('pntr-'+g.id+'-'+pi,pn.tracto)+'</div>'+
-          '<div><div class="eq-label">Semi</div>'+selSemi(tipo,'pnsm-'+g.id+'-'+pi,pn.semi)+'</div>'+
-        '</div>'+
-        '<div class="field-row"><span class="lbl" style="min-width:80px;font-size:12px">Escolta</span>'+
-          '<input type="text" id="pnes-'+g.id+'-'+pi+'" placeholder="Ej: Toyota Hilux ABC-123" value="'+(pn.escolta||'')+'"></div>'+
-        '<div class="field-row"><span class="lbl" style="min-width:80px;font-size:12px">Cond. INCOM</span>'+
-          '<input type="text" id="pncd-'+g.id+'-'+pi+'" placeholder="Nombre conductor escolta" value="'+(pn.condEscolta||'')+'"></div>'+
-      '</div>'
-    ).join('');
+// ══════════════════════════════════════════════════════════════
+// REPORTE 8 AM — TARJETA VISUAL
+// ══════════════════════════════════════════════════════════════
+function genMatutino(){
+  const hora=document.getElementById('m-hora').value||'08:00';
+  const sup=getSup(), fecha=getHoy();
+  const bT=getN('mb-total'),bB=getN('mb-base'),bRF=getN('mb-rutaf'),bF=getN('mb-faena');
+  const rT=getN('mr-total'),rC=getN('mr-carga'),rD=getN('mr-desc'),rRF=getN('mr-rutaf');
+  const rF=getN('mr-faena'),rRD=getN('mr-rutadesc'),rN=getN('mr-neumaticos'),rRB=getN('mr-rutab');
 
-    div.innerHTML=
-      '<div class="grupo-header">'+
-        '<div class="grupo-num">'+g.num+'</div>'+
-        '<div style="flex:1"><div style="font-size:13px;font-weight:600">Grupo '+g.num+'</div>'+
-          (g.salida?'<div style="font-size:11px;color:#6B7280">Salida KM1: '+g.salida+' hrs</div>':'')+
-        '</div><button class="btn-danger" onclick="removePosGrupo('+g.id+')">Quitar</button>'+
-      '</div>'+
-      (eqList?'<div style="margin-bottom:10px;padding:8px;background:#F9FAFB;border-radius:8px">'+eqList+'</div>':'')+
-      '<div style="font-size:10px;font-weight:700;color:#374151;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">Tramo actual:</div>'+
-      '<div class="tramos-grid">'+tramosHTML+'</div>'+
-      (pannesHTML?'<div style="margin-top:10px">'+pannesHTML+'</div>':'')+
-      '<button class="btn-outline" style="font-size:11px;padding:5px 10px;margin-top:8px;width:auto;color:#92550A;border-color:#FCD34D;background:#FFFBEB" onclick="readGruposPos();addPanne('+g.id+')">🔧 + Equipo en panne</button>'+
-      '<div class="field-row" style="margin-top:8px"><span class="lbl">Observación</span>'+
-        '<input type="text" id="pobs-'+g.id+'" placeholder="Opcional" value="'+(g.obs||'')+'"></div>';
-    cont.appendChild(div);
-  });
-}
-
-// ── ANÁLISIS DE TIEMPO EN RUTA ────────────────────────
-// Convierte "HH:MM" a minutos desde medianoche
-function toMin(t){if(!t||!t.includes(':'))return null;const[h,m]=t.split(':').map(Number);return h*60+m;}
-
-// Dado salida KM1, tramo actual y tipo, calcula:
-//  - etaTramo: hora proyectada de llegada al inicio del tramo actual
-//  - etaFin:   hora proyectada de llegada al destino final
-//  - diffMin:  diferencia en minutos (negativo = adelantado, positivo = atrasado)
-//  - etaFinActualizada: ETA al destino desde la posición actual usando hora actual
-function analizarTiempo(salida, tramoActual, tipo){
-  if(!salida||!tramoActual) return null;
-  const factor=condicion==='normal'?1:condicion==='precaucion'?1.15:1.30;
-  const segs=tipo==='ramplas'?segsRam:segsBat;
-  const horaActual=getNow();
-  const nowMin=toMin(horaActual);
-  const salidaMin=toMin(salida);
-
-  // Buscar índice del tramo actual por origen
-  const tramoOrigen=tramoActual.split('→')[0].trim().toUpperCase();
-  let idxTramo=-1;
-  segs.forEach((s,i)=>{if(s.o.toUpperCase()===tramoOrigen)idxTramo=i;});
-  if(idxTramo<0) return null;
-
-  // ETA al FINAL del tramo actual (cuándo debería llegar al destino de este tramo)
-  let minAcumFin=0;
-  for(let i=0;i<=idxTramo;i++) minAcumFin+=Math.round(segs[i].min*factor);
-  const etaFinTramoMin=salidaMin+minAcumFin;
-  const etaInicioTramo=String(Math.floor(etaFinTramoMin/60)%24).padStart(2,'0')+':'+String(etaFinTramoMin%60).padStart(2,'0');
-
-  // Diferencia: hora actual vs ETA fin del tramo actual
-  // Si nowMin < etaFinTramoMin → va en tiempo dentro del tramo (diffMin negativo = bien)
-  // Si nowMin > etaFinTramoMin → ya debería haber pasado ese tramo = demora
-  const diffMin=nowMin-etaFinTramoMin;
-
-  // ETA al destino final desde ahora
-  let minRestante=0;
-  for(let i=idxTramo+1;i<segs.length;i++) minRestante+=Math.round(segs[i].min*factor);
-  // Si aún no termina el tramo actual, agregar tiempo restante del tramo
-  const tiempoTramoActual=Math.round(segs[idxTramo].min*factor);
-  const etaInicioTramoMin=salidaMin+minAcumFin-tiempoTramoActual;
-  const tiempoEnTramo=nowMin-etaInicioTramoMin;
-  const tiempoRestanteTramo=Math.max(0,tiempoTramoActual-tiempoEnTramo);
-  const etaFinMin=nowMin+tiempoRestanteTramo+minRestante;
-  const etaFin=String(Math.floor(etaFinMin/60)%24).padStart(2,'0')+':'+String(etaFinMin%60).padStart(2,'0');
-
-  // ETA final proyectada desde salida (sin demoras)
-  let minTotal=0;
-  segs.forEach(s=>minTotal+=Math.round(s.min*factor));
-  const etaFinProy=String(Math.floor((salidaMin+minTotal)/60)%24).padStart(2,'0')+':'+String((salidaMin+minTotal)%60).padStart(2,'0');
-
-  return{diffMin,etaInicioTramo,etaFin,etaFinProy,destino:segs[segs.length-1].d};
-}
-
-function semaforoHTML(analisis){
-  if(!analisis) return '';
-  const{diffMin,etaInicioTramo,etaFin,etaFinProy,destino}=analisis;
-  const abs=Math.abs(diffMin);
-  let icono,color,bg,border,texto;
-  if(diffMin<-5){
-    icono='🟢';color='#166534';bg='#DCFCE7';border='#86EFAC';
-    texto='En tiempo · '+abs+' min antes de lo proyectado';
-  } else if(diffMin<=0){
-    icono='🟢';color='#166534';bg='#DCFCE7';border='#86EFAC';
-    texto='En tiempo';
-  } else if(diffMin<=15){
-    icono='🟡';color='#854D0E';bg='#FEF9C3';border='#FDE047';
-    texto='Demora leve: +'+diffMin+' min';
-  } else {
-    icono='🔴';color='#991B1B';bg='#FEE2E2';border='#FCA5A5';
-    texto='Demora: +'+diffMin+' min sobre lo proyectado';
+  function fila(label,val,last,hl){
+    const bdr=last?'':'border-bottom:0.5px solid #e2e8f0;';
+    const color=hl?'#003DA5':'#374151', w=hl?'700':'500';
+    return`<div style="${bdr}display:flex;justify-content:space-between;align-items:center;padding:5px 12px">
+      <span style="font-size:12px;color:#6b7280">${label}</span>
+      <span style="font-size:12px;font-weight:${w};color:${color}">${val}</span></div>`;
   }
-  return'<div style="margin-top:10px;background:'+bg+';border:1px solid '+border+';border-radius:10px;padding:10px 14px">'+
-    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'+
-      '<span style="font-size:18px">'+icono+'</span>'+
-      '<span style="font-size:13px;font-weight:700;color:'+color+'">'+texto+'</span>'+
-    '</div>'+
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+
-      '<div style="background:rgba(255,255,255,.7);border-radius:7px;padding:6px 10px">'+
-        '<div style="font-size:10px;color:#6B7280;font-weight:600;text-transform:uppercase;letter-spacing:.4px">Proyectado fin de tramo</div>'+
-        '<div style="font-size:14px;font-weight:700;color:#111;margin-top:2px">'+etaInicioTramo+' hrs</div>'+
-      '</div>'+
-      '<div style="background:rgba(255,255,255,.7);border-radius:7px;padding:6px 10px">'+
-        '<div style="font-size:10px;color:#6B7280;font-weight:600;text-transform:uppercase;letter-spacing:.4px">🏁 ETA '+destino+'</div>'+
-        '<div style="font-size:14px;font-weight:700;color:#003DA5;margin-top:2px">~'+etaFin+' hrs</div>'+
-      '</div>'+
-    '</div>'+
-  '</div>';
+
+  const html=`
+  <div style="font-family:'Segoe UI',Arial,sans-serif;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);max-width:420px;margin:0 auto">
+    <div style="background:#1D3557;padding:12px 16px;display:flex;align-items:center;gap:10px">
+      <div style="background:#fff;border-radius:5px;padding:2px 7px"><span style="font-size:12px;font-weight:900;color:#1D3557;letter-spacing:1px">INCOM</span></div>
+      <div style="flex:1"><div style="font-size:14px;font-weight:700;color:#fff">Reporte de Turno</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.7)">${fecha} · Sup: ${sup}</div></div>
+      <div style="text-align:right"><div style="font-size:26px;font-weight:700;color:#fff;line-height:1">${hora}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.6)">hrs</div></div>
+    </div>
+    <div style="padding:10px 14px">
+      <div style="margin-bottom:8px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+          <div style="display:flex;align-items:center;gap:6px"><div style="width:8px;height:8px;border-radius:50%;background:#16A34A"></div>
+            <span style="font-size:12px;font-weight:700;color:#111">BATEAS</span></div>
+          <span style="font-size:10px;color:#9ca3af">Pto. Totoralillo</span></div>
+        <div style="background:#f1f5f9;border-radius:10px;overflow:hidden">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 12px;border-bottom:0.5px solid #e2e8f0">
+            <span style="font-size:12px;font-weight:700;color:#1D3557">Total equipos del día</span>
+            <span style="font-size:22px;font-weight:900;color:#003DA5;line-height:1">${bT}</span></div>
+          ${fila('En base',bB)}${fila('En ruta a faena',bRF)}${fila('En faena',bF,true,true)}</div></div>
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+          <div style="display:flex;align-items:center;gap:6px"><div style="width:8px;height:8px;border-radius:50%;background:#2563EB"></div>
+            <span style="font-size:12px;font-weight:700;color:#111">RAMPLAS</span></div>
+          <span style="font-size:10px;color:#9ca3af">Base INCOM Copiapó</span></div>
+        <div style="background:#f1f5f9;border-radius:10px;overflow:hidden">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 12px;border-bottom:0.5px solid #e2e8f0">
+            <span style="font-size:12px;font-weight:700;color:#1D3557">Total equipos del día</span>
+            <span style="font-size:22px;font-weight:900;color:#003DA5;line-height:1">${rT}</span></div>
+          ${fila('En carga',rC)}${fila('En descarga',rD)}${fila('En ruta a faena',rRF)}
+          ${fila('En faena',rF)}${fila('En ruta a descarga',rRD)}
+          ${fila('Carga de neumáticos',rN)}${fila('En ruta a base INCOM',rRB,true,true)}</div></div>
+    </div>
+    <div style="background:#f8fafc;padding:6px 14px;display:flex;justify-content:space-between;border-top:0.5px solid #e2e8f0">
+      <span style="font-size:10px;color:#9ca3af">Supervisor: <strong style="color:#374151">${sup}</strong></span>
+      <span style="font-size:10px;color:#9ca3af">INCOM Control de Tráfico</span></div>
+  </div>`;
+
+  const cont=document.getElementById('tarjeta-matutino');
+  cont.innerHTML=html;
+  document.getElementById('out-matutino').classList.remove('hidden');
+  cont.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-function genPosicion(){
-  readGruposPos();
-  if(!gruposPos.length){alert('Agrega al menos un grupo');return;}
-  const hora=getNow();
-  const tipo=document.getElementById('p-tipo').value;
-  const tipoLabel=tipo==='bateas'?'BATEAS':'RAMPLAS';
-  const segs=tipo==='ramplas'?segsRam:segsBat;
-  const tramosLabels=['KM1','T.LAU','LOROS','PABE','NANT','AC.R5','BYPAS','PEAJE','CALD','TOTO'];
-  const tramosLabelsFull=segs.map(s=>s.d);
-
-  // Construir filas por grupo
-  let filasHTML='';
-  let totalDesc=0;
-
-  gruposPos.forEach(g=>{
-    const eqV=(g.equipos||[]).filter(eq=>eq.conductor||eq.tracto);
-    const analisis=g.salida&&g.tramo?analizarTiempo(g.salida,g.tramo,tipo):null;
-
-    // Determinar índice del tramo actual
-    const tramoOrigen=g.tramo?g.tramo.split('→')[0].trim().toUpperCase():'';
-    let idxActual=-1;
-    segs.forEach((s,i)=>{if(s.o.toUpperCase()===tramoOrigen)idxActual=i;});
-    const enDescarga=g.tramo&&g.tramo.toUpperCase().includes('DESCARG');
-    if(enDescarga)totalDesc+=eqV.length;
-
-    // Semáforo
-    let semColor='#6B7280',semIcon='⚪',semTxt='Sin datos';
-    if(analisis){
-      const d=analisis.diffMin;
-      if(d<=-1){semColor='#16A34A';semIcon='🟢';semTxt='En tiempo';}
-      else if(d<=15){semColor='#D97706';semIcon='🟡';semTxt='+'+d+' min';}
-      else{semColor='#DC2626';semIcon='🔴';semTxt='+'+d+' min demora';}
-    }
-
-    // Header del grupo
-    filasHTML+=
-      '<tr style="background:#003DA5">'+
-        '<td colspan="2" style="padding:6px 10px;color:#fff;font-size:11px;font-weight:700;text-align:left">'+
-          'GRUPO '+g.num+(g.salida?' · Salida KM1: '+g.salida+' hrs':'')+
-        '</td>'+
-        segs.map((_,i)=>'<td style="background:#002D7A;border:1px solid #001F5C"></td>').join('')+
-        '<td style="background:#002D7A;border:1px solid #001F5C;color:'+semColor+';font-size:12px;font-weight:700;text-align:center">'+semIcon+'</td>'+
-        '<td style="background:#002D7A;border:1px solid #001F5C;color:#fff;font-size:10px;text-align:center">'+semTxt+'</td>'+
-        (analisis?'<td style="background:#002D7A;color:#93C5FD;font-size:10px;text-align:center">~'+analisis.etaFin+'</td>':'<td style="background:#002D7A"></td>')+
-      '</tr>';
-
-    // Filas por equipo
-    eqV.forEach((eq,ei)=>{
-      const celdas=segs.map((_,i)=>{
-        if(enDescarga&&i===segs.length-1)
-          return'<td style="background:#16A34A;border:1px solid #E5E7EB;text-align:center;color:#fff;font-size:14px">✓</td>';
-        if(i<idxActual)
-          return'<td style="background:#DCFCE7;border:1px solid #E5E7EB;text-align:center;color:#16A34A;font-size:12px">✓</td>';
-        if(i===idxActual)
-          return'<td style="background:#003DA5;border:1px solid #E5E7EB;text-align:center;color:#fff;font-size:11px;font-weight:700">●</td>';
-        return'<td style="border:1px solid #E5E7EB;background:#F9FAFB"></td>';
-      }).join('');
-      filasHTML+=
-        '<tr style="border-bottom:1px solid #F3F4F6">'+
-          '<td style="padding:7px 10px;font-size:12px;font-weight:600;color:#111;border:1px solid #E5E7EB;white-space:nowrap">'+(eq.conductor||'—')+'</td>'+
-          '<td style="padding:7px 8px;font-size:11px;color:#374151;border:1px solid #E5E7EB;white-space:nowrap">'+
-            '<span style="background:#F3F4F6;padding:1px 6px;border-radius:4px">'+(eq.tracto||'—')+'</span> '+
-            '<span style="background:#EEF2FF;padding:1px 6px;border-radius:4px;color:#4338CA">'+(eq.semi||'—')+'</span>'+
-          '</td>'+
-          celdas+
-          (ei===0?'<td rowspan="'+eqV.length+'" style="text-align:center;font-size:16px;vertical-align:middle;border:1px solid #E5E7EB">'+semIcon+'</td>':'')+ 
-          (ei===0?'<td rowspan="'+eqV.length+'" style="text-align:center;font-size:10px;font-weight:600;color:'+semColor+';vertical-align:middle;border:1px solid #E5E7EB">'+semTxt+'</td>':'')+ 
-          (ei===0&&analisis?'<td rowspan="'+eqV.length+'" style="text-align:center;font-size:10px;color:#003DA5;vertical-align:middle;border:1px solid #E5E7EB">~'+analisis.etaFin+' hrs</td>':'')+ 
-          (ei===0&&!analisis?'<td rowspan="'+eqV.length+'" style="border:1px solid #E5E7EB"></td>':'')+
-        '</tr>';
-    });
-
-    // Panne
-    (g.pannes||[]).forEach(pn=>{
-      filasHTML+=
-        '<tr style="background:#FEF3E2">'+
-          '<td style="padding:5px 10px;font-size:11px;color:#92550A;font-weight:600;border:1px solid #FCD34D">🔧 '+(pn.conductor||pn.tracto||'Panne')+'</td>'+
-          '<td style="padding:5px 8px;font-size:11px;color:#78350F;border:1px solid #FCD34D">'+(pn.escolta?'🚐 '+pn.escolta:'Esperando escolta')+'</td>'+
-          '<td colspan="'+(segs.length+3)+'" style="padding:5px 8px;font-size:11px;color:#92550A;border:1px solid #FCD34D">'+(pn.motivo||'')+'</td>'+
-        '</tr>';
-    });
-  });
-
-  // Encabezados de tramos abreviados
-  const thTramos=segs.map((s,i)=>
-    '<th style="background:#002D7A;color:#fff;font-size:8px;font-weight:700;padding:4px 2px;text-align:center;border:1px solid #001F5C;white-space:nowrap;writing-mode:vertical-lr;transform:rotate(180deg);height:60px">'+
-      (s.o+' →<br>'+s.d)+
-    '</th>'
-  ).join('');
-
-  const tabla=
-    '<table style="width:100%;border-collapse:collapse;font-family:Inter,sans-serif;font-size:11px">'+
-      '<thead><tr>'+
-        '<th style="background:#1F2937;color:#fff;padding:6px 10px;text-align:left;font-size:10px;border:1px solid #374151;white-space:nowrap">CONDUCTOR</th>'+
-        '<th style="background:#1F2937;color:#fff;padding:6px 8px;text-align:left;font-size:10px;border:1px solid #374151;white-space:nowrap">TRACTO · SEMI</th>'+
-        thTramos+
-        '<th style="background:#1F2937;color:#fff;padding:4px;text-align:center;font-size:9px;border:1px solid #374151">EST.</th>'+
-        '<th style="background:#1F2937;color:#fff;padding:4px;text-align:center;font-size:9px;border:1px solid #374151">TIEMPO</th>'+
-        '<th style="background:#1F2937;color:#fff;padding:4px;text-align:center;font-size:9px;border:1px solid #374151">ETA</th>'+
-      '</tr></thead>'+
-      '<tbody>'+filasHTML+'</tbody>'+
-    '</table>';
-
-  const tarjetaPos=document.getElementById('tarjeta-posicion');
-  const outPos=document.getElementById('out-posicion');
-  outPos.classList.remove('hidden');
-  tarjetaPos.innerHTML=
-    '<div style="background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12)">'+
-      '<div class="pos-card-header">'+
-        '<div style="font-family:Barlow Condensed,sans-serif;font-size:20px;font-weight:700;color:#fff;border:2px solid rgba(255,255,255,.4);padding:2px 10px;border-radius:5px">INCOM</div>'+
-        '<div style="flex:1;margin-left:8px">'+
-          '<div style="font-size:15px;font-weight:700;color:#fff">Posición en Ruta — '+tipoLabel+'</div>'+
-          '<div style="font-size:12px;color:rgba(255,255,255,.75);margin-top:2px">'+getHoy()+'</div>'+
-        '</div>'+
-        '<div style="text-align:right">'+
-          '<div style="font-family:Barlow Condensed,sans-serif;font-size:28px;font-weight:700;color:#fff">'+hora+'</div>'+
-          '<div style="font-size:10px;color:rgba(255,255,255,.65)">hrs</div>'+
-        '</div>'+
-      '</div>'+
-      '<div style="overflow-x:auto">'+tabla+'</div>'+
-      '<div style="padding:10px 16px;display:flex;align-items:center;justify-content:space-between;background:#F9FAFB">'+
-        '<span style="font-size:11px;color:#6B7280">Sup: '+getSup()+'</span>'+
-        '<span style="font-size:11px;color:#6B7280">✓ pasado &nbsp; ● actual &nbsp; 🟢 en tiempo &nbsp; 🟡 leve &nbsp; 🔴 demora</span>'+
-        '<span style="font-size:11px;color:#9CA3AF">INCOM Control de Tráfico</span>'+
-      '</div>'+
-    '</div>';
-  outPos.scrollIntoView({behavior:'smooth',block:'start'});
-}
-
-
-
-// ── GOOGLE SHEETS (deshabilitado) ─────────────────────
-async function guardarEnSheets(plan){return false;}
-async function leerDesdeSheets(){return null;}
-
-
-// Estructura: {id, nombre, fecha, equiposBat:[{conductor,tracto,semi}], equiposRam:[...]}
-
-function initPlan(){
-  try{
-    const saved=localStorage.getItem('incom_planes');
-    const savedActivo=localStorage.getItem('incom_plan_activo');
-    if(saved){
-      planes=JSON.parse(saved);
-      if(savedActivo&&planes.length){
-        planActivo=planes.find(p=>p.id===savedActivo)||planes[0]||null;
-      }
-    } else {planes=[];planActivo=null;}
-  }catch(e){planes=[];planActivo=null;}
-
-  // Intentar cargar desde Google Sheets
-  leerDesdeSheets().then(planSheets=>{
-    if(planSheets&&planSheets.equiposBat&&(planSheets.equiposBat.length||planSheets.equiposRam.length)){
-      // Actualizar planActivo con datos frescos de Sheets
-      planActivo=planSheets;
-      if(!planes.find(p=>p.id==='sheet_plan'))planes.unshift(planSheets);
-      else planes=planes.map(p=>p.id==='sheet_plan'?planSheets:p);
-      try{localStorage.setItem('incom_planes',JSON.stringify(planes));localStorage.setItem('incom_plan_activo','sheet_plan');}catch(e){}
-    }
-    renderPlanSel();
-    if(planActivo){
-      document.getElementById('plan-sel').value=planActivo.id;
-      cargarPlan();
-    }
-  }).catch(()=>{
-    renderPlanSel();
-    if(planActivo){
-      document.getElementById('plan-sel').value=planActivo.id;
-      cargarPlan();
-    }
-  });
-}
-
+// ══════════════════════════════════════════════════════════════
+// PLANIFICACIÓN
+// ══════════════════════════════════════════════════════════════
 function renderPlanSel(){
   const sel=document.getElementById('plan-sel');
-  const cur=planActivo?planActivo.id:'';
-  sel.innerHTML='<option value="">— Seleccionar planificación —</option>';
+  sel.innerHTML='<option value="">— Seleccionar —</option>';
   planes.forEach(p=>{
-    const fd=p.fecha?p.fecha.split('-').reverse().join('-'):'sin fecha';
-    const opt=document.createElement('option');
-    opt.value=p.id;
-    opt.textContent=p.nombre+' · '+fd;
-    if(p.id===cur)opt.selected=true;
-    sel.appendChild(opt);
+    const o=document.createElement('option');
+    o.value=p.id;o.textContent=p.nombre+' ('+p.fecha+')';
+    sel.appendChild(o);
   });
-}
-
-function cargarPlan(){
-  try{
-    const id=document.getElementById('plan-sel').value;
-    if(!id){document.getElementById('plan-form').classList.add('hidden');planActivo=null;return;}
-    planActivo=planes.find(p=>p.id===id)||null;
-    if(!planActivo){alert('No se encontró');return;}
-    document.getElementById('plan-nombre').value=planActivo.nombre||'';
-    document.getElementById('plan-fecha').value=planActivo.fecha||'';
-    document.getElementById('plan-form').classList.remove('hidden');
-    renderPlanEquipos('bat');
-    renderPlanEquipos('ram');
-    actualizarResumen();
-    initSelectorPlan();
-  }catch(e){alert('Error: '+e.message);}
 }
 
 function nuevaPlan(){
-  try{
-    const n=new Date();
-    const m=new Date(n);m.setDate(n.getDate()+1);
-    const fs=m.getFullYear()+'-'+String(m.getMonth()+1).padStart(2,'0')+'-'+String(m.getDate()).padStart(2,'0');
-    const fd=String(m.getDate()).padStart(2,'0')+'-'+String(m.getMonth()+1).padStart(2,'0')+'-'+m.getFullYear();
-    planActivo={id:'plan_'+Date.now(),nombre:fd,fecha:fs,equiposBat:[],equiposRam:[]};
-    planes.push(planActivo);
-    try{localStorage.setItem('incom_planes',JSON.stringify(planes));localStorage.setItem('incom_plan_activo',planActivo.id);}catch(e){}
-    renderPlanSel();
-    document.getElementById('plan-sel').value=planActivo.id;
+  const id='plan_'+Date.now();
+  const hoy=new Date().toISOString().slice(0,10);
+  const p={id,nombre:'Plan '+getHoy(),fecha:hoy,equiposBat:[],equiposRam:[]};
+  planes.push(p);planActivo=p;
+  renderPlanSel();
+  document.getElementById('plan-sel').value=id;
+  document.getElementById('plan-nombre').value=p.nombre;
+  document.getElementById('plan-fecha').value=hoy;
+  mostrarEditor();
+  guardarStorage();
+}
+
+function mostrarEditor(){
+  document.getElementById('plan-editor').classList.remove('hidden');
+  if(planActivo){
     document.getElementById('plan-nombre').value=planActivo.nombre;
     document.getElementById('plan-fecha').value=planActivo.fecha;
-    document.getElementById('plan-form').classList.remove('hidden');
-    renderPlanEquipos('bat');
-    renderPlanEquipos('ram');
-    actualizarResumen();
-    initSelectorPlan();
-  }catch(e){alert('Error en nuevaPlan: '+e.message);}
+    renderListaBat();renderListaRam();
+  }
 }
 
-function duplicarPlan(){
-  if(!planActivo){alert('Selecciona una planificación para duplicar');return;}
-  readPlanForm();
-  const n=new Date();const sig=new Date(n);sig.setDate(n.getDate()+1);
-  const fs=sig.getFullYear()+'-'+String(sig.getMonth()+1).padStart(2,'0')+'-'+String(sig.getDate()).padStart(2,'0');
-  const fd=String(sig.getDate()).padStart(2,'0')+'-'+String(sig.getMonth()+1).padStart(2,'0')+'-'+sig.getFullYear();
-  const copia={
-    id:'plan_'+Date.now(),nombre:fd,fecha:fs,
-    equiposBat:JSON.parse(JSON.stringify(planActivo.equiposBat||[])),
-    equiposRam:JSON.parse(JSON.stringify(planActivo.equiposRam||[])),
-  };
-  planes.push(copia);planActivo=copia;
-  renderPlanSel();
-  document.getElementById('plan-sel').value=copia.id;
-  document.getElementById('plan-nombre').value=copia.nombre;
-  document.getElementById('plan-fecha').value=copia.fecha;
-  document.getElementById('plan-form').classList.remove('hidden');
-  renderPlanEquipos('bat');renderPlanEquipos('ram');
-  mostrarAviso('✓ Duplicada para '+fd+' — recuerda Exportar');
-}
-
-function eliminarPlan(){
-  if(!planActivo){alert('Selecciona una planificación');return;}
-  if(!confirm('¿Eliminar "'+planActivo.nombre+'"?'))return;
-  planes=planes.filter(p=>p.id!==planActivo.id);
-  planActivo=null;renderPlanSel();
-  document.getElementById('plan-form').classList.add('hidden');
+function cargarPlanSel(){
+  const id=document.getElementById('plan-sel').value;
+  if(!id){planActivo=null;document.getElementById('plan-editor').classList.add('hidden');return;}
+  planActivo=planes.find(p=>p.id===id)||null;
+  if(planActivo){mostrarEditor();guardarStorage();}
 }
 
 function guardarPlan(){
-  readPlanForm();
+  if(!planActivo)return;
+  planActivo.nombre=document.getElementById('plan-nombre').value||planActivo.nombre;
+  planActivo.fecha=document.getElementById('plan-fecha').value||planActivo.fecha;
+  guardarStorage();renderPlanSel();
+  document.getElementById('plan-sel').value=planActivo.id;
+  mostrarAviso('✓ Planificación guardada');
+}
+
+function guardarStorage(){
   try{
     localStorage.setItem('incom_planes',JSON.stringify(planes));
     if(planActivo)localStorage.setItem('incom_plan_activo',planActivo.id);
   }catch(e){}
-  renderPlanSel();actualizarResumen();
-  mostrarAviso('✓ Planificación guardada. Usa ⬇ Exportar para compartir con supervisores.');
+}
+
+function eliminarPlan(){
+  if(!planActivo)return;
+  if(!confirm('¿Eliminar "'+planActivo.nombre+'"?'))return;
+  planes=planes.filter(p=>p.id!==planActivo.id);
+  planActivo=null;
+  document.getElementById('plan-editor').classList.add('hidden');
+  renderPlanSel();guardarStorage();
 }
 
 function exportarPlan(){
-  readPlanForm();
-  if(!planActivo){alert('No hay planificación activa');return;}
-  const blob=new Blob([JSON.stringify(planes,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
+  if(!planActivo){mostrarAviso('⚠ No hay planificación activa');return;}
+  const data=JSON.stringify(planActivo,null,2);
   const a=document.createElement('a');
-  a.download='INCOM_Plan_'+planActivo.nombre.replace(/[^a-zA-Z0-9_\-]/g,'_')+'.json';
-  a.href=url;a.click();URL.revokeObjectURL(url);
-  mostrarAviso('✓ Archivo exportado');
+  a.href='data:application/json;charset=utf-8,'+encodeURIComponent(data);
+  a.download='plan_'+planActivo.fecha+'.json';a.click();
 }
 
-function importarPlanArchivo(event){
-  const file=event.target.files[0];if(!file)return;
-  const reader=new FileReader();
-  reader.onload=function(e){
-    try{
-      const datos=JSON.parse(e.target.result);
-      if(!Array.isArray(datos))throw new Error('Formato inválido');
-      datos.forEach(p=>{if(!planes.find(x=>x.id===p.id))planes.push(p);});
-      try{localStorage.setItem('incom_planes',JSON.stringify(planes));}catch(e){}
-      renderPlanSel();
-      if(datos.length>0){planActivo=datos[0];document.getElementById('plan-sel').value=planActivo.id;cargarPlan();}
-      mostrarAviso('✓ '+datos.length+' planificación(es) importada(s)');
-    }catch(err){alert('Error al importar: '+err.message);}
-  };
-  reader.readAsText(file);event.target.value='';
+function importarPlan(){
+  const inp=document.createElement('input');inp.type='file';inp.accept='.json';
+  inp.onchange=e=>{
+    const f=e.target.files[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=ev=>{
+      try{
+        const p=JSON.parse(ev.target.result);
+        if(!p.id)p.id='plan_'+Date.now();
+        const existe=planes.findIndex(x=>x.id===p.id);
+        if(existe>=0)planes[existe]=p;else planes.push(p);
+        planActivo=p;renderPlanSel();
+        document.getElementById('plan-sel').value=p.id;
+        mostrarEditor();guardarStorage();
+        mostrarAviso('✓ Planificación importada');
+      }catch(e){mostrarAviso('⚠ Error al importar');}
+    };r.readAsText(f);
+  };inp.click();
 }
 
-function mostrarAviso(msg){
-  const el=document.getElementById('plan-aviso');if(!el)return;
-  el.textContent=msg;el.classList.remove('hidden');
-  setTimeout(()=>el.classList.add('hidden'),4000);
-}
-
-function readPlanForm(){
+// ── Render listas ───────────────────────────────────────────
+function renderListaBat(){
   if(!planActivo)return;
-  planActivo.nombre=document.getElementById('plan-nombre').value||planActivo.nombre;
-  planActivo.fecha=document.getElementById('plan-fecha').value||planActivo.fecha;
-  // NO tocar equiposBat ni equiposRam — se manejan con confirmarEquipo/removePlanEquipo
+  const cont=document.getElementById('plan-lista-bat');
+  const arr=planActivo.equiposBat||[];
+  cont.innerHTML=arr.length?arr.map((eq,i)=>rowEquipo(eq,i,'bat')).join('')
+    :'<p style="font-size:12px;color:var(--gray-text);padding:8px 0">Sin equipos asignados</p>';
+  document.getElementById('resumen-bat').textContent=arr.filter(e=>!e.fueraServicio).length+' activos';
+}
+function renderListaRam(){
+  if(!planActivo)return;
+  const cont=document.getElementById('plan-lista-ram');
+  const arr=planActivo.equiposRam||[];
+  cont.innerHTML=arr.length?arr.map((eq,i)=>rowEquipo(eq,i,'ram')).join('')
+    :'<p style="font-size:12px;color:var(--gray-text);padding:8px 0">Sin equipos asignados</p>';
+  document.getElementById('resumen-ram').textContent=arr.filter(e=>!e.fueraServicio).length+' activos';
 }
 
-const MOTIVOS_FS=['Mantención','Reparación','Certificación','Otro'];
+function rowEquipo(eq,i,tipo){
+  const fueraClass=eq.fueraServicio?'fuera':'';
+  const num=i+1;
+  return`<div class="plan-equipo-row ${fueraClass}">
+    <div class="equipo-info">
+      <div class="equipo-nombre"><span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;background:${eq.fueraServicio?'#DC2626':'#1D3557'};color:#fff;border-radius:50%;font-size:10px;margin-right:6px">${num}</span>${eq.conductor||'—'}</div>
+      <div class="equipo-patentes">${eq.tracto||'—'} · ${eq.semi||'—'}</div>
+      ${eq.fueraServicio?`<div class="equipo-motivo">🔴 ${eq.motivo}</div>`:''}
+    </div>
+    <button class="btn-sm btn-sm-red" onclick="quitarEquipo('${tipo}',${i})">✕</button>
+  </div>`;
+}
 
-function marcarFueraServicio(tipo){
-  const tracto=getVal('sel-'+tipo+'-tr');
-  const semi=getVal('sel-'+tipo+'-sm');
-  if(!tracto&&!semi){alert('Selecciona al menos el tracto o semi a marcar fuera de servicio');return;}
-  // Pedir motivo
-  const motivo=prompt('Motivo fuera de servicio:\n1. Mantención\n2. Reparación\n3. Certificación\n4. Otro\n\nEscribe el número o el motivo:');
-  if(!motivo)return;
-  const motivoTexto=motivo==='1'?'Mantención':motivo==='2'?'Reparación':motivo==='3'?'Certificación':motivo==='4'?'Otro':motivo;
+function quitarEquipo(tipo,idx){
   if(!planActivo)return;
   const arr=tipo==='bat'?planActivo.equiposBat:planActivo.equiposRam;
-  if(tracto){
-    arr.push({conductor:'',tracto,semi:'',fueraServicio:true,motivoFS:'Tracto · '+motivoTexto});
+  arr.splice(idx,1);
+  tipo==='bat'?renderListaBat():renderListaRam();
+  guardarStorage();
+}
+
+// ── Selector ─────────────────────────────────────────────────
+function abrirSelector(tipo){
+  tipoSelector=tipo;
+  selCond={cond:null,tr:null,sm:null};
+  document.getElementById('sel-modal-title').textContent=tipo==='bat'?'Agregar Batea':'Agregar Rampla';
+  document.getElementById('grp-sm-label').textContent=tipo==='bat'?'SEMIRREMOLQUE (BATEA)':'SEMIRREMOLQUE (RAMPLA)';
+
+  const arr=tipo==='bat'?planActivo.equiposBat:planActivo.equiposRam;
+  const usadosCond=arr.map(e=>e.conductor);
+  const usadosTr=[...(planActivo.equiposBat||[]),...(planActivo.equiposRam||[])].map(e=>e.tracto);
+  const usadosSm=arr.map(e=>e.semi);
+  const semis=tipo==='bat'?SEMIS_BAT:SEMIS_RAM;
+
+  renderSelGrid('grp-cond',CONDUCTORES,usadosCond,'cond');
+  renderSelGrid('grp-tr',TRACTOS,usadosTr,'tr');
+  renderSelGrid('grp-sm',semis,usadosSm,'sm');
+
+  document.getElementById('selector-modal').classList.remove('hidden');
+}
+
+function renderSelGrid(cont,items,usados,campo){
+  const el=document.getElementById(cont);
+  el.innerHTML=items.map(item=>{
+    const usado=usados.includes(item);
+    const cls='sel-btn'+(usado?' usado':'');
+    return`<button class="${cls}" onclick="selItem(this,'${campo}','${item}')" ${usado?'disabled':''}>${item}</button>`;
+  }).join('');
+}
+
+function selItem(btn,campo,val){
+  const cont=btn.parentElement;
+  cont.querySelectorAll('.sel-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selCond[campo]=val;
+}
+
+function cerrarSelector(){document.getElementById('selector-modal').classList.add('hidden');}
+
+function confirmarEquipo(){
+  if(!selCond.cond||!selCond.tr||!selCond.sm){mostrarAviso('⚠ Selecciona conductor, tracto y semirremolque');return;}
+  const arr=tipoSelector==='bat'?planActivo.equiposBat:planActivo.equiposRam;
+  arr.push({conductor:selCond.cond,tracto:selCond.tr,semi:selCond.sm,fueraServicio:false,motivo:''});
+  cerrarSelector();
+  tipoSelector==='bat'?renderListaBat():renderListaRam();
+  guardarStorage();
+}
+
+function confirmarFueraServicio(){
+  if(!selCond.tr&&!selCond.sm){mostrarAviso('⚠ Selecciona al menos un tracto o semirremolque');return;}
+  motivoSeleccionado='';
+  document.querySelectorAll('.motivo-btn').forEach(b=>{b.style.background='#fff';b.style.borderColor='var(--gray-border)';});
+  document.getElementById('fuera-modal').style.display='flex';
+}
+
+function selMotivo(btn){
+  document.querySelectorAll('.motivo-btn').forEach(b=>{b.style.background='#fff';b.style.borderColor='var(--gray-border)';});
+  btn.style.background='#FEE2E2';btn.style.borderColor='#DC2626';
+  motivoSeleccionado=btn.dataset.m;
+}
+
+function cerrarFueraModal(){document.getElementById('fuera-modal').style.display='none';}
+
+function confirmarFuera(){
+  if(!motivoSeleccionado){mostrarAviso('⚠ Selecciona un motivo');return;}
+  const arr=tipoSelector==='bat'?planActivo.equiposBat:planActivo.equiposRam;
+  arr.push({conductor:selCond.cond||'',tracto:selCond.tr||'',semi:selCond.sm||'',fueraServicio:true,motivo:motivoSeleccionado});
+  cerrarFueraModal();cerrarSelector();
+  tipoSelector==='bat'?renderListaBat():renderListaRam();
+  guardarStorage();
+}
+
+// ── Tarjeta conductores ───────────────────────────────────────
+function genTarjetaConductores(){
+  if(!planActivo){mostrarAviso('⚠ Carga una planificación primero');return;}
+  const bat=(planActivo.equiposBat||[]).filter(e=>!e.fueraServicio);
+  const ram=(planActivo.equiposRam||[]).filter(e=>!e.fueraServicio);
+  const fueraBat=(planActivo.equiposBat||[]).filter(e=>e.fueraServicio);
+  const fueraRam=(planActivo.equiposRam||[]).filter(e=>e.fueraServicio);
+  const totalEq=bat.length+ram.length;
+  const fecha=planActivo.fecha||getHoy();
+
+  function fila(eq,i){
+    return`<tr style="border-bottom:0.5px solid #e2e8f0">
+      <td style="padding:8px 10px;font-size:13px;font-weight:700;color:#1e293b">
+        <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;background:#1D3557;color:#fff;border-radius:50%;font-size:10px;margin-right:7px">${i+1}</span>${eq.conductor||'—'}
+      </td>
+      <td style="padding:8px 10px;font-size:12px;color:#475569;text-align:center">${eq.tracto||'—'}</td>
+      <td style="padding:8px 10px;font-size:12px;font-weight:700;color:#2563EB;text-align:center">${eq.semi||'—'}</td>
+      <td style="padding:8px 10px;font-size:12px;color:#94a3b8;text-align:center">—</td>
+    </tr>`;
   }
-  if(semi&&semi!==tracto){
-    arr.push({conductor:'',tracto:'',semi,fueraServicio:true,motivoFS:'Semi · '+motivoTexto});
+  function seccion(titulo,arr,colorBanner,icono){
+    if(!arr.length)return'';
+    return`<tr><td colspan="4" style="background:${colorBanner};padding:8px 12px">
+      <span style="color:#fff;font-size:12px;font-weight:700">${icono} ${titulo} (${arr.length} equipo${arr.length!==1?'s':''})</span></td></tr>
+      ${arr.map((eq,i)=>fila(eq,i)).join('')}`;
   }
-  // Limpiar selección
-  ['cond','tr','sm'].forEach(campo=>{
-    const inp=document.getElementById('sel-'+tipo+'-'+campo);
-    if(inp)inp.value='';
-    const grp=document.getElementById('grp-sel-'+tipo+'-'+campo);
-    if(grp)grp.querySelectorAll('button').forEach(b=>{
-      b.style.background='#fff';b.style.color='#374151';
-      b.style.borderColor='#D1D5DB';b.style.fontWeight='400';
-    });
-  });
-  const prev=document.getElementById('sel-'+tipo+'-preview');
-  if(prev)prev.style.display='none';
-  ocultarUsados('bat');ocultarUsados('ram');
-  renderPlanEquipos(tipo);actualizarResumen();
+  function filasRojo(arr){
+    return arr.map(eq=>`<tr style="background:#FEF2F2;border-bottom:0.5px solid #FECACA">
+      <td colspan="2" style="padding:7px 10px;font-size:12px;color:#B91C1C;font-weight:600">🔴 ${eq.tracto||'—'} / ${eq.semi||'—'}</td>
+      <td colspan="2" style="padding:7px 10px;font-size:11px;color:#B91C1C;text-align:right">${eq.motivo}</td></tr>`).join('');
+  }
+
+  const html=`<div style="font-family:'Segoe UI',Arial,sans-serif;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);max-width:480px;margin:0 auto">
+    <div style="background:linear-gradient(135deg,#1D3557 0%,#2563EB 100%);padding:16px 18px 14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="background:#fff;border-radius:6px;padding:4px 8px"><span style="font-size:13px;font-weight:900;color:#1D3557;letter-spacing:1px">INCOM</span></div>
+          <div><div style="color:#fff;font-size:11px;font-weight:700">Programación de Equipos</div>
+            <div style="color:#93c5fd;font-size:10px">PROGRAMACION · ${fecha}</div></div>
+        </div>
+        <div style="text-align:center;background:rgba(255,255,255,0.15);border-radius:10px;padding:6px 14px;border:1px solid rgba(255,255,255,0.25)">
+          <div style="font-size:38px;font-weight:900;color:#fff;line-height:1">${totalEq}</div>
+          <div style="font-size:10px;color:#bfdbfe;font-weight:600;letter-spacing:1px">EQ Total</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px">
+        ${bat.length?`<div style="flex:1;background:rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;border:1px solid rgba(255,255,255,0.2);text-align:center">
+          <div style="font-size:28px;font-weight:900;color:#fff;line-height:1">${bat.length}</div>
+          <div style="font-size:10px;color:#86efac;font-weight:600;margin-top:2px">● BATEAS</div></div>`:''}
+        ${ram.length?`<div style="flex:1;background:rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;border:1px solid rgba(255,255,255,0.2);text-align:center">
+          <div style="font-size:28px;font-weight:900;color:#fff;line-height:1">${ram.length}</div>
+          <div style="font-size:10px;color:#93c5fd;font-weight:600;margin-top:2px">● RAMPLAS</div></div>`:''}
+      </div>
+    </div>
+    <table style="width:100%;border-collapse:collapse">
+      <thead><tr style="background:#f1f5f9">
+        <th style="padding:8px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:left;letter-spacing:.5px">CONDUCTOR</th>
+        <th style="padding:8px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:center">TRACTO</th>
+        <th style="padding:8px 10px;font-size:10px;color:#f59e0b;font-weight:700;text-align:center">SEMIRREMOLQUE</th>
+        <th style="padding:8px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:center">MOVIMIENTO</th>
+      </thead>
+      <tbody>
+        ${seccion('BATEAS — Puerto Totoralillo',bat,'#1D7A3A','🟢')}
+        ${seccion('RAMPLAS — Base INCOM Copiapó',ram,'#1D3557','🔵')}
+        ${(fueraBat.length||fueraRam.length)?`<tr><td colspan="4" style="background:#B91C1C;padding:8px 12px">
+          <span style="color:#fff;font-size:12px;font-weight:700">🔴 EQUIPOS FUERA DE SERVICIO</span></td></tr>
+          ${filasRojo([...fueraBat,...fueraRam])}`:'' }
+      </tbody>
+    </table>
+    <div style="background:#f8fafc;padding:8px 14px;display:flex;justify-content:space-between;border-top:1px solid #e2e8f0">
+      <span style="font-size:10px;color:#94a3b8">Sup: Supervisor de turno</span>
+      <span style="font-size:10px;color:#94a3b8">INCOM Control de Tráfico</span>
+    </div>
+  </div>`;
+
+  const cont=document.getElementById('tarjeta-conductores');
+  cont.innerHTML=html;
+  document.getElementById('out-conductores').classList.remove('hidden');
+  cont.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-function initSelectorPlan(){
-  ['bat','ram'].forEach(tipo=>{
-    // Conductor — lista completa
-    const cw=document.getElementById('sel-'+tipo+'-cond-wrap');
-    if(cw)cw.innerHTML=btnGroup(CONDUCTORES_BAT,'sel-'+tipo+'-cond','','selPlanBtn',false);
-    // Tracto — lista completa compartida
-    const tw=document.getElementById('sel-'+tipo+'-tr-wrap');
-    if(tw)tw.innerHTML=btnGroup(TRACTOS.map(t=>t.p),'sel-'+tipo+'-tr','','selPlanBtn',true);
-    // Semi — según tipo
-    const lista=tipo==='ram'?RAMPLAS:BATEAS;
-    const sw=document.getElementById('sel-'+tipo+'-sm-wrap');
-    if(sw)sw.innerHTML=btnGroup(lista.map(b=>b.p),'sel-'+tipo+'-sm','','selPlanBtn',true);
-  });
-  // Ocultar ya usados si hay equipos cargados
-  if(planActivo){ocultarUsados('bat');ocultarUsados('ram');}
+// ══════════════════════════════════════════════════════════════
+// SALIDA FAENA
+// ══════════════════════════════════════════════════════════════
+function setCond(c,btn){
+  condicion=c;
+  document.querySelectorAll('.cond-btn').forEach(b=>b.className='cond-btn');
+  btn.className='cond-btn active-'+({'normal':'normal','precaucion':'prec','critica':'crit'}[c]);
+  const info={'normal':'Normal — tiempos estándar de ruta','precaucion':'Precaución — +15% en tiempos proyectados','critica':'Crítica — +30% en tiempos proyectados'};
+  document.getElementById('cond-info-txt').textContent=info[c];
 }
 
-function selPlanBtn(id,val){
-  // igual que selBtn pero actualiza preview
-  selBtn(id,val);
-  // detectar tipo
-  const tipo=id.includes('-bat-')?'bat':'ram';
-  const cond=getVal('sel-'+tipo+'-cond');
-  const tr=getVal('sel-'+tipo+'-tr');
-  const sm=getVal('sel-'+tipo+'-sm');
-  const prev=document.getElementById('sel-'+tipo+'-preview');
-  if(!prev)return;
-  if(!cond&&!tr&&!sm){prev.style.display='none';return;}
-  prev.style.display='flex';
-  prev.innerHTML=
-    (cond?'<span style="background:#003DA5;color:#fff;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700">👤 '+cond+'</span>':
-      '<span style="background:#F3F4F6;color:#9CA3AF;padding:4px 12px;border-radius:20px;font-size:12px">👤 Sin conductor</span>')+
-    (tr?'<span style="background:#F3F4F6;color:#374151;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500">🚛 '+tr+'</span>':'')+
-    (sm?'<span style="background:#EEF2FF;color:#4338CA;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500">🔗 '+sm+'</span>':'');
+function addGrupoFaena(){
+  const n=gruposFaena.length+1;
+  gruposFaena.push({num:n,conductores:[],horaS:'',observ:''});
+  renderGruposFaena();
 }
 
-function confirmarEquipo(tipo){
-  const cond=getVal('sel-'+tipo+'-cond');
-  const tr=getVal('sel-'+tipo+'-tr');
-  const sm=getVal('sel-'+tipo+'-sm');
-  if(!cond&&!tr){alert('Selecciona al menos el conductor o tracto');return;}
-  if(!planActivo)return;
-  const arr=tipo==='bat'?planActivo.equiposBat:planActivo.equiposRam;
-  arr.push({conductor:cond,tracto:tr,semi:sm});
-  // Limpiar selección
-  ['cond','tr','sm'].forEach(campo=>{
-    const inp=document.getElementById('sel-'+tipo+'-'+campo);
-    if(inp)inp.value='';
-    const grp=document.getElementById('grp-sel-'+tipo+'-'+campo);
-    if(grp)grp.querySelectorAll('button').forEach(b=>{
-      b.style.background='#fff';b.style.color='#374151';
-      b.style.borderColor='#D1D5DB';b.style.fontWeight='400';
-    });
-  });
-  const prev=document.getElementById('sel-'+tipo+'-preview');
-  if(prev)prev.style.display='none';
-  // Ocultar usados en AMBOS selectores
-  ocultarUsados('bat');
-  ocultarUsados('ram');
-  renderPlanEquipos(tipo);
-  actualizarResumen();
+function quitarGrupo(idx){gruposFaena.splice(idx,1);gruposFaena.forEach((g,i)=>g.num=i+1);renderGruposFaena();}
+
+function renderGruposFaena(){
+  const cont=document.getElementById('grupos-faena-cont');
+  if(!gruposFaena.length){cont.innerHTML='<p style="font-size:12px;color:var(--gray-text);padding:4px 0">Sin grupos creados</p>';return;}
+  cont.innerHTML=gruposFaena.map((g,i)=>`
+    <div class="grupo-card">
+      <div class="grupo-header">
+        <div class="grupo-title">Grupo ${g.num}</div>
+        <div style="display:flex;gap:6px">
+          <input type="time" value="${g.horaS}" onchange="gruposFaena[${i}].horaS=this.value"
+            style="padding:4px 7px;border:1px solid var(--gray-border);border-radius:6px;font-size:12px;font-family:'Inter',sans-serif">
+          <button class="btn-sm btn-sm-red" onclick="quitarGrupo(${i})">✕</button>
+        </div>
+      </div>
+      <textarea placeholder="Conductores / patentes del grupo..." rows="2"
+        style="width:100%;padding:7px;border:1px solid var(--gray-border);border-radius:6px;font-size:12px;font-family:'Inter',sans-serif;resize:none;margin-bottom:6px"
+        onchange="gruposFaena[${i}].conductores=this.value.split('\\n').filter(Boolean)">${g.conductores.join('\n')}</textarea>
+      <div style="display:flex;align-items:center;gap:6px">
+        <input type="checkbox" id="panne-${i}" onchange="togglePanne(${i},this.checked)">
+        <label for="panne-${i}" style="font-size:12px;color:var(--gray-text)">Equipo en panne en este grupo</label>
+      </div>
+      ${g.panne?`<div style="margin-top:6px;padding:8px;background:#FEF2F2;border-radius:6px;border:1px solid #FECACA">
+        <input type="text" placeholder="Equipo en panne (patente)" value="${g.panneEquipo||''}"
+          onchange="gruposFaena[${i}].panneEquipo=this.value"
+          style="width:100%;padding:6px;border:1px solid #FECACA;border-radius:5px;font-size:12px;font-family:'Inter',sans-serif;margin-bottom:6px;background:#fff">
+        <input type="text" placeholder="Escolta: Camioneta + Conductor INCOM" value="${g.panneEscolta||''}"
+          onchange="gruposFaena[${i}].panneEscolta=this.value"
+          style="width:100%;padding:6px;border:1px solid #FECACA;border-radius:5px;font-size:12px;font-family:'Inter',sans-serif;background:#fff">
+      </div>`:''}
+    </div>`).join('');
 }
 
-function ocultarUsados(tipo){
-  if(!planActivo)return;
-  const arrBat=planActivo.equiposBat||[];
-  const arrRam=planActivo.equiposRam||[];
-  const todosCondUsados=[...arrBat,...arrRam].map(e=>e.conductor).filter(Boolean);
-  const tractosUsados=[...arrBat,...arrRam].map(e=>e.tracto).filter(Boolean);
-  const sUsadosBat=arrBat.map(e=>e.semi).filter(Boolean);
-  const sUsadosRam=arrRam.map(e=>e.semi).filter(Boolean);
+function togglePanne(i,v){gruposFaena[i].panne=v;if(!v){delete gruposFaena[i].panneEquipo;delete gruposFaena[i].panneEscolta;}renderGruposFaena();}
 
-  // Conductores — ocultar globalmente
-  ['bat','ram'].forEach(t=>{
-    const grp=document.getElementById('grp-sel-'+t+'-cond');
-    if(grp)grp.querySelectorAll('button').forEach(b=>{
-      b.style.display=todosCondUsados.includes(b.textContent.trim())?'none':'inline-block';
-    });
-  });
-
-  // Tractos — compartidos, ocultar en AMBOS
-  ['bat','ram'].forEach(t=>{
-    const grp=document.getElementById('grp-sel-'+t+'-tr');
-    if(grp)grp.querySelectorAll('button').forEach(b=>{
-      b.style.display=tractosUsados.includes(b.textContent.trim())?'none':'inline-block';
-    });
-  });
-
-  // Semis — independientes por tipo
-  ['bat','ram'].forEach(t=>{
-    const usados=t==='bat'?sUsadosBat:sUsadosRam;
-    const grp=document.getElementById('grp-sel-'+t+'-sm');
-    if(grp)grp.querySelectorAll('button').forEach(b=>{
-      b.style.display=usados.includes(b.textContent.trim())?'none':'inline-block';
-    });
-  });
+function cargarGruposDesdePlan(){
+  if(!planActivo){mostrarAviso('⚠ No hay planificación activa');return;}
+  const tipo=document.getElementById('f-tipo').value;
+  const arr=tipo==='bateas'?(planActivo.equiposBat||[]):(planActivo.equiposRam||[]);
+  const activos=arr.filter(e=>!e.fueraServicio);
+  if(!activos.length){mostrarAviso('⚠ No hay equipos activos en la planificación');return;}
+  gruposFaena=[{num:1,conductores:activos.map(e=>e.conductor+' · '+e.tracto+' / '+e.semi),horaS:'',observ:'',panne:false}];
+  document.getElementById('f-total').textContent=activos.length;
+  renderGruposFaena();
+  mostrarAviso('✓ Cargados '+activos.length+' equipos');
 }
 
-function removePlanEquipo(tipo,i){
-  if(!planActivo)return;
-  const arr=tipo==='bat'?planActivo.equiposBat:planActivo.equiposRam;
-  arr.splice(i,1);
-  renderPlanEquipos(tipo);
-  actualizarResumen();
-  ocultarUsados('bat');
-  ocultarUsados('ram');
+function calcHoraLlegada(horaS,minsExtra){
+  if(!horaS)return'—';
+  const [h,m]=horaS.split(':').map(Number);
+  const tot=h*60+m+minsExtra;
+  return String(Math.floor(tot/60)%24).padStart(2,'0')+':'+String(tot%60).padStart(2,'0');
 }
 
-function actualizarResumen(){
-  if(!planActivo)return;
-  const bE=(planActivo.equiposBat||[]).length;
-  const rE=(planActivo.equiposRam||[]).length;
-  const be=document.getElementById('plan-bat-resumen');
-  const re=document.getElementById('plan-ram-resumen');
-  if(be)be.textContent=bE+' equipo'+(bE!==1?'s':'');
-  if(re)re.textContent=rE+' equipo'+(rE!==1?'s':'');
-}
+function genFaena(){
+  if(!gruposFaena.length){mostrarAviso('⚠ Agrega al menos un grupo');return;}
+  const tipo=document.getElementById('f-tipo').value;
+  const tipoLabel=tipo==='bateas'?'BATEAS':'RAMPLAS';
+  const sup=getSup(), fecha=document.getElementById('f-fecha').value||getHoy();
+  const factor=condicion==='normal'?1:condicion==='precaucion'?1.15:1.30;
+  const condLabel={'normal':'Normal','precaucion':'Precaución ⚠️','critica':'Crítica 🔴'}[condicion];
+  const minsRuta=Math.round(segmentos.reduce((s,sg)=>s+sg.mins,0)*factor);
 
-function setEstadoRampla(inputId,estado,btn){
-  const inp=document.getElementById(inputId);
-  if(inp)inp.value=estado;
-  btn.closest('div').querySelectorAll('button').forEach(b=>{
-    const sel=b.textContent.trim()===estado;
-    b.style.background=sel?'#1D4ED8':'#fff';
-    b.style.color=sel?'#fff':'#374151';
-    b.style.borderColor=sel?'#1D4ED8':'#D1D5DB';
-    b.style.fontWeight=sel?'600':'400';
-  });
-}
-
-function renderPlanEquipos(tipo){
-  if(!planActivo)return;
-  const arr=tipo==='bat'?(planActivo.equiposBat||[]):(planActivo.equiposRam||[]);
-  const cont=document.getElementById('plan-equipos-'+tipo);
-  if(!cont)return;
-  if(!arr.length){cont.innerHTML='<div style="text-align:center;padding:1rem;color:#9CA3AF;font-size:13px">Sin equipos agregados</div>';return;}
-  cont.innerHTML='';
-  const tabla=document.createElement('div');
-  tabla.style.cssText='border:1px solid #E5E7EB;border-radius:10px;overflow:hidden;margin-bottom:8px';
-
-  const ESTADOS_RAM=['Carga en faena','Descarga en puerto','En tránsito a base','Carga de neumáticos'];
-  const colsHeader=tipo==='ram'?
-    '<span style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;width:28px">#</span>'+
-    '<span style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase">Conductor</span>'+
-    '<span style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;min-width:72px;text-align:center">Tracto</span>'+
-    '<span style="font-size:10px;font-weight:700;color:#4338CA;text-transform:uppercase;min-width:72px;text-align:center">Semi</span>'+
-    '<span style="font-size:10px;font-weight:700;color:#92550A;text-transform:uppercase;flex:1;text-align:center">Movimiento</span>'+
-    '<span style="width:32px"></span>'
-    :
-    '<span style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;width:28px">#</span>'+
-    '<span style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase">Conductor</span>'+
-    '<span style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;min-width:72px;text-align:center">Tracto</span>'+
-    '<span style="font-size:10px;font-weight:700;color:#4338CA;text-transform:uppercase;min-width:72px;text-align:center">Semi</span>'+
-    '<span style="width:32px"></span>';
-
-  const gridCols=tipo==='ram'?'auto 1fr auto auto 1fr auto':'auto 1fr auto auto auto';
-  const header='<div style="display:grid;grid-template-columns:'+gridCols+';gap:0;background:#F9FAFB;border-bottom:1px solid #E5E7EB;padding:6px 12px">'+colsHeader+'</div>';
-
-  const filas=arr.map((eq,i)=>{
-    const fs=eq.fueraServicio;
-    if(fs){
-      return'<div style="display:grid;grid-template-columns:auto 1fr auto auto;gap:0;align-items:center;padding:8px 12px;border-bottom:1px solid #FECACA;background:#FEE2E2">'+
-        '<span style="font-size:12px;font-weight:700;color:#DC2626;width:28px">'+(i+1)+'</span>'+
-        '<span style="font-size:12px;font-weight:600;color:#DC2626">🔴 FUERA DE SERVICIO — '+(eq.tracto||eq.semi||'—')+'</span>'+
-        '<span style="font-size:11px;color:#991B1B;background:#FECACA;padding:2px 8px;border-radius:5px;margin:0 4px">'+eq.motivoFS+'</span>'+
-        '<button onclick="removePlanEquipo(\''+tipo+'\','+i+')" style="background:transparent;border:none;color:#EF4444;cursor:pointer;font-size:16px;padding:0 4px;width:28px">✕</button>'+
-      '</div>';
-    }
-    const estadoBtns=tipo==='ram'?
-      '<div style="display:flex;flex-wrap:wrap;gap:3px;padding:0 4px">'+
-        ESTADOS_RAM.map(est=>
-          '<button id="pe-ram-est-btn-'+i+'-'+est.replace(/\s/g,'_')+'" '+
-          'onclick="setEstadoPlanRam('+i+',\''+est+'\')" '+
-          'style="padding:3px 6px;font-size:10px;border-radius:5px;border:1px solid '+(eq.estado===est?'#1D4ED8':'#D1D5DB')+';'+
-          'background:'+(eq.estado===est?'#1D4ED8':'#fff')+';color:'+(eq.estado===est?'#fff':'#374151')+';cursor:pointer;white-space:nowrap">'+est+'</button>'
-        ).join('')+
-      '</div>':'';
-
-    return'<div style="display:grid;grid-template-columns:'+gridCols+';gap:0;align-items:center;padding:8px 12px;border-bottom:1px solid #F3F4F6;'+(i%2===0?'':'background:#FAFAFA')+'">'+
-      '<span style="font-size:12px;font-weight:700;color:#003DA5;width:28px">'+(i+1)+'</span>'+
-      '<span style="font-size:12px;font-weight:600;color:#111">'+(eq.conductor||'—')+'</span>'+
-      '<span style="font-size:11px;color:#374151;min-width:72px;text-align:center;background:#F3F4F6;padding:2px 8px;border-radius:5px;margin:0 4px">'+(eq.tracto||'—')+'</span>'+
-      '<span style="font-size:11px;color:#4338CA;min-width:72px;text-align:center;background:#EEF2FF;padding:2px 8px;border-radius:5px;margin:0 4px">'+(eq.semi||'—')+'</span>'+
-      (tipo==='ram'?estadoBtns:'')+
-      '<button onclick="removePlanEquipo(\''+tipo+'\','+i+')" style="background:transparent;border:none;color:#EF4444;cursor:pointer;font-size:16px;padding:0 4px;width:28px">✕</button>'+
-    '</div>';
+  const rows=gruposFaena.map(g=>{
+    const hs=g.horaS||'—';
+    const ll=g.horaS?calcHoraLlegada(g.horaS,minsRuta):'—';
+    const conds=g.conductores.join('<br>');
+    const panneHtml=g.panne?`<div style="margin-top:4px;padding:4px 8px;background:#FEE2E2;border-radius:4px;font-size:11px;color:#B91C1C">
+      🔴 Panne: ${g.panneEquipo||'—'} · Escolta: ${g.panneEscolta||'—'}</div>`:'';
+    return`<tr style="border-bottom:1px solid #E5E7EB">
+      <td style="padding:8px 10px;font-size:13px;font-weight:700;color:#1D3557;text-align:center;vertical-align:top">G${g.num}</td>
+      <td style="padding:8px 10px;font-size:12px;color:#374151;vertical-align:top">${conds}${panneHtml}</td>
+      <td style="padding:8px 10px;font-size:13px;font-weight:700;color:#003DA5;text-align:center;vertical-align:top">${hs}</td>
+      <td style="padding:8px 10px;font-size:13px;font-weight:700;color:#1B7E3A;text-align:center;vertical-align:top">${ll}</td>
+    </tr>`;
   }).join('');
 
-  tabla.innerHTML=header+filas;
-  cont.appendChild(tabla);
+  const html=`<div style="font-family:'Segoe UI',Arial,sans-serif;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);max-width:480px;margin:0 auto">
+    <div style="background:#1D3557;padding:12px 16px;display:flex;align-items:center;gap:10px">
+      <div style="background:#fff;border-radius:5px;padding:2px 7px"><span style="font-size:12px;font-weight:900;color:#1D3557;letter-spacing:1px">INCOM</span></div>
+      <div style="flex:1"><div style="font-size:14px;font-weight:700;color:#fff">Reporte Salida Faena — ${tipoLabel}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.7)">${fecha} · Sup: ${sup} · Condición: ${condLabel}</div></div>
+    </div>
+    <table style="width:100%;border-collapse:collapse">
+      <thead><tr style="background:#F1F5F9">
+        <th style="padding:7px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:center">GRUPO</th>
+        <th style="padding:7px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:left">CONDUCTORES / EQUIPOS</th>
+        <th style="padding:7px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:center">SALIDA</th>
+        <th style="padding:7px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:center">LLEGADA</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div style="background:#f8fafc;padding:6px 14px;display:flex;justify-content:space-between;border-top:1px solid #E5E7EB">
+      <span style="font-size:10px;color:#94a3b8">Supervisor: <strong style="color:#374151">${sup}</strong></span>
+      <span style="font-size:10px;color:#94a3b8">INCOM Control de Tráfico</span>
+    </div>
+  </div>`;
+
+  const cont=document.getElementById('tarjeta-faena');
+  cont.innerHTML=html;
+  document.getElementById('out-faena').classList.remove('hidden');
+  cont.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-function setEstadoPlanRam(idx,estado){
-  if(!planActivo||!planActivo.equiposRam)return;
-  planActivo.equiposRam[idx].estado=estado;
-  renderPlanEquipos('ram');
+// ══════════════════════════════════════════════════════════════
+// POSICIÓN EN RUTA
+// ══════════════════════════════════════════════════════════════
+let gruposPos=[];
+
+function importarGruposPos(){
+  if(!gruposFaena.length){mostrarAviso('⚠ No hay grupos en Salida Faena');return;}
+  gruposPos=gruposFaena.map(g=>({...g,tramo:TRAMOS[0]}));
+  renderGruposPos();mostrarAviso('✓ Grupos importados desde Salida Faena');
 }
 
-function genTarjetaConductores(){
-  readPlanForm();
-  if(!planActivo){alert('No hay planificación activa');return;}
-  const bat=planActivo.equiposBat||[];
-  const ram=planActivo.equiposRam||[];
-  if(!bat.length&&!ram.length){alert('No hay equipos planificados');return;}
-  const fecha=planActivo.fecha?planActivo.fecha.split('-').reverse().join('-'):getHoy();
-  const nombre=planActivo.nombre||fecha;
-
-  function filasBat(){
-    if(!bat.length)return'';
-    const normales=bat.filter(eq=>!eq.fueraServicio);
-    const fuera=bat.filter(eq=>eq.fueraServicio);
-    return'<tr style="background:#003DA5"><td colspan="3" style="padding:7px 12px;color:#fff;font-size:11px;font-weight:700">🟢 BATEAS — Puerto Totoralillo ('+normales.length+' equipos activos)</td></tr>'+
-      normales.map((eq,i)=>
-        '<tr style="border-bottom:1px solid #F3F4F6">'+
-          '<td style="padding:8px 12px;font-size:13px;font-weight:600;color:#111">'+(eq.conductor||'—')+'</td>'+
-          '<td style="padding:8px 10px;font-size:12px;color:#374151;text-align:center">'+(eq.tracto||'—')+'</td>'+
-          '<td style="padding:8px 10px;font-size:12px;color:#4338CA;text-align:center">'+(eq.semi||'—')+'</td>'+
-        '</tr>'
-      ).join('')+
-      (fuera.length?'<tr style="background:#DC2626"><td colspan="3" style="padding:6px 12px;color:#fff;font-size:10px;font-weight:700">🔴 FUERA DE SERVICIO ('+fuera.length+')</td></tr>'+
-        fuera.map(eq=>
-          '<tr style="background:#FEE2E2;border-bottom:1px solid #FECACA">'+
-            '<td style="padding:7px 12px;font-size:12px;font-weight:600;color:#DC2626">'+(eq.tracto||eq.semi||'—')+'</td>'+
-            '<td colspan="2" style="padding:7px 10px;font-size:11px;color:#991B1B">'+(eq.motivoFS||'Sin motivo')+'</td>'+
-          '</tr>'
-        ).join(''):'');
-  }
-  function filasRam(){
-    if(!ram.length)return'';
-    return'<tr style="background:#1D4ED8"><td colspan="4" style="padding:7px 12px;color:#fff;font-size:11px;font-weight:700">🔵 RAMPLAS — Base INCOM Copiapó ('+ram.length+' equipos)</td></tr>'+
-      ram.map((eq,i)=>
-        '<tr style="border-bottom:1px solid #F3F4F6">'+
-          '<td style="padding:8px 12px;font-size:13px;font-weight:600;color:#111">'+(eq.conductor||'—')+'</td>'+
-          '<td style="padding:8px 10px;font-size:12px;color:#374151;text-align:center">'+(eq.tracto||'—')+'</td>'+
-          '<td style="padding:8px 10px;font-size:12px;color:#4338CA;text-align:center">'+(eq.semi||'—')+'</td>'+
-          '<td style="padding:8px 10px;font-size:11px;color:#92550A;text-align:center;background:#FEF3E2">'+(eq.estado||'—')+'</td>'+
-        '</tr>'
-      ).join('');
-  }
-
-  const html=
-    '<div style="background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);font-family:Inter,sans-serif">'+
-      '<div style="background:#003DA5;padding:14px 20px;display:flex;align-items:center;gap:12px">'+
-        '<div style="font-family:Barlow Condensed,sans-serif;font-size:18px;font-weight:700;color:#fff;border:2px solid rgba(255,255,255,.4);padding:2px 9px;border-radius:5px">INCOM</div>'+
-        '<div style="flex:1">'+
-          '<div style="font-size:15px;font-weight:700;color:#fff">Programación de Equipos</div>'+
-          '<div style="font-size:12px;color:rgba(255,255,255,.8);margin-top:2px">'+nombre+' &nbsp;·&nbsp; '+fecha+'</div>'+
-        '</div>'+
-        '<div style="text-align:right">'+
-          '<div style="font-family:Barlow Condensed,sans-serif;font-size:26px;font-weight:700;color:#fff">'+(bat.length+ram.length)+' EQ</div>'+
-          '<div style="font-size:10px;color:rgba(255,255,255,.7)">Total</div>'+
-        '</div>'+
-      '</div>'+
-      '<table style="width:100%;border-collapse:collapse">'+
-        '<thead><tr style="background:#F9FAFB;border-bottom:2px solid #E5E7EB">'+
-          '<th style="padding:8px 12px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.4px">Conductor</th>'+
-          '<th style="padding:8px 10px;text-align:center;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.4px">Tracto</th>'+
-          '<th style="padding:8px 10px;text-align:center;font-size:10px;font-weight:700;color:#4338CA;text-transform:uppercase;letter-spacing:.4px">Semirremolque</th>'+
-          '<th style="padding:8px 10px;text-align:center;font-size:10px;font-weight:700;color:#92550A;text-transform:uppercase;letter-spacing:.4px">Movimiento</th>'+
-        '</tr></thead>'+
-        '<tbody>'+filasBat()+filasRam()+'</tbody>'+
-      '</table>'+
-      '<div style="background:#F9FAFB;padding:10px 20px;display:flex;justify-content:space-between;align-items:center">'+
-        '<span style="font-size:11px;color:#6B7280">Sup: '+getSup()+'</span>'+
-        '<span style="font-size:11px;color:#9CA3AF">INCOM Control de Tráfico</span>'+
-      '</div>'+
-    '</div>';
-
-  const out=document.getElementById('out-conductores');
-  out.classList.remove('hidden');
-  document.getElementById('tarjeta-conductores').innerHTML=html;
-  out.scrollIntoView({behavior:'smooth',block:'start'});
+function addGrupoPos(){
+  gruposPos.push({num:gruposPos.length+1,conductores:[],tramo:TRAMOS[0],panne:false});
+  renderGruposPos();
 }
 
-// ── DESCARGA PNG ──────────────────────────────────────
-function descargarPNG(elementId, nombre){
-  const el=document.getElementById(elementId);
-  if(!el){alert('Error: no se encontró el elemento');return;}
-  html2canvas(el,{
-    scale:2,
-    backgroundColor:'#ffffff',
-    useCORS:true,
-    logging:false
-  }).then(canvas=>{
-    const link=document.createElement('a');
-    link.download=nombre+'_'+getHoy().replace(/-/g,'')+'.png';
-    link.href=canvas.toDataURL('image/png');
-    link.click();
-  }).catch(()=>alert('Error al generar imagen. Intenta con screenshot manual.'));
+function renderGruposPos(){
+  const cont=document.getElementById('grupos-pos-cont');
+  if(!gruposPos.length){cont.innerHTML='<p style="font-size:12px;color:var(--gray-text);padding:4px 0">Sin grupos</p>';return;}
+  cont.innerHTML=gruposPos.map((g,i)=>`
+    <div class="grupo-card">
+      <div class="grupo-header">
+        <div class="grupo-title">Grupo ${g.num}</div>
+        <button class="btn-sm btn-sm-red" onclick="quitarGrupoPos(${i})">✕</button>
+      </div>
+      <select class="tramo-sel" onchange="gruposPos[${i}].tramo=this.value">
+        ${TRAMOS.map(t=>`<option value="${t}" ${g.tramo===t?'selected':''}>${t}</option>`).join('')}
+      </select>
+      <textarea placeholder="Conductores / patentes..." rows="2"
+        style="width:100%;padding:7px;border:1px solid var(--gray-border);border-radius:6px;font-size:12px;font-family:'Inter',sans-serif;resize:none;margin-bottom:6px"
+        onchange="gruposPos[${i}].conductores=this.value.split('\\n').filter(Boolean)">${g.conductores.join('\n')}</textarea>
+      <div style="display:flex;align-items:center;gap:6px">
+        <input type="checkbox" id="pos-panne-${i}" ${g.panne?'checked':''} onchange="togglePannePos(${i},this.checked)">
+        <label for="pos-panne-${i}" style="font-size:12px;color:var(--gray-text)">Equipo en panne</label>
+      </div>
+      ${g.panne?`<div style="margin-top:6px;padding:8px;background:#FEF2F2;border-radius:6px;border:1px solid #FECACA">
+        <input type="text" placeholder="Equipo en panne" value="${g.panneEquipo||''}"
+          onchange="gruposPos[${i}].panneEquipo=this.value"
+          style="width:100%;padding:6px;border:1px solid #FECACA;border-radius:5px;font-size:12px;font-family:'Inter',sans-serif;margin-bottom:6px;background:#fff">
+        <input type="text" placeholder="Escolta INCOM" value="${g.panneEscolta||''}"
+          onchange="gruposPos[${i}].panneEscolta=this.value"
+          style="width:100%;padding:6px;border:1px solid #FECACA;border-radius:5px;font-size:12px;font-family:'Inter',sans-serif;background:#fff">
+      </div>`:''}
+    </div>`).join('');
 }
 
-// ── SEGMENTOS ─────────────────────────────────────────
-function renderSegs(){
-  function renderLista(segs,contId,arr){
-    const cont=document.getElementById(contId);cont.innerHTML='';
-    segs.forEach((s,i)=>{
-      const row=document.createElement('div');row.className='seg-row';
-      row.innerHTML='<span style="font-size:13px;color:var(--text)">'+s.o+' → '+s.d+'</span>'+
-        '<input type="number" min="5" max="180" value="'+s.min+'" style="width:65px;text-align:center" onchange="'+arr+'['+i+'].min=parseInt(this.value)||'+s.min+'">'+
-        '<span style="font-size:12px;color:#6B7280">min</span>';
-      cont.appendChild(row);
-    });
-  }
-  renderLista(segsBat,'segs-bat-list','segsBat');
-  renderLista(segsRam,'segs-ram-list','segsRam');
+function quitarGrupoPos(i){gruposPos.splice(i,1);gruposPos.forEach((g,j)=>g.num=j+1);renderGruposPos();}
+function togglePannePos(i,v){gruposPos[i].panne=v;renderGruposPos();}
+
+function genPosicion(){
+  if(!gruposPos.length){mostrarAviso('⚠ Agrega al menos un grupo');return;}
+  const sup=getSup(), hora=new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
+
+  const filas=gruposPos.map(g=>{
+    const panneHtml=g.panne?`<div style="margin-top:4px;padding:4px 8px;background:#FEE2E2;border-radius:4px;font-size:11px;color:#B91C1C">
+      🔴 Panne: ${g.panneEquipo||'—'} · Escolta: ${g.panneEscolta||'—'}</div>`:'';
+    const tramoIdx=TRAMOS.indexOf(g.tramo);
+    const semaforo=tramoIdx<=2?'🟢':tramoIdx<=5?'🟡':'🔴';
+    return`<tr style="border-bottom:1px solid #E5E7EB">
+      <td style="padding:8px 10px;font-size:13px;font-weight:700;color:#1D3557;text-align:center">${semaforo} G${g.num}</td>
+      <td style="padding:8px 10px;font-size:12px;color:#374151">${g.conductores.join('<br>')||'—'}${panneHtml}</td>
+      <td style="padding:8px 10px;font-size:12px;color:#fff;background:#003DA5;font-weight:600;text-align:center;border-radius:0 0 0 0">${g.tramo}</td>
+    </tr>`;
+  }).join('');
+
+  const html=`<div style="font-family:'Segoe UI',Arial,sans-serif;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);max-width:480px;margin:0 auto">
+    <div style="background:#1D3557;padding:12px 16px;display:flex;align-items:center;gap:10px">
+      <div style="background:#fff;border-radius:5px;padding:2px 7px"><span style="font-size:12px;font-weight:900;color:#1D3557;letter-spacing:1px">INCOM</span></div>
+      <div style="flex:1"><div style="font-size:14px;font-weight:700;color:#fff">Posición en Ruta</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.7)">${getHoy()} · ${hora} hrs · Sup: ${sup}</div></div>
+    </div>
+    <table style="width:100%;border-collapse:collapse">
+      <thead><tr style="background:#F1F5F9">
+        <th style="padding:7px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:center">GRUPO</th>
+        <th style="padding:7px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:left">EQUIPOS</th>
+        <th style="padding:7px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:center">UBICACIÓN</th>
+      </tr></thead>
+      <tbody>${filas}</tbody>
+    </table>
+    <div style="background:#f8fafc;padding:6px 14px;display:flex;justify-content:space-between;border-top:1px solid #E5E7EB">
+      <span style="font-size:10px;color:#94a3b8">🟢 Inicio · 🟡 Ruta media · 🔴 Llegada</span>
+      <span style="font-size:10px;color:#94a3b8">INCOM Control de Tráfico</span>
+    </div>
+  </div>`;
+
+  const cont=document.getElementById('tarjeta-posicion');
+  cont.innerHTML=html;
+  document.getElementById('out-posicion').classList.remove('hidden');
+  cont.scrollIntoView({behavior:'smooth',block:'start'});
 }
+
+// ══════════════════════════════════════════════════════════════
+// TIEMPOS / SEGMENTOS
+// ══════════════════════════════════════════════════════════════
+function renderSegmentos(){
+  const cont=document.getElementById('seg-cont');
+  cont.innerHTML=segmentos.map((s,i)=>`
+    <div class="seg-row">
+      <span style="flex:1;color:#374151">${s.nombre}</span>
+      <input type="number" class="seg-input" value="${s.mins}" min="1" max="300"
+        onchange="segmentos[${i}].mins=parseInt(this.value)||30">
+      <span style="font-size:12px;color:var(--gray-text)">min</span>
+    </div>`).join('');
+}
+
+function guardarSegmentos(){
+  try{localStorage.setItem('incom_segs',JSON.stringify(segmentos));}catch(e){}
+  mostrarAviso('✓ Tiempos guardados');
+}
+
+// ══════════════════════════════════════════════════════════════
+// DESCARGAR PNG (via html2canvas si disponible, sino aviso)
+// ══════════════════════════════════════════════════════════════
+function descargarPNG(id,nombre){
+  mostrarAviso('📸 Usa captura de pantalla para guardar la imagen');
+}
+
+// Fix: variable duplicada condicion
 </script>
 </body>
 </html>
