@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INCOM — Control de Tráfico</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap');
+:root{
+  --blue:#003DA5;--blue2:#1a56db;--blue-light:#EFF6FF;
+  --green:#1B7E3A;--green-light:#E6F4EA;
+  --red:#B91C1C;--red-light:#FEE2E2;
+  --amber:#92550A;--amber-light:#FEF3E2;
+  --gray-bg:#F0F2F5;--gray-border:#D1D5DB;
+  --gray-text:#6B7280;--text:#111827;--white:#fff;
+  --navy:#1D3557;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--gray-bg);color:var(--text);min-height:100vh}
+
+/* TOP */
+.topbar{background:var(--navy);padding:0 1rem;display:flex;align-items:center;gap:10px;height:50px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.3)}
+.topbar-logo{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:#fff;letter-spacing:1px;border:1.5px solid rgba(255,255,255,0.4);padding:2px 10px;border-radius:4px}
+.topbar-title{font-size:12px;color:rgba(255,255,255,0.75);flex:1}
+.topbar select{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:#fff;font-family:'Inter',sans-serif;font-size:12px;padding:5px 8px;border-radius:6px;outline:none;max-width:180px}
+.topbar select option{background:#1D3557;color:#fff}
+
+/* TABS */
+.main-tabs{display:flex;background:#fff;border-bottom:1px solid var(--gray-border);overflow-x:auto;-webkit-overflow-scrolling:touch;position:sticky;top:50px;z-index:99}
+.main-tab{flex:1;min-width:75px;padding:10px 4px;font-family:'Inter',sans-serif;font-size:11px;font-weight:500;color:var(--gray-text);background:transparent;border:none;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap;transition:color .15s}
+.main-tab.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
+
+/* LAYOUT */
+.content{max-width:680px;margin:0 auto;padding:12px}
+.hidden{display:none!important}
+
+/* CARDS */
+.card{background:#fff;border:1px solid var(--gray-border);border-radius:12px;padding:14px;margin-bottom:12px}
+.card-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px}
+
+/* BUTTONS */
+.btn-primary{background:var(--blue);color:#fff;border:none;border-radius:8px;padding:10px 16px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;width:100%;margin-bottom:8px}
+.btn-primary:active{opacity:.85}
+.btn-outline{background:#fff;color:var(--blue);border:1.5px solid var(--blue);border-radius:8px;padding:9px 16px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;width:100%;margin-bottom:8px}
+.btn-danger{background:#fff;color:var(--red);border:1.5px solid var(--red);border-radius:8px;padding:9px 16px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;margin-bottom:8px}
+.btn-sm{padding:5px 11px;font-size:12px;border-radius:6px;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-weight:500}
+.btn-sm-blue{background:var(--blue);color:#fff}
+.btn-sm-red{background:#FEE2E2;color:var(--red)}
+.btn-sm-gray{background:#F3F4F6;color:#374151}
+
+/* FIELD ROWS */
+.field-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #F3F4F6}
+.field-row:last-child{border-bottom:none}
+.field-label{font-size:13px;color:var(--gray-text)}
+
+/* COUNTERS */
+.eq-counter{display:flex;align-items:center;gap:8px}
+.eq-counter button{width:28px;height:28px;border-radius:6px;border:1px solid var(--gray-border);background:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:600;color:var(--blue)}
+.eq-num{font-size:18px;font-weight:700;color:var(--text);min-width:28px;text-align:center}
+
+/* TOTALIZADOR */
+.totalizador{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-radius:8px;font-size:12px;margin-top:8px;font-weight:500}
+.tot-ok{background:#DCFCE7;color:#166534}
+.tot-warn{background:#FEF3C7;color:#92400E}
+.tot-err{background:#FEE2E2;color:var(--red)}
+
+/* SECTION HEADERS */
+.section-header{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;border-radius:8px;margin-bottom:8px}
+.section-bat{background:#1B7E3A;color:#fff}
+.section-ram{background:var(--navy);color:#fff}
+.section-label{font-size:12px;font-weight:600;letter-spacing:.3px}
+
+/* PLAN EQUIPMENT ROWS */
+.plan-equipo-row{background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.plan-equipo-row.fuera{background:#FEF2F2;border-color:#FECACA}
+.equipo-info{flex:1;min-width:0}
+.equipo-nombre{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.equipo-patentes{font-size:11px;color:var(--gray-text);margin-top:2px}
+.equipo-motivo{font-size:11px;color:var(--red);font-weight:500;margin-top:2px}
+
+/* SELECTOR BUTTONS */
+.sel-grid{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.sel-btn{padding:4px 9px;font-size:11px;border-radius:5px;border:1px solid var(--gray-border);background:#fff;cursor:pointer;font-family:'Inter',sans-serif;color:#374151;transition:all .1s}
+.sel-btn:hover{background:var(--blue-light);border-color:#93C5FD}
+.sel-btn.selected{background:var(--blue);color:#fff;border-color:var(--blue)}
+.sel-btn.usado{background:#F3F4F6;color:#9CA3AF;text-decoration:line-through;cursor:not-allowed}
+
+/* COND BUTTONS */
+.cond-row{display:flex;gap:6px;margin-bottom:8px}
+.cond-btn{flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid var(--gray-border);background:#fff;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:500}
+.cond-btn.active-normal{background:#DCFCE7;border-color:#16A34A;color:#166534}
+.cond-btn.active-prec{background:#FEF3C7;border-color:#D97706;color:#92400E}
+.cond-btn.active-crit{background:#FEE2E2;border-color:#DC2626;color:var(--red)}
+
+/* GRUPO FAENA */
+.grupo-card{background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;padding:10px;margin-bottom:8px}
+.grupo-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.grupo-title{font-size:12px;font-weight:600;color:var(--text)}
+.grupo-equipo{display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid #F3F4F6;font-size:12px}
+.grupo-equipo:last-child{border-bottom:none}
+.panne-badge{background:#FEE2E2;color:var(--red);font-size:10px;font-weight:600;padding:1px 6px;border-radius:4px}
+
+/* TARJETA CONDUCTORES */
+.tarjeta-wrap{margin-top:10px}
+
+/* POSICION */
+.tramo-sel{width:100%;padding:8px;font-size:13px;border:1px solid var(--gray-border);border-radius:7px;font-family:'Inter',sans-serif;margin-bottom:6px}
+
+/* SEGMENTOS */
+.seg-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #F3F4F6;font-size:13px}
+.seg-input{width:70px;padding:5px 8px;border:1px solid var(--gray-border);border-radius:6px;font-size:13px;font-family:'Inter',sans-serif;text-align:center}
+
+/* AVISO */
+.aviso{position:fixed;top:110px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,.25);pointer-events:none;opacity:0;transition:opacity .3s}
+.aviso.show{opacity:1}
+
+input[type=time],input[type=date],input[type=text],select.normal{width:100%;padding:8px 10px;border:1px solid var(--gray-border);border-radius:7px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text);background:#fff;outline:none;margin-bottom:8px}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-logo">INCOM</div>
+  <div class="topbar-title">Control de Tráfico</div>
+  <select id="sel-supervisor" onchange="guardarSup()">
+    <option value="">— Supervisor —</option>
+    <option>Gonzalo Fernandez</option>
+    <option>Boris Gana</option>
+    <option>Juan Olivares</option>
+    <option>Javier Silva</option>
+  </select>
+</div>
+
+<!-- TABS -->
+<div class="main-tabs">
+  <button class="main-tab active" id="tab-btn-plan"     onclick="switchTab('plan')">📋 Plan</button>
+  <button class="main-tab"        id="tab-btn-matutino" onclick="switchTab('matutino')">🕗 8 AM</button>
+  <button class="main-tab"        id="tab-btn-faena"    onclick="switchTab('faena')">🚛 Faena</button>
+  <button class="main-tab"        id="tab-btn-posicion" onclick="switchTab('posicion')">📍 Ruta</button>
+  <button class="main-tab"        id="tab-btn-tiempos"  onclick="switchTab('tiempos')">⚙ Tiempos</button>
+</div>
+
+<div class="content">
+
+<!-- ══════════════════════════════════════════
+     TAB PLANIFICACIÓN
+══════════════════════════════════════════ -->
+<div id="tab-plan">
+
+  <div class="card">
+    <div class="card-title">Planificaciones guardadas</div>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <select id="plan-sel" style="flex:1;padding:8px;border:1px solid var(--gray-border);border-radius:7px;font-family:'Inter',sans-serif;font-size:13px" onchange="cargarPlanSel()">
+        <option value="">— Seleccionar —</option>
+      </select>
+      <button class="btn-sm btn-sm-red" onclick="eliminarPlan()">🗑</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <button class="btn-sm btn-sm-blue" style="padding:9px" onclick="nuevaPlan()">+ Nueva</button>
+      <button class="btn-sm btn-sm-gray" style="padding:9px" onclick="importarPlan()">📂 Importar</button>
+    </div>
+  </div>
+
+  <div id="plan-editor" class="hidden">
+    <div class="card">
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <input type="text" id="plan-nombre" placeholder="Nombre planificación" style="flex:1;padding:8px;border:1px solid var(--gray-border);border-radius:7px;font-family:'Inter',sans-serif;font-size:13px">
+        <input type="date" id="plan-fecha" style="padding:8px;border:1px solid var(--gray-border);border-radius:7px;font-family:'Inter',sans-serif;font-size:13px">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button class="btn-primary" style="margin:0" onclick="guardarPlan()">💾 Guardar</button>
+        <button class="btn-outline" style="margin:0" onclick="exportarPlan()">⬇ Exportar</button>
+      </div>
+    </div>
+
+    <!-- BATEAS -->
+    <div class="card">
+      <div class="section-header section-bat">
+        <span class="section-label">🟢 BATEAS — Puerto Totoralillo</span>
+        <span id="resumen-bat" style="font-size:11px;opacity:.8">0 equipos</span>
+      </div>
+      <div id="plan-lista-bat"></div>
+      <button class="btn-outline" onclick="abrirSelector('bat')">+ Agregar equipo</button>
+    </div>
+
+    <!-- RAMPLAS -->
+    <div class="card">
+      <div class="section-header section-ram">
+        <span class="section-label">🔵 RAMPLAS — Base INCOM Copiapó</span>
+        <span id="resumen-ram" style="font-size:11px;opacity:.8">0 equipos</span>
+      </div>
+      <div id="plan-lista-ram"></div>
+      <button class="btn-outline" onclick="abrirSelector('ram')">+ Agregar equipo</button>
+    </div>
+
+    <button class="btn-primary" onclick="genTarjetaConductores()">📋 Generar programación</button>
+    <div id="out-conductores" class="hidden tarjeta-wrap">
+      <div id="tarjeta-conductores"></div>
+      <button class="btn-primary" style="background:#7C3AED;margin-top:10px" onclick="descargarPNG('tarjeta-conductores','programacion_conductores')">⬇ Descargar imagen</button>
+      <p style="font-size:11px;color:var(--gray-text);text-align:center;margin-top:4px">Descarga y envía por WhatsApp a los conductores</p>
+    </div>
+  </div>
+
+  <!-- SELECTOR MODAL -->
+  <div id="selector-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:flex-end">
+    <div style="background:#fff;border-radius:16px 16px 0 0;padding:16px;width:100%;max-height:80vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="font-size:14px;font-weight:600" id="sel-modal-title">Seleccionar equipo</div>
+        <button onclick="cerrarSelector()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--gray-text)">✕</button>
+      </div>
+      <div style="font-size:12px;font-weight:600;color:var(--gray-text);margin-bottom:6px">CONDUCTOR</div>
+      <div class="sel-grid" id="grp-cond"></div>
+      <div style="font-size:12px;font-weight:600;color:var(--gray-text);margin:8px 0 6px">TRACTO</div>
+      <div class="sel-grid" id="grp-tr"></div>
+      <div style="font-size:12px;font-weight:600;color:var(--gray-text);margin:8px 0 6px" id="grp-sm-label">SEMIRREMOLQUE</div>
+      <div class="sel-grid" id="grp-sm"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
+        <button class="btn-primary" style="margin:0" onclick="confirmarEquipo()">✓ Agregar</button>
+        <button class="btn-danger" style="margin:0" onclick="confirmarFueraServicio()">🔴 Fuera de servicio</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL MOTIVO FUERA DE SERVICIO -->
+  <div id="fuera-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:210;display:flex;align-items:center;justify-content:center;padding:16px">
+    <div style="background:#fff;border-radius:12px;padding:16px;width:100%;max-width:340px">
+      <div style="font-size:14px;font-weight:600;margin-bottom:12px;color:var(--red)">🔴 Equipo fuera de servicio</div>
+      <div style="font-size:12px;color:var(--gray-text);margin-bottom:8px">Selecciona el motivo:</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px">
+        <button class="motivo-btn btn-sm" onclick="selMotivo(this)" data-m="Mantención" style="padding:10px;border:1.5px solid var(--gray-border);border-radius:7px;background:#fff;cursor:pointer;font-family:'Inter',sans-serif;font-size:12px">🔧 Mantención</button>
+        <button class="motivo-btn btn-sm" onclick="selMotivo(this)" data-m="Reparación" style="padding:10px;border:1.5px solid var(--gray-border);border-radius:7px;background:#fff;cursor:pointer;font-family:'Inter',sans-serif;font-size:12px">🛠 Reparación</button>
+        <button class="motivo-btn btn-sm" onclick="selMotivo(this)" data-m="Certificación" style="padding:10px;border:1.5px solid var(--gray-border);border-radius:7px;background:#fff;cursor:pointer;font-family:'Inter',sans-serif;font-size:12px">📋 Certificación</button>
+        <button class="motivo-btn btn-sm" onclick="selMotivo(this)" data-m="Otro" style="padding:10px;border:1.5px solid var(--gray-border);border-radius:7px;background:#fff;cursor:pointer;font-family:'Inter',sans-serif;font-size:12px">📌 Otro</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button class="btn-danger" style="margin:0" onclick="cerrarFueraModal()">Cancelar</button>
+        <button class="btn-primary" style="margin:0;background:var(--red)" onclick="confirmarFuera()">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     TAB REPORTE 8 AM
+══════════════════════════════════════════ -->
+<div id="tab-matutino" class="hidden">
+
+  <div class="card">
+    <div class="card-title">Hora del reporte</div>
+    <input type="time" id="m-hora" value="08:00">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+      <span style="font-size:12px;color:var(--gray-text)">Cargar totales desde planificación</span>
+      <button class="btn-sm btn-sm-blue" onclick="cargarDesdePlan()">↓ Cargar</button>
+    </div>
+  </div>
+
+  <!-- BATEAS -->
+  <div class="card">
+    <div class="section-header section-bat" style="margin-bottom:10px">
+      <span class="section-label">🟢 BATEAS</span>
+      <span style="font-size:11px;opacity:.8">Pto. Totoralillo</span>
+    </div>
+    <div class="field-row">
+      <span class="field-label">Total equipos del día</span>
+      <div class="eq-counter">
+        <button onclick="adjM('mb-total',-1)">−</button>
+        <span class="eq-num" id="mb-total">0</span>
+        <button onclick="adjM('mb-total',1)">+</button>
+      </div>
+    </div>
+    <div class="field-row">
+      <span class="field-label">En base</span>
+      <div class="eq-counter"><button onclick="adjM('mb-base',-1)">−</button><span class="eq-num" id="mb-base">0</span><button onclick="adjM('mb-base',1)">+</button></div>
+    </div>
+    <div class="field-row">
+      <span class="field-label">En ruta a faena</span>
+      <div class="eq-counter"><button onclick="adjM('mb-rutaf',-1)">−</button><span class="eq-num" id="mb-rutaf">0</span><button onclick="adjM('mb-rutaf',1)">+</button></div>
+    </div>
+    <div class="field-row">
+      <span class="field-label">En faena</span>
+      <div class="eq-counter"><button onclick="adjM('mb-faena',-1)">−</button><span class="eq-num" id="mb-faena">0</span><button onclick="adjM('mb-faena',1)">+</button></div>
+    </div>
+    <div class="totalizador tot-ok" id="tot-bat-el">
+      <span>Suma de estados</span><span id="tot-bat-txt">0 / 0</span>
+    </div>
+  </div>
+
+  <!-- RAMPLAS -->
+  <div class="card">
+    <div class="section-header section-ram" style="margin-bottom:10px">
+      <span class="section-label">🔵 RAMPLAS</span>
+      <span style="font-size:11px;opacity:.8">Base INCOM Copiapó</span>
+    </div>
+    <div class="field-row">
+      <span class="field-label">Total equipos del día</span>
+      <div class="eq-counter"><button onclick="adjM('mr-total',-1)">−</button><span class="eq-num" id="mr-total">0</span><button onclick="adjM('mr-total',1)">+</button></div>
+    </div>
+    <div class="field-row">
+      <span class="field-label">En carga</span>
+      <div class="eq-counter"><button onclick="adjM('mr-carga',-1)">−</button><span class="eq-num" id="mr-carga">0</span><button onclick="adjM('mr-carga',1)">+</button></div>
+    </div>
+    <div class="field-row">
+      <span class="field-label">En descarga</span>
+      <div class="eq-counter"><button onclick="adjM('mr-desc',-1)">−</button><span class="eq-num" id="mr-desc">0</span><button onclick="adjM('mr-desc',1)">+</button></div>
+    </div>
+    <div class="field-row">
+      <span class="field-label">En ruta a faena</span>
+      <div class="eq-counter"><button onclick="adjM('mr-rutaf',-1)">−</button><span class="eq-num" id="mr-rutaf">0</span><button onclick="adjM('mr-rutaf',1)">+</button></div>
+    </div>
+    <div class="field-row">
+      <span class="field-label">En faena</span>
+      <div class="eq-counter"><button onclick="adjM('mr-faena',-1)">−</button><span class="eq-num" id="mr-faena">0</span><button onclick="adjM('mr-faena',1)">+</button></div>
+    </div>
+    <div class="field-row">
+      <span class="field-label">En ruta a descarga</span>
+      <div class="eq-counter"><button onclick="adjM('mr-rutadesc',-1)">−</button><span class="eq-num" id="mr-rutadesc">0</span><button onclick="adjM('mr-rutadesc',1)">+</button></div>
+    </div>
+    <div class="field-row">
+      <span class="field-label">Carga de neumáticos</span>
+      <div class="eq-counter"><button onclick="adjM('mr-neumaticos',-1)">−</button><span class="eq-num" id="mr-neumaticos">0</span><button onclick="adjM('mr-neumaticos',1)">+</button></div>
+    </div>
+    <div class="field-row">
+      <span class="field-label">En ruta a base INCOM</span>
+      <div class="eq-counter"><button onclick="adjM('mr-rutab',-1)">−</button><span class="eq-num" id="mr-rutab">0</span><button onclick="adjM('mr-rutab',1)">+</button></div>
+    </div>
+    <div class="totalizador tot-ok" id="tot-ram-el">
+      <span>Suma de estados</span><span id="tot-ram-txt">0 / 0</span>
+    </div>
+  </div>
+
+  <button class="btn-primary" onclick="genMatutino()">📋 Generar tarjeta visual</button>
+  <div id="out-matutino" class="hidden tarjeta-wrap">
+    <div id="tarjeta-matutino"></div>
+    <p style="font-size:11px;color:var(--gray-text);text-align:center;margin-top:8px">📸 Captura con screenshot y envía por WhatsApp</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     TAB SALIDA FAENA
+══════════════════════════════════════════ -->
+<div id="tab-faena" class="hidden">
+
+  <div class="card">
+    <div class="card-title">Condición de ruta</div>
+    <div class="cond-row">
+      <button class="cond-btn active-normal" id="cond-normal" onclick="setCond('normal',this)">✅ Normal</button>
+      <button class="cond-btn" id="cond-prec"   onclick="setCond('precaucion',this)">⚠️ Precaución</button>
+      <button class="cond-btn" id="cond-crit"   onclick="setCond('critica',this)">🔴 Crítica</button>
+    </div>
+    <div style="font-size:12px;color:var(--gray-text)" id="cond-info-txt">Normal — tiempos estándar de ruta</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Tipo de transporte</div>
+    <select id="f-tipo" class="normal">
+      <option value="bateas">Transporte Concentrado — Bateas</option>
+      <option value="ramplas">Transporte Cátodo/Molibdeno — Ramplas</option>
+    </select>
+    <div class="field-row">
+      <span class="field-label">Total equipos</span>
+      <div class="eq-counter">
+        <button onclick="adjNum('f-total',-1)">−</button>
+        <span class="eq-num" id="f-total">0</span>
+        <button onclick="adjNum('f-total',1)">+</button>
+      </div>
+    </div>
+    <div class="field-row" style="margin-top:8px">
+      <span class="field-label">Fecha</span>
+      <input type="date" id="f-fecha" style="width:auto;padding:6px 8px;border:1px solid var(--gray-border);border-radius:6px;font-size:13px;margin:0">
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Grupos / Convoys</div>
+    <div id="grupos-faena-cont"></div>
+    <button class="btn-outline" onclick="addGrupoFaena()">+ Agregar grupo</button>
+    <button class="btn-outline" style="border-color:#7C3AED;color:#7C3AED" onclick="cargarGruposDesdePlan()">↓ Cargar desde planificación</button>
+  </div>
+
+  <button class="btn-primary" onclick="genFaena()">📋 Generar tarjeta salida</button>
+  <div id="out-faena" class="hidden tarjeta-wrap">
+    <div id="tarjeta-faena"></div>
+    <p style="font-size:11px;color:var(--gray-text);text-align:center;margin-top:8px">📸 Captura y envía por WhatsApp</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     TAB POSICIÓN EN RUTA
+══════════════════════════════════════════ -->
+<div id="tab-posicion" class="hidden">
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div class="card-title" style="margin:0">Grupos en ruta</div>
+      <button class="btn-sm btn-sm-blue" onclick="importarGruposPos()">↓ Desde Faena</button>
+    </div>
+    <div id="grupos-pos-cont"></div>
+    <button class="btn-outline" onclick="addGrupoPos()">+ Agregar grupo</button>
+  </div>
+
+  <button class="btn-primary" onclick="genPosicion()">📋 Generar tarjeta posición</button>
+  <div id="out-posicion" class="hidden tarjeta-wrap">
+    <div id="tarjeta-posicion"></div>
+    <p style="font-size:11px;color:var(--gray-text);text-align:center;margin-top:8px">📸 Captura y envía por WhatsApp</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     TAB TIEMPOS
+══════════════════════════════════════════ -->
+<div id="tab-tiempos" class="hidden">
+  <div class="card">
+    <div class="card-title">Tiempos estimados por tramo (minutos)</div>
+    <p style="font-size:12px;color:var(--gray-text);margin-bottom:12px">Estos tiempos se usan para calcular la hora proyectada de llegada en los reportes de salida.</p>
+    <div id="seg-cont"></div>
+    <button class="btn-primary" onclick="guardarSegmentos()">💾 Guardar tiempos</button>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<!-- AVISO TOAST -->
+<div class="aviso" id="aviso-global"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// DATOS BASE
+// ══════════════════════════════════════════════════════════════
+const CONDUCTORES=[
+  'JAVIER CORTES','DAMM CRUZ','MARTIN VITALI','JUAN MUÑOZ','RICARDO RAMIREZ',
+  'FRANCISCO HANSHING','RICARDO CONTRERAS','FELIPE CORTES','LUIS MUÑOZ',
+  'JOSE GONZALEZ','RENE PAEZ','MARCO QUIROGA','ABELINO CARRIZO',
+  'CRISTIAN OLIVARES','ENRIQUE ROJAS','DANIEL VEGA PEREIRA','BRAYAN GUEVARA',
+  'EDUARDO LEDESMA','PEDRO SAEZ','MARCO RIQUELME','WILFREDO OLIVARES',
+  'UBER ZAMORA','ALBERTO ASTORGA','BORIS ROJAS','LUIS MADARIAGA',
+  'PEDRO ARRIAGADA','JOSE URIZAR','ROBERTO FAJARDO','CRISTIAN LANAS',
+  'JUAN VALENZUELA','ROLANDO GUZMAN','JAVIER SANCHEZ','ORLANDO BUGUEÑO'
+];
+const TRACTOS=[
+  'PPPW-79','RVFF-13','RVXB-98','RTRJ-40','SHLL-37','PJFD-76','SSHY-46',
+  'PJFD-83','LRVV-86','PJBP-94','SYPL-10','PJBP-95','PPPW-78','LRVV-85',
+  'PJFD-81','RKGC-82','LXXL-81','RVFK-47','RVFK-46','RVFK-45','SPSH-74',
+  'TWPZ-91','RVXC-10','RJBV-34'
+];
+const SEMIS_BAT=[
+  'KDKS-88','KDKS-89','KYRG-46','KYPR-55','KDKS-72','KDKS-71','KYPV-88',
+  'PTXP-75','HGKS-91','KDKS-78','KDKS-82','KYRG-55','KYPR-44','KDKS-65',
+  'KDKS-90','KYRG-12','KYPR-77','KYPV-33'
+];
+const SEMIS_RAM=[
+  'PWVX-90','PWVX-89','PWVX-88','PWVX-87','PWVX-86','PWVX-85',
+  'PWVX-84','PWVX-83','PWVX-82','PWVX-81'
+];
+const TRAMOS=[
+  'KM1 — T. Lautaro','T. Lautaro — Los Loros','Los Loros — Pabellón',
+  'Pabellón — Nantoco','Nantoco — Ac. Ruta 5','Ac. Ruta 5 — Bypass Toledo',
+  'Bypass Toledo — Peaje P. Viejo','Peaje P. Viejo — Caldera',
+  'Caldera — Totoralillo','Totoralillo (Descargando)'
+];
+
+// ══════════════════════════════════════════════════════════════
+// ESTADO GLOBAL
+// ══════════════════════════════════════════════════════════════
+let planes=[], planActivo=null;
+let condicion='normal';
+let gruposFaena=[];
+let segmentos=TRAMOS.map((t,i)=>({nombre:t,mins:[45,30,20,25,15,20,25,30,20,60][i]||30}));
+let motivoSeleccionado='';
+let tipoSelector='bat';
+let selCond={cond:null,tr:null,sm:null};
+
+// ══════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════
+window.onload=function(){
+  // Supervisor
+  const sup=localStorage.getItem('incom_sup')||'';
+  if(sup)document.getElementById('sel-supervisor').value=sup;
+
+  // Planes
+  try{
+    const s=localStorage.getItem('incom_planes');
+    const a=localStorage.getItem('incom_plan_activo');
+    if(s){planes=JSON.parse(s);if(a)planActivo=planes.find(p=>p.id===a)||null;}
+  }catch(e){}
+  renderPlanSel();
+  if(planActivo){document.getElementById('plan-sel').value=planActivo.id;mostrarEditor();}
+
+  // Segmentos
+  try{const ss=localStorage.getItem('incom_segs');if(ss)segmentos=JSON.parse(ss);}catch(e){}
+  renderSegmentos();
+
+  // Fecha faena
+  document.getElementById('f-fecha').value=new Date().toISOString().slice(0,10);
+
+  // Fecha actual en reporte
+  switchTab('plan');
+};
+
+// ══════════════════════════════════════════════════════════════
+// NAV
+// ══════════════════════════════════════════════════════════════
+function switchTab(t){
+  ['plan','matutino','faena','posicion','tiempos'].forEach(id=>{
+    document.getElementById('tab-'+id).classList.toggle('hidden',id!==t);
+    document.getElementById('tab-btn-'+id).classList.toggle('active',id===t);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// SUPERVISOR
+// ══════════════════════════════════════════════════════════════
+function guardarSup(){localStorage.setItem('incom_sup',getSup());}
+function getSup(){return document.getElementById('sel-supervisor').value||'(sin asignar)';}
+function getHoy(){return new Date().toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'});}
+
+// ══════════════════════════════════════════════════════════════
+// AVISO TOAST
+// ══════════════════════════════════════════════════════════════
+function mostrarAviso(msg){
+  const el=document.getElementById('aviso-global');
+  el.textContent=msg;el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),3000);
+}
+
+// ══════════════════════════════════════════════════════════════
+// CONTADORES
+// ══════════════════════════════════════════════════════════════
+function adj(id,d){const el=document.getElementById(id);el.textContent=Math.max(0,parseInt(el.textContent)+d);}
+function adjM(id,d){adj(id,d);updateTot();}
+function adjNum(id,d){const el=document.getElementById(id);el.textContent=Math.max(0,parseInt(el.textContent)+d);}
+function getN(id){return parseInt(document.getElementById(id).textContent)||0;}
+
+function updateTot(){
+  const bT=getN('mb-total'),bB=getN('mb-base'),bRF=getN('mb-rutaf'),bF=getN('mb-faena');
+  const rT=getN('mr-total'),rC=getN('mr-carga'),rD=getN('mr-desc'),rRF=getN('mr-rutaf');
+  const rF=getN('mr-faena'),rRD=getN('mr-rutadesc'),rN=getN('mr-neumaticos'),rRB=getN('mr-rutab');
+  const bSum=bB+bRF+bF, rSum=rC+rD+rRF+rF+rRD+rN+rRB;
+  const bOk=bSum===bT, rOk=rSum===rT;
+  const bEl=document.getElementById('tot-bat-el'), rEl=document.getElementById('tot-ram-el');
+  bEl.className='totalizador '+(bOk?'tot-ok':'tot-warn');
+  document.getElementById('tot-bat-txt').textContent=bSum+' / '+bT+(bOk?' ✓':' ⚠');
+  rEl.className='totalizador '+(rOk?'tot-ok':'tot-warn');
+  document.getElementById('tot-ram-txt').textContent=rSum+' / '+rT+(rOk?' ✓':' ⚠');
+}
+
+function cargarDesdePlan(){
+  if(!planActivo){mostrarAviso('⚠ Carga primero una planificación');return;}
+  const bT=(planActivo.equiposBat||[]).filter(e=>!e.fueraServicio).length;
+  const rT=(planActivo.equiposRam||[]).filter(e=>!e.fueraServicio).length;
+  document.getElementById('mb-total').textContent=bT;
+  document.getElementById('mb-faena').textContent=bT;
+  document.getElementById('mb-base').textContent=0;
+  document.getElementById('mb-rutaf').textContent=0;
+  document.getElementById('mr-total').textContent=rT;
+  document.getElementById('mr-faena').textContent=rT;
+  ['mr-carga','mr-desc','mr-rutaf','mr-rutadesc','mr-neumaticos','mr-rutab'].forEach(id=>{
+    document.getElementById(id).textContent=0;
+  });
+  updateTot();
+  mostrarAviso('✓ Cargado: '+bT+' bateas · '+rT+' ramplas');
+}
+
+// ══════════════════════════════════════════════════════════════
+// REPORTE 8 AM — TARJETA VISUAL
+// ══════════════════════════════════════════════════════════════
+function genMatutino(){
+  const hora=document.getElementById('m-hora').value||'08:00';
+  const sup=getSup(), fecha=getHoy();
+  const bT=getN('mb-total'),bB=getN('mb-base'),bRF=getN('mb-rutaf'),bF=getN('mb-faena');
+  const rT=getN('mr-total'),rC=getN('mr-carga'),rD=getN('mr-desc'),rRF=getN('mr-rutaf');
+  const rF=getN('mr-faena'),rRD=getN('mr-rutadesc'),rN=getN('mr-neumaticos'),rRB=getN('mr-rutab');
+
+  function fila(label,val,last,hl){
+    const bdr=last?'':'border-bottom:0.5px solid #e2e8f0;';
+    const color=hl?'#003DA5':'#374151', w=hl?'700':'500';
+    return`<div style="${bdr}display:flex;justify-content:space-between;align-items:center;padding:5px 12px">
+      <span style="font-size:12px;color:#6b7280">${label}</span>
+      <span style="font-size:12px;font-weight:${w};color:${color}">${val}</span></div>`;
+  }
+
+  const html=`
+  <div style="font-family:'Segoe UI',Arial,sans-serif;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);max-width:420px;margin:0 auto">
+    <div style="background:#1D3557;padding:12px 16px;display:flex;align-items:center;gap:10px">
+      <div style="background:#fff;border-radius:5px;padding:2px 7px"><span style="font-size:12px;font-weight:900;color:#1D3557;letter-spacing:1px">INCOM</span></div>
+      <div style="flex:1"><div style="font-size:14px;font-weight:700;color:#fff">Reporte de Turno</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.7)">${fecha} · Sup: ${sup}</div></div>
+      <div style="text-align:right"><div style="font-size:26px;font-weight:700;color:#fff;line-height:1">${hora}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.6)">hrs</div></div>
+    </div>
+    <div style="padding:10px 14px">
+      <div style="margin-bottom:8px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+          <div style="display:flex;align-items:center;gap:6px"><div style="width:8px;height:8px;border-radius:50%;background:#16A34A"></div>
+            <span style="font-size:12px;font-weight:700;color:#111">BATEAS</span></div>
+          <span style="font-size:10px;color:#9ca3af">Pto. Totoralillo</span></div>
+        <div style="background:#f1f5f9;border-radius:10px;overflow:hidden">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 12px;border-bottom:0.5px solid #e2e8f0">
+            <span style="font-size:12px;font-weight:700;color:#1D3557">Total equipos del día</span>
+            <span style="font-size:22px;font-weight:900;color:#003DA5;line-height:1">${bT}</span></div>
+          ${fila('En base',bB)}${fila('En ruta a faena',bRF)}${fila('En faena',bF,true,true)}</div></div>
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+          <div style="display:flex;align-items:center;gap:6px"><div style="width:8px;height:8px;border-radius:50%;background:#2563EB"></div>
+            <span style="font-size:12px;font-weight:700;color:#111">RAMPLAS</span></div>
+          <span style="font-size:10px;color:#9ca3af">Base INCOM Copiapó</span></div>
+        <div style="background:#f1f5f9;border-radius:10px;overflow:hidden">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 12px;border-bottom:0.5px solid #e2e8f0">
+            <span style="font-size:12px;font-weight:700;color:#1D3557">Total equipos del día</span>
+            <span style="font-size:22px;font-weight:900;color:#003DA5;line-height:1">${rT}</span></div>
+          ${fila('En carga',rC)}${fila('En descarga',rD)}${fila('En ruta a faena',rRF)}
+          ${fila('En faena',rF)}${fila('En ruta a descarga',rRD)}
+          ${fila('Carga de neumáticos',rN)}${fila('En ruta a base INCOM',rRB,true,true)}</div></div>
+    </div>
+    <div style="background:#f8fafc;padding:6px 14px;display:flex;justify-content:space-between;border-top:0.5px solid #e2e8f0">
+      <span style="font-size:10px;color:#9ca3af">Supervisor: <strong style="color:#374151">${sup}</strong></span>
+      <span style="font-size:10px;color:#9ca3af">INCOM Control de Tráfico</span></div>
+  </div>`;
+
+  const cont=document.getElementById('tarjeta-matutino');
+  cont.innerHTML=html;
+  document.getElementById('out-matutino').classList.remove('hidden');
+  cont.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ══════════════════════════════════════════════════════════════
+// PLANIFICACIÓN
+// ══════════════════════════════════════════════════════════════
+function renderPlanSel(){
+  const sel=document.getElementById('plan-sel');
+  sel.innerHTML='<option value="">— Seleccionar —</option>';
+  planes.forEach(p=>{
+    const o=document.createElement('option');
+    o.value=p.id;o.textContent=p.nombre+' ('+p.fecha+')';
+    sel.appendChild(o);
+  });
+}
+
+function nuevaPlan(){
+  const id='plan_'+Date.now();
+  const hoy=new Date().toISOString().slice(0,10);
+  const p={id,nombre:'Plan '+getHoy(),fecha:hoy,equiposBat:[],equiposRam:[]};
+  planes.push(p);planActivo=p;
+  renderPlanSel();
+  document.getElementById('plan-sel').value=id;
+  document.getElementById('plan-nombre').value=p.nombre;
+  document.getElementById('plan-fecha').value=hoy;
+  mostrarEditor();
+  guardarStorage();
+}
+
+function mostrarEditor(){
+  document.getElementById('plan-editor').classList.remove('hidden');
+  if(planActivo){
+    document.getElementById('plan-nombre').value=planActivo.nombre;
+    document.getElementById('plan-fecha').value=planActivo.fecha;
+    renderListaBat();renderListaRam();
+  }
+}
+
+function cargarPlanSel(){
+  const id=document.getElementById('plan-sel').value;
+  if(!id){planActivo=null;document.getElementById('plan-editor').classList.add('hidden');return;}
+  planActivo=planes.find(p=>p.id===id)||null;
+  if(planActivo){mostrarEditor();guardarStorage();}
+}
+
+function guardarPlan(){
+  if(!planActivo)return;
+  planActivo.nombre=document.getElementById('plan-nombre').value||planActivo.nombre;
+  planActivo.fecha=document.getElementById('plan-fecha').value||planActivo.fecha;
+  guardarStorage();renderPlanSel();
+  document.getElementById('plan-sel').value=planActivo.id;
+  mostrarAviso('✓ Planificación guardada');
+}
+
+function guardarStorage(){
+  try{
+    localStorage.setItem('incom_planes',JSON.stringify(planes));
+    if(planActivo)localStorage.setItem('incom_plan_activo',planActivo.id);
+  }catch(e){}
+}
+
+function eliminarPlan(){
+  if(!planActivo)return;
+  if(!confirm('¿Eliminar "'+planActivo.nombre+'"?'))return;
+  planes=planes.filter(p=>p.id!==planActivo.id);
+  planActivo=null;
+  document.getElementById('plan-editor').classList.add('hidden');
+  renderPlanSel();guardarStorage();
+}
+
+function exportarPlan(){
+  if(!planActivo){mostrarAviso('⚠ No hay planificación activa');return;}
+  const data=JSON.stringify(planActivo,null,2);
+  const a=document.createElement('a');
+  a.href='data:application/json;charset=utf-8,'+encodeURIComponent(data);
+  a.download='plan_'+planActivo.fecha+'.json';a.click();
+}
+
+function importarPlan(){
+  const inp=document.createElement('input');inp.type='file';inp.accept='.json';
+  inp.onchange=e=>{
+    const f=e.target.files[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=ev=>{
+      try{
+        const p=JSON.parse(ev.target.result);
+        if(!p.id)p.id='plan_'+Date.now();
+        const existe=planes.findIndex(x=>x.id===p.id);
+        if(existe>=0)planes[existe]=p;else planes.push(p);
+        planActivo=p;renderPlanSel();
+        document.getElementById('plan-sel').value=p.id;
+        mostrarEditor();guardarStorage();
+        mostrarAviso('✓ Planificación importada');
+      }catch(e){mostrarAviso('⚠ Error al importar');}
+    };r.readAsText(f);
+  };inp.click();
+}
+
+// ── Render listas ───────────────────────────────────────────
+function renderListaBat(){
+  if(!planActivo)return;
+  const cont=document.getElementById('plan-lista-bat');
+  const arr=planActivo.equiposBat||[];
+  cont.innerHTML=arr.length?arr.map((eq,i)=>rowEquipo(eq,i,'bat')).join('')
+    :'<p style="font-size:12px;color:var(--gray-text);padding:8px 0">Sin equipos asignados</p>';
+  document.getElementById('resumen-bat').textContent=arr.filter(e=>!e.fueraServicio).length+' activos';
+}
+function renderListaRam(){
+  if(!planActivo)return;
+  const cont=document.getElementById('plan-lista-ram');
+  const arr=planActivo.equiposRam||[];
+  cont.innerHTML=arr.length?arr.map((eq,i)=>rowEquipo(eq,i,'ram')).join('')
+    :'<p style="font-size:12px;color:var(--gray-text);padding:8px 0">Sin equipos asignados</p>';
+  document.getElementById('resumen-ram').textContent=arr.filter(e=>!e.fueraServicio).length+' activos';
+}
+
+function rowEquipo(eq,i,tipo){
+  const fueraClass=eq.fueraServicio?'fuera':'';
+  const num=i+1;
+  return`<div class="plan-equipo-row ${fueraClass}">
+    <div class="equipo-info">
+      <div class="equipo-nombre"><span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;background:${eq.fueraServicio?'#DC2626':'#1D3557'};color:#fff;border-radius:50%;font-size:10px;margin-right:6px">${num}</span>${eq.conductor||'—'}</div>
+      <div class="equipo-patentes">${eq.tracto||'—'} · ${eq.semi||'—'}</div>
+      ${eq.fueraServicio?`<div class="equipo-motivo">🔴 ${eq.motivo}</div>`:''}
+    </div>
+    <button class="btn-sm btn-sm-red" onclick="quitarEquipo('${tipo}',${i})">✕</button>
+  </div>`;
+}
+
+function quitarEquipo(tipo,idx){
+  if(!planActivo)return;
+  const arr=tipo==='bat'?planActivo.equiposBat:planActivo.equiposRam;
+  arr.splice(idx,1);
+  tipo==='bat'?renderListaBat():renderListaRam();
+  guardarStorage();
+}
+
+// ── Selector ─────────────────────────────────────────────────
+function abrirSelector(tipo){
+  tipoSelector=tipo;
+  selCond={cond:null,tr:null,sm:null};
+  document.getElementById('sel-modal-title').textContent=tipo==='bat'?'Agregar Batea':'Agregar Rampla';
+  document.getElementById('grp-sm-label').textContent=tipo==='bat'?'SEMIRREMOLQUE (BATEA)':'SEMIRREMOLQUE (RAMPLA)';
+
+  const arr=tipo==='bat'?planActivo.equiposBat:planActivo.equiposRam;
+  const usadosCond=arr.map(e=>e.conductor);
+  const usadosTr=[...(planActivo.equiposBat||[]),...(planActivo.equiposRam||[])].map(e=>e.tracto);
+  const usadosSm=arr.map(e=>e.semi);
+  const semis=tipo==='bat'?SEMIS_BAT:SEMIS_RAM;
+
+  renderSelGrid('grp-cond',CONDUCTORES,usadosCond,'cond');
+  renderSelGrid('grp-tr',TRACTOS,usadosTr,'tr');
+  renderSelGrid('grp-sm',semis,usadosSm,'sm');
+
+  document.getElementById('selector-modal').classList.remove('hidden');
+}
+
+function renderSelGrid(cont,items,usados,campo){
+  const el=document.getElementById(cont);
+  el.innerHTML=items.map(item=>{
+    const usado=usados.includes(item);
+    const cls='sel-btn'+(usado?' usado':'');
+    return`<button class="${cls}" onclick="selItem(this,'${campo}','${item}')" ${usado?'disabled':''}>${item}</button>`;
+  }).join('');
+}
+
+function selItem(btn,campo,val){
+  const cont=btn.parentElement;
+  cont.querySelectorAll('.sel-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selCond[campo]=val;
+}
+
+function cerrarSelector(){document.getElementById('selector-modal').classList.add('hidden');}
+
+function confirmarEquipo(){
+  if(!selCond.cond||!selCond.tr||!selCond.sm){mostrarAviso('⚠ Selecciona conductor, tracto y semirremolque');return;}
+  const arr=tipoSelector==='bat'?planActivo.equiposBat:planActivo.equiposRam;
+  arr.push({conductor:selCond.cond,tracto:selCond.tr,semi:selCond.sm,fueraServicio:false,motivo:''});
+  cerrarSelector();
+  tipoSelector==='bat'?renderListaBat():renderListaRam();
+  guardarStorage();
+}
+
+function confirmarFueraServicio(){
+  if(!selCond.tr&&!selCond.sm){mostrarAviso('⚠ Selecciona al menos un tracto o semirremolque');return;}
+  motivoSeleccionado='';
+  document.querySelectorAll('.motivo-btn').forEach(b=>{b.style.background='#fff';b.style.borderColor='var(--gray-border)';});
+  document.getElementById('fuera-modal').style.display='flex';
+}
+
+function selMotivo(btn){
+  document.querySelectorAll('.motivo-btn').forEach(b=>{b.style.background='#fff';b.style.borderColor='var(--gray-border)';});
+  btn.style.background='#FEE2E2';btn.style.borderColor='#DC2626';
+  motivoSeleccionado=btn.dataset.m;
+}
+
+function cerrarFueraModal(){document.getElementById('fuera-modal').style.display='none';}
+
+function confirmarFuera(){
+  if(!motivoSeleccionado){mostrarAviso('⚠ Selecciona un motivo');return;}
+  const arr=tipoSelector==='bat'?planActivo.equiposBat:planActivo.equiposRam;
+  arr.push({conductor:selCond.cond||'',tracto:selCond.tr||'',semi:selCond.sm||'',fueraServicio:true,motivo:motivoSeleccionado});
+  cerrarFueraModal();cerrarSelector();
+  tipoSelector==='bat'?renderListaBat():renderListaRam();
+  guardarStorage();
+}
+
+// ── Tarjeta conductores ───────────────────────────────────────
+function genTarjetaConductores(){
+  if(!planActivo){mostrarAviso('⚠ Carga una planificación primero');return;}
+  const bat=(planActivo.equiposBat||[]).filter(e=>!e.fueraServicio);
+  const ram=(planActivo.equiposRam||[]).filter(e=>!e.fueraServicio);
+  const fueraBat=(planActivo.equiposBat||[]).filter(e=>e.fueraServicio);
+  const fueraRam=(planActivo.equiposRam||[]).filter(e=>e.fueraServicio);
+  const totalEq=bat.length+ram.length;
+  const fecha=planActivo.fecha||getHoy();
+
+  function fila(eq,i){
+    return`<tr style="border-bottom:0.5px solid #e2e8f0">
+      <td style="padding:8px 10px;font-size:13px;font-weight:700;color:#1e293b">
+        <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;background:#1D3557;color:#fff;border-radius:50%;font-size:10px;margin-right:7px">${i+1}</span>${eq.conductor||'—'}
+      </td>
+      <td style="padding:8px 10px;font-size:12px;color:#475569;text-align:center">${eq.tracto||'—'}</td>
+      <td style="padding:8px 10px;font-size:12px;font-weight:700;color:#2563EB;text-align:center">${eq.semi||'—'}</td>
+      <td style="padding:8px 10px;font-size:12px;color:#94a3b8;text-align:center">—</td>
+    </tr>`;
+  }
+  function seccion(titulo,arr,colorBanner,icono){
+    if(!arr.length)return'';
+    return`<tr><td colspan="4" style="background:${colorBanner};padding:8px 12px">
+      <span style="color:#fff;font-size:12px;font-weight:700">${icono} ${titulo} (${arr.length} equipo${arr.length!==1?'s':''})</span></td></tr>
+      ${arr.map((eq,i)=>fila(eq,i)).join('')}`;
+  }
+  function filasRojo(arr){
+    return arr.map(eq=>`<tr style="background:#FEF2F2;border-bottom:0.5px solid #FECACA">
+      <td colspan="2" style="padding:7px 10px;font-size:12px;color:#B91C1C;font-weight:600">🔴 ${eq.tracto||'—'} / ${eq.semi||'—'}</td>
+      <td colspan="2" style="padding:7px 10px;font-size:11px;color:#B91C1C;text-align:right">${eq.motivo}</td></tr>`).join('');
+  }
+
+  const html=`<div style="font-family:'Segoe UI',Arial,sans-serif;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);max-width:480px;margin:0 auto">
+    <div style="background:linear-gradient(135deg,#1D3557 0%,#2563EB 100%);padding:16px 18px 14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="background:#fff;border-radius:6px;padding:4px 8px"><span style="font-size:13px;font-weight:900;color:#1D3557;letter-spacing:1px">INCOM</span></div>
+          <div><div style="color:#fff;font-size:11px;font-weight:700">Programación de Equipos</div>
+            <div style="color:#93c5fd;font-size:10px">PROGRAMACION · ${fecha}</div></div>
+        </div>
+        <div style="text-align:center;background:rgba(255,255,255,0.15);border-radius:10px;padding:6px 14px;border:1px solid rgba(255,255,255,0.25)">
+          <div style="font-size:38px;font-weight:900;color:#fff;line-height:1">${totalEq}</div>
+          <div style="font-size:10px;color:#bfdbfe;font-weight:600;letter-spacing:1px">EQ Total</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px">
+        ${bat.length?`<div style="flex:1;background:rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;border:1px solid rgba(255,255,255,0.2);text-align:center">
+          <div style="font-size:28px;font-weight:900;color:#fff;line-height:1">${bat.length}</div>
+          <div style="font-size:10px;color:#86efac;font-weight:600;margin-top:2px">● BATEAS</div></div>`:''}
+        ${ram.length?`<div style="flex:1;background:rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;border:1px solid rgba(255,255,255,0.2);text-align:center">
+          <div style="font-size:28px;font-weight:900;color:#fff;line-height:1">${ram.length}</div>
+          <div style="font-size:10px;color:#93c5fd;font-weight:600;margin-top:2px">● RAMPLAS</div></div>`:''}
+      </div>
+    </div>
+    <table style="width:100%;border-collapse:collapse">
+      <thead><tr style="background:#f1f5f9">
+        <th style="padding:8px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:left;letter-spacing:.5px">CONDUCTOR</th>
+        <th style="padding:8px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:center">TRACTO</th>
+        <th style="padding:8px 10px;font-size:10px;color:#f59e0b;font-weight:700;text-align:center">SEMIRREMOLQUE</th>
+        <th style="padding:8px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:center">MOVIMIENTO</th>
+      </thead>
+      <tbody>
+        ${seccion('BATEAS — Puerto Totoralillo',bat,'#1D7A3A','🟢')}
+        ${seccion('RAMPLAS — Base INCOM Copiapó',ram,'#1D3557','🔵')}
+        ${(fueraBat.length||fueraRam.length)?`<tr><td colspan="4" style="background:#B91C1C;padding:8px 12px">
+          <span style="color:#fff;font-size:12px;font-weight:700">🔴 EQUIPOS FUERA DE SERVICIO</span></td></tr>
+          ${filasRojo([...fueraBat,...fueraRam])}`:'' }
+      </tbody>
+    </table>
+    <div style="background:#f8fafc;padding:8px 14px;display:flex;justify-content:space-between;border-top:1px solid #e2e8f0">
+      <span style="font-size:10px;color:#94a3b8">Sup: Supervisor de turno</span>
+      <span style="font-size:10px;color:#94a3b8">INCOM Control de Tráfico</span>
+    </div>
+  </div>`;
+
+  const cont=document.getElementById('tarjeta-conductores');
+  cont.innerHTML=html;
+  document.getElementById('out-conductores').classList.remove('hidden');
+  cont.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ══════════════════════════════════════════════════════════════
+// SALIDA FAENA
+// ══════════════════════════════════════════════════════════════
+function setCond(c,btn){
+  condicion=c;
+  document.querySelectorAll('.cond-btn').forEach(b=>b.className='cond-btn');
+  btn.className='cond-btn active-'+({'normal':'normal','precaucion':'prec','critica':'crit'}[c]);
+  const info={'normal':'Normal — tiempos estándar de ruta','precaucion':'Precaución — +15% en tiempos proyectados','critica':'Crítica — +30% en tiempos proyectados'};
+  document.getElementById('cond-info-txt').textContent=info[c];
+}
+
+function addGrupoFaena(){
+  const n=gruposFaena.length+1;
+  gruposFaena.push({num:n,conductores:[],horaS:'',observ:''});
+  renderGruposFaena();
+}
+
+function quitarGrupo(idx){gruposFaena.splice(idx,1);gruposFaena.forEach((g,i)=>g.num=i+1);renderGruposFaena();}
+
+function renderGruposFaena(){
+  const cont=document.getElementById('grupos-faena-cont');
+  if(!gruposFaena.length){cont.innerHTML='<p style="font-size:12px;color:var(--gray-text);padding:4px 0">Sin grupos creados</p>';return;}
+  cont.innerHTML=gruposFaena.map((g,i)=>`
+    <div class="grupo-card">
+      <div class="grupo-header">
+        <div class="grupo-title">Grupo ${g.num}</div>
+        <div style="display:flex;gap:6px">
+          <input type="time" value="${g.horaS}" onchange="gruposFaena[${i}].horaS=this.value"
+            style="padding:4px 7px;border:1px solid var(--gray-border);border-radius:6px;font-size:12px;font-family:'Inter',sans-serif">
+          <button class="btn-sm btn-sm-red" onclick="quitarGrupo(${i})">✕</button>
+        </div>
+      </div>
+      <textarea placeholder="Conductores / patentes del grupo..." rows="2"
+        style="width:100%;padding:7px;border:1px solid var(--gray-border);border-radius:6px;font-size:12px;font-family:'Inter',sans-serif;resize:none;margin-bottom:6px"
+        onchange="gruposFaena[${i}].conductores=this.value.split('\\n').filter(Boolean)">${g.conductores.join('\n')}</textarea>
+      <div style="display:flex;align-items:center;gap:6px">
+        <input type="checkbox" id="panne-${i}" onchange="togglePanne(${i},this.checked)">
+        <label for="panne-${i}" style="font-size:12px;color:var(--gray-text)">Equipo en panne en este grupo</label>
+      </div>
+      ${g.panne?`<div style="margin-top:6px;padding:8px;background:#FEF2F2;border-radius:6px;border:1px solid #FECACA">
+        <input type="text" placeholder="Equipo en panne (patente)" value="${g.panneEquipo||''}"
+          onchange="gruposFaena[${i}].panneEquipo=this.value"
+          style="width:100%;padding:6px;border:1px solid #FECACA;border-radius:5px;font-size:12px;font-family:'Inter',sans-serif;margin-bottom:6px;background:#fff">
+        <input type="text" placeholder="Escolta: Camioneta + Conductor INCOM" value="${g.panneEscolta||''}"
+          onchange="gruposFaena[${i}].panneEscolta=this.value"
+          style="width:100%;padding:6px;border:1px solid #FECACA;border-radius:5px;font-size:12px;font-family:'Inter',sans-serif;background:#fff">
+      </div>`:''}
+    </div>`).join('');
+}
+
+function togglePanne(i,v){gruposFaena[i].panne=v;if(!v){delete gruposFaena[i].panneEquipo;delete gruposFaena[i].panneEscolta;}renderGruposFaena();}
+
+function cargarGruposDesdePlan(){
+  if(!planActivo){mostrarAviso('⚠ No hay planificación activa');return;}
+  const tipo=document.getElementById('f-tipo').value;
+  const arr=tipo==='bateas'?(planActivo.equiposBat||[]):(planActivo.equiposRam||[]);
+  const activos=arr.filter(e=>!e.fueraServicio);
+  if(!activos.length){mostrarAviso('⚠ No hay equipos activos en la planificación');return;}
+  gruposFaena=[{num:1,conductores:activos.map(e=>e.conductor+' · '+e.tracto+' / '+e.semi),horaS:'',observ:'',panne:false}];
+  document.getElementById('f-total').textContent=activos.length;
+  renderGruposFaena();
+  mostrarAviso('✓ Cargados '+activos.length+' equipos');
+}
+
+function calcHoraLlegada(horaS,minsExtra){
+  if(!horaS)return'—';
+  const [h,m]=horaS.split(':').map(Number);
+  const tot=h*60+m+minsExtra;
+  return String(Math.floor(tot/60)%24).padStart(2,'0')+':'+String(tot%60).padStart(2,'0');
+}
+
+function genFaena(){
+  if(!gruposFaena.length){mostrarAviso('⚠ Agrega al menos un grupo');return;}
+  const tipo=document.getElementById('f-tipo').value;
+  const tipoLabel=tipo==='bateas'?'BATEAS':'RAMPLAS';
+  const sup=getSup(), fecha=document.getElementById('f-fecha').value||getHoy();
+  const factor=condicion==='normal'?1:condicion==='precaucion'?1.15:1.30;
+  const condLabel={'normal':'Normal','precaucion':'Precaución ⚠️','critica':'Crítica 🔴'}[condicion];
+  const minsRuta=Math.round(segmentos.reduce((s,sg)=>s+sg.mins,0)*factor);
+
+  const rows=gruposFaena.map(g=>{
+    const hs=g.horaS||'—';
+    const ll=g.horaS?calcHoraLlegada(g.horaS,minsRuta):'—';
+    const conds=g.conductores.join('<br>');
+    const panneHtml=g.panne?`<div style="margin-top:4px;padding:4px 8px;background:#FEE2E2;border-radius:4px;font-size:11px;color:#B91C1C">
+      🔴 Panne: ${g.panneEquipo||'—'} · Escolta: ${g.panneEscolta||'—'}</div>`:'';
+    return`<tr style="border-bottom:1px solid #E5E7EB">
+      <td style="padding:8px 10px;font-size:13px;font-weight:700;color:#1D3557;text-align:center;vertical-align:top">G${g.num}</td>
+      <td style="padding:8px 10px;font-size:12px;color:#374151;vertical-align:top">${conds}${panneHtml}</td>
+      <td style="padding:8px 10px;font-size:13px;font-weight:700;color:#003DA5;text-align:center;vertical-align:top">${hs}</td>
+      <td style="padding:8px 10px;font-size:13px;font-weight:700;color:#1B7E3A;text-align:center;vertical-align:top">${ll}</td>
+    </tr>`;
+  }).join('');
+
+  const html=`<div style="font-family:'Segoe UI',Arial,sans-serif;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);max-width:480px;margin:0 auto">
+    <div style="background:#1D3557;padding:12px 16px;display:flex;align-items:center;gap:10px">
+      <div style="background:#fff;border-radius:5px;padding:2px 7px"><span style="font-size:12px;font-weight:900;color:#1D3557;letter-spacing:1px">INCOM</span></div>
+      <div style="flex:1"><div style="font-size:14px;font-weight:700;color:#fff">Reporte Salida Faena — ${tipoLabel}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.7)">${fecha} · Sup: ${sup} · Condición: ${condLabel}</div></div>
+    </div>
+    <table style="width:100%;border-collapse:collapse">
+      <thead><tr style="background:#F1F5F9">
+        <th style="padding:7px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:center">GRUPO</th>
+        <th style="padding:7px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:left">CONDUCTORES / EQUIPOS</th>
+        <th style="padding:7px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:center">SALIDA</th>
+        <th style="padding:7px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:center">LLEGADA</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div style="background:#f8fafc;padding:6px 14px;display:flex;justify-content:space-between;border-top:1px solid #E5E7EB">
+      <span style="font-size:10px;color:#94a3b8">Supervisor: <strong style="color:#374151">${sup}</strong></span>
+      <span style="font-size:10px;color:#94a3b8">INCOM Control de Tráfico</span>
+    </div>
+  </div>`;
+
+  const cont=document.getElementById('tarjeta-faena');
+  cont.innerHTML=html;
+  document.getElementById('out-faena').classList.remove('hidden');
+  cont.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ══════════════════════════════════════════════════════════════
+// POSICIÓN EN RUTA
+// ══════════════════════════════════════════════════════════════
+let gruposPos=[];
+
+function importarGruposPos(){
+  if(!gruposFaena.length){mostrarAviso('⚠ No hay grupos en Salida Faena');return;}
+  gruposPos=gruposFaena.map(g=>({...g,tramo:TRAMOS[0]}));
+  renderGruposPos();mostrarAviso('✓ Grupos importados desde Salida Faena');
+}
+
+function addGrupoPos(){
+  gruposPos.push({num:gruposPos.length+1,conductores:[],tramo:TRAMOS[0],panne:false});
+  renderGruposPos();
+}
+
+function renderGruposPos(){
+  const cont=document.getElementById('grupos-pos-cont');
+  if(!gruposPos.length){cont.innerHTML='<p style="font-size:12px;color:var(--gray-text);padding:4px 0">Sin grupos</p>';return;}
+  cont.innerHTML=gruposPos.map((g,i)=>`
+    <div class="grupo-card">
+      <div class="grupo-header">
+        <div class="grupo-title">Grupo ${g.num}</div>
+        <button class="btn-sm btn-sm-red" onclick="quitarGrupoPos(${i})">✕</button>
+      </div>
+      <select class="tramo-sel" onchange="gruposPos[${i}].tramo=this.value">
+        ${TRAMOS.map(t=>`<option value="${t}" ${g.tramo===t?'selected':''}>${t}</option>`).join('')}
+      </select>
+      <textarea placeholder="Conductores / patentes..." rows="2"
+        style="width:100%;padding:7px;border:1px solid var(--gray-border);border-radius:6px;font-size:12px;font-family:'Inter',sans-serif;resize:none;margin-bottom:6px"
+        onchange="gruposPos[${i}].conductores=this.value.split('\\n').filter(Boolean)">${g.conductores.join('\n')}</textarea>
+      <div style="display:flex;align-items:center;gap:6px">
+        <input type="checkbox" id="pos-panne-${i}" ${g.panne?'checked':''} onchange="togglePannePos(${i},this.checked)">
+        <label for="pos-panne-${i}" style="font-size:12px;color:var(--gray-text)">Equipo en panne</label>
+      </div>
+      ${g.panne?`<div style="margin-top:6px;padding:8px;background:#FEF2F2;border-radius:6px;border:1px solid #FECACA">
+        <input type="text" placeholder="Equipo en panne" value="${g.panneEquipo||''}"
+          onchange="gruposPos[${i}].panneEquipo=this.value"
+          style="width:100%;padding:6px;border:1px solid #FECACA;border-radius:5px;font-size:12px;font-family:'Inter',sans-serif;margin-bottom:6px;background:#fff">
+        <input type="text" placeholder="Escolta INCOM" value="${g.panneEscolta||''}"
+          onchange="gruposPos[${i}].panneEscolta=this.value"
+          style="width:100%;padding:6px;border:1px solid #FECACA;border-radius:5px;font-size:12px;font-family:'Inter',sans-serif;background:#fff">
+      </div>`:''}
+    </div>`).join('');
+}
+
+function quitarGrupoPos(i){gruposPos.splice(i,1);gruposPos.forEach((g,j)=>g.num=j+1);renderGruposPos();}
+function togglePannePos(i,v){gruposPos[i].panne=v;renderGruposPos();}
+
+function genPosicion(){
+  if(!gruposPos.length){mostrarAviso('⚠ Agrega al menos un grupo');return;}
+  const sup=getSup(), hora=new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
+
+  const filas=gruposPos.map(g=>{
+    const panneHtml=g.panne?`<div style="margin-top:4px;padding:4px 8px;background:#FEE2E2;border-radius:4px;font-size:11px;color:#B91C1C">
+      🔴 Panne: ${g.panneEquipo||'—'} · Escolta: ${g.panneEscolta||'—'}</div>`:'';
+    const tramoIdx=TRAMOS.indexOf(g.tramo);
+    const semaforo=tramoIdx<=2?'🟢':tramoIdx<=5?'🟡':'🔴';
+    return`<tr style="border-bottom:1px solid #E5E7EB">
+      <td style="padding:8px 10px;font-size:13px;font-weight:700;color:#1D3557;text-align:center">${semaforo} G${g.num}</td>
+      <td style="padding:8px 10px;font-size:12px;color:#374151">${g.conductores.join('<br>')||'—'}${panneHtml}</td>
+      <td style="padding:8px 10px;font-size:12px;color:#fff;background:#003DA5;font-weight:600;text-align:center;border-radius:0 0 0 0">${g.tramo}</td>
+    </tr>`;
+  }).join('');
+
+  const html=`<div style="font-family:'Segoe UI',Arial,sans-serif;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);max-width:480px;margin:0 auto">
+    <div style="background:#1D3557;padding:12px 16px;display:flex;align-items:center;gap:10px">
+      <div style="background:#fff;border-radius:5px;padding:2px 7px"><span style="font-size:12px;font-weight:900;color:#1D3557;letter-spacing:1px">INCOM</span></div>
+      <div style="flex:1"><div style="font-size:14px;font-weight:700;color:#fff">Posición en Ruta</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.7)">${getHoy()} · ${hora} hrs · Sup: ${sup}</div></div>
+    </div>
+    <table style="width:100%;border-collapse:collapse">
+      <thead><tr style="background:#F1F5F9">
+        <th style="padding:7px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:center">GRUPO</th>
+        <th style="padding:7px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:left">EQUIPOS</th>
+        <th style="padding:7px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:center">UBICACIÓN</th>
+      </tr></thead>
+      <tbody>${filas}</tbody>
+    </table>
+    <div style="background:#f8fafc;padding:6px 14px;display:flex;justify-content:space-between;border-top:1px solid #E5E7EB">
+      <span style="font-size:10px;color:#94a3b8">🟢 Inicio · 🟡 Ruta media · 🔴 Llegada</span>
+      <span style="font-size:10px;color:#94a3b8">INCOM Control de Tráfico</span>
+    </div>
+  </div>`;
+
+  const cont=document.getElementById('tarjeta-posicion');
+  cont.innerHTML=html;
+  document.getElementById('out-posicion').classList.remove('hidden');
+  cont.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ══════════════════════════════════════════════════════════════
+// TIEMPOS / SEGMENTOS
+// ══════════════════════════════════════════════════════════════
+function renderSegmentos(){
+  const cont=document.getElementById('seg-cont');
+  cont.innerHTML=segmentos.map((s,i)=>`
+    <div class="seg-row">
+      <span style="flex:1;color:#374151">${s.nombre}</span>
+      <input type="number" class="seg-input" value="${s.mins}" min="1" max="300"
+        onchange="segmentos[${i}].mins=parseInt(this.value)||30">
+      <span style="font-size:12px;color:var(--gray-text)">min</span>
+    </div>`).join('');
+}
+
+function guardarSegmentos(){
+  try{localStorage.setItem('incom_segs',JSON.stringify(segmentos));}catch(e){}
+  mostrarAviso('✓ Tiempos guardados');
+}
+
+// ══════════════════════════════════════════════════════════════
+// DESCARGAR PNG (via html2canvas si disponible, sino aviso)
+// ══════════════════════════════════════════════════════════════
+function descargarPNG(id,nombre){
+  mostrarAviso('📸 Usa captura de pantalla para guardar la imagen');
+}
+
+// Fix: variable duplicada condicion
+</script>
+</body>
+</html>
