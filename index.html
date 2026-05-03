@@ -79,11 +79,11 @@ body{font-family:'Inter',sans-serif;background:var(--gray-bg);color:var(--text);
 .equipo-motivo{font-size:11px;color:var(--red);font-weight:500;margin-top:2px}
 
 /* SELECTOR BUTTONS */
-.sel-grid{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
-.sel-btn{padding:4px 9px;font-size:11px;border-radius:5px;border:1px solid var(--gray-border);background:#fff;cursor:pointer;font-family:'Inter',sans-serif;color:#374151;transition:all .1s}
-.sel-btn:hover{background:var(--blue-light);border-color:#93C5FD}
-.sel-btn.selected{background:var(--blue);color:#fff;border-color:var(--blue)}
-.sel-btn.usado{background:#F3F4F6;color:#9CA3AF;text-decoration:line-through;cursor:not-allowed}
+.sel-grid{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px}
+.sel-btn{padding:8px 14px;font-size:13px;border-radius:8px;border:1.5px solid var(--gray-border);background:#fff;cursor:pointer;font-family:'Inter',sans-serif;color:#374151;transition:all .15s;font-weight:500;min-height:38px;display:flex;align-items:center}
+.sel-btn:hover{background:var(--blue-light);border-color:#93C5FD;color:var(--blue)}
+.sel-btn.selected{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:700;box-shadow:0 2px 8px rgba(0,61,165,0.3)}
+.sel-btn.usado{background:#F3F4F6;color:#9CA3AF;text-decoration:line-through;cursor:not-allowed;opacity:0.6}
 
 /* COND BUTTONS */
 .cond-row{display:flex;gap:6px;margin-bottom:8px}
@@ -210,21 +210,22 @@ input[type=time],input[type=date],input[type=text],select.normal{width:100%;padd
   </div>
 
   <!-- SELECTOR MODAL -->
-  <div id="selector-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:flex-end">
-    <div style="background:#fff;border-radius:16px 16px 0 0;padding:16px;width:100%;max-height:80vh;overflow-y:auto">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <div style="font-size:14px;font-weight:600" id="sel-modal-title">Seleccionar equipo</div>
-        <button onclick="cerrarSelector()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--gray-text)">✕</button>
+  <div id="selector-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:flex;align-items:flex-end">
+    <div style="background:#fff;border-radius:20px 20px 0 0;padding:20px 18px 24px;width:100%;max-height:90vh;overflow-y:auto">
+      <div style="width:40px;height:4px;background:#D1D5DB;border-radius:2px;margin:0 auto 16px"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div style="font-size:17px;font-weight:700;color:#111" id="sel-modal-title">Seleccionar equipo</div>
+        <button onclick="cerrarSelector()" style="background:#F3F4F6;border:none;width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#6B7280">✕</button>
       </div>
-      <div style="font-size:12px;font-weight:600;color:var(--gray-text);margin-bottom:6px">CONDUCTOR</div>
+      <div style="font-size:11px;font-weight:700;color:#6B7280;letter-spacing:.8px;margin-bottom:8px">CONDUCTOR</div>
       <div class="sel-grid" id="grp-cond"></div>
-      <div style="font-size:12px;font-weight:600;color:var(--gray-text);margin:8px 0 6px">TRACTO</div>
+      <div style="font-size:11px;font-weight:700;color:#6B7280;letter-spacing:.8px;margin:14px 0 8px">TRACTO</div>
       <div class="sel-grid" id="grp-tr"></div>
-      <div style="font-size:12px;font-weight:600;color:var(--gray-text);margin:8px 0 6px" id="grp-sm-label">SEMIRREMOLQUE</div>
+      <div style="font-size:11px;font-weight:700;color:#6B7280;letter-spacing:.8px;margin:14px 0 8px" id="grp-sm-label">SEMIRREMOLQUE</div>
       <div class="sel-grid" id="grp-sm"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
-        <button class="btn-primary" style="margin:0" onclick="confirmarEquipo()">✓ Agregar</button>
-        <button class="btn-danger" style="margin:0" onclick="confirmarFueraServicio()">🔴 Fuera de servicio</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px">
+        <button class="btn-primary" style="margin:0;padding:13px;font-size:14px" onclick="confirmarEquipo()">✓ Agregar</button>
+        <button class="btn-danger" style="margin:0;padding:13px;font-size:14px" onclick="confirmarFueraServicio()">🔴 Fuera de servicio</button>
       </div>
     </div>
   </div>
