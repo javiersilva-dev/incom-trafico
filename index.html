@@ -972,7 +972,6 @@ function genTarjetaConductores(tipo){
 // ══════════════════════════════════════════════════════════════
 // SALIDA FAENA
 // ══════════════════════════════════════════════════════════════
-let condicionBat='normal', condicionRam='normal';
 
 function setCondTipo(tipo,c,btn){
   if(tipo==='bat') condicionBat=c; else condicionRam=c;
@@ -986,7 +985,6 @@ function setCondTipo(tipo,c,btn){
   if(el) el.textContent=info[c];
 }
 
-let equiposPoolBat=[], equiposPoolRam=[];
 
 function getGrupos(tipo){ return tipo==='bat'?gruposBat:gruposRam; }
 function getPool(tipo){ return tipo==='bat'?equiposPoolBat:equiposPoolRam; }
