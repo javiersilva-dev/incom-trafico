@@ -1144,7 +1144,9 @@ function agregarConvoyATarjeta(tipo, convoy){
   const grupos=getGrupos(tipo);
   let acum=0;
   for(const g of grupos){acum+=(g.equipos||[]).length;if(g.id===convoy.id)break;}
-  const totalEq=grupos.reduce((s,g)=>s+(g.equipos||[]).length,0);
+  // totalEq = total equipos del día (pool completo, no solo los ya asignados)
+  const pool=getPool(tipo);
+  const totalEq=pool.length||grupos.reduce((s,g)=>s+(g.equipos||[]).length,0);
   const eqs=convoy.equipos||[];
   const gid=convoy.id;
   const nRows=eqs.length+1;
