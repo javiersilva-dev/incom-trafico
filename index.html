@@ -1067,40 +1067,117 @@ function crearConvoyTipo(tipo){
   mostrarAviso('✓ Convoy '+n+' creado — '+sel.length+' equipos · '+hora+' hrs');
 }
 
+function calcTiempoFaena(gid, tipo, horaS, minsToto){
+  const elTt=document.getElementById('tt-'+gid);
+  const elHl=document.getElementById('hl-'+gid);
+  const rtEl=document.getElementById('rt-'+gid);
+  if(!rtEl||!horaS) return;
+  const realToto=rtEl.value;
+  if(!realToto){if(elTt)elTt.textContent='—';return;}
+  const diff=diffMins(horaS,realToto);
+  if(diff===null) return;
+  const atraso=diff-minsToto;
+  const enTiempo=atraso<=5;
+  if(elTt){
+    elTt.textContent=formatMins(diff)+' hrs';
+    elTt.style.color=enTiempo?'#16A34A':'#DC2626';
+  }
+  if(elHl){
+    elHl.style.background=enTiempo?'rgba(22,163,74,0.1)':'rgba(220,38,38,0.1)';
+    const inp=elHl.querySelector('input');
+    if(inp) inp.style.borderColor=enTiempo?'#16A34A':'#DC2626';
+  }
+  // Actualizar texto tiempo total con estado
+  if(elTt){
+    const estadoTxt=enTiempo?' ✓':' ⚠ +'+formatMins(atraso);
+    elTt.innerHTML=formatMins(diff)+'<br><span style="font-size:10px;font-weight:600">'+estadoTxt+'</span>';
+  }
+}
+
 function agregarConvoyATarjeta(tipo, convoy){
-  // Mostrar el contenedor si estaba oculto
   const outEl=document.getElementById('out-faena-'+tipo);
   outEl.classList.remove('hidden');
   const cont=document.getElementById('tarjeta-faena-'+tipo);
-  // Si no tiene la tabla aun, crearla
-  if(!cont.querySelector('table')){
-    iniciarTarjetaFaena(tipo);
-  }
-  // Agregar filas al tbody existente
-  const tbody=cont.querySelector('tbody');
-  const fecha=document.getElementById('f-'+tipo+'-fecha').value||getHoy();
+  if(!cont.querySelector('tbody')) iniciarTarjetaFaena(tipo);
+  const tbody=document.getElementById('tbody-faena-'+tipo)||cont.querySelector('tbody');
+
   const factor=getCond(tipo)==='normal'?1:getCond(tipo)==='precaucion'?1.15:1.30;
-  const totalMins=Math.round(segmentos.reduce((s,sg)=>s+sg.mins,0)*factor);
-  const eta=calcHoraLlegada(convoy.horaS,totalMins);
-  const panneHtml=convoy.panne?`<div style="margin-top:3px;padding:3px 7px;background:#FEE2E2;border-radius:4px;font-size:11px;color:#B91C1C">🔴 Panne: ${convoy.panneEquipo||'—'} · Escolta: ${convoy.panneEscolta||'—'}</div>`:'';
-  // Fila header del convoy
-  const tr0=document.createElement('tr');
-  tr0.style.cssText='background:#1D3557';
-  tr0.innerHTML=`<td colspan="4" style="padding:5px 10px;color:#fff;font-size:11px;font-weight:700">
-    CONVOY ${convoy.num} · Salida KM1: ${convoy.horaS} hrs${convoy.panne?` · 🔴 Panne: ${convoy.panneEquipo}`:''}
-  </td>`;
-  tbody.appendChild(tr0);
-  // Filas de equipos
-  convoy.equipos.forEach((eq,ei)=>{
+  const minsLoros=Math.round((segmentos[0].mins+segmentos[1].mins)*factor);
+  const minsToto=Math.round(segmentos.reduce((s,sg)=>s+sg.mins,0)*factor);
+  const proyLoros=calcHoraLlegada(convoy.horaS,minsLoros);
+  const proyToto=calcHoraLlegada(convoy.horaS,minsToto);
+
+  // Calcular total equipos ya despachados hasta este convoy
+  const grupos=getGrupos(tipo);
+  let acum=0;
+  for(const g of grupos){
+    acum+=(g.equipos||[]).length;
+    if(g.id===convoy.id) break;
+  }
+  const totalEq=grupos.reduce((s,g)=>s+(g.equipos||[]).length,0);
+
+  const eqs=convoy.equipos||[];
+  const gid=convoy.id;
+
+  // Fila 1: primer conductor + fila Los Loros
+  const tr1=document.createElement('tr');
+  tr1.style.cssText='border-bottom:0.5px solid #e2e8f0;background:#fff';
+  tr1.innerHTML=`
+    <td rowspan="${eqs.length+1}" style="padding:8px;font-size:24px;font-weight:900;color:#1D3557;text-align:center;vertical-align:middle;border-right:2px solid #E5E7EB;border-left:3px solid #1D4ED8">${convoy.num}</td>
+    <td style="padding:6px 10px;font-size:12px;font-weight:600;color:#111">${eqs[0]?eqs[0].conductor:'—'}</td>
+    <td style="padding:6px 10px;font-size:11px;color:#6B7280;text-align:center">${eqs[0]?eqs[0].tracto:'—'}</td>
+    <td rowspan="${eqs.length+1}" style="padding:8px;font-size:15px;font-weight:700;color:#1D3557;text-align:center;vertical-align:middle;border-left:1px solid #E5E7EB;border-right:1px solid #E5E7EB">${acum}/${totalEq}</td>
+    <td rowspan="${eqs.length+1}" style="padding:8px;font-size:16px;font-weight:700;color:#003DA5;text-align:center;vertical-align:middle;border-right:1px solid #E5E7EB">${convoy.horaS||'—'}</td>
+    <td style="padding:6px 10px;font-size:12px;font-weight:700;color:#fff;background:#003DA5;text-align:center;white-space:nowrap">Los Loros</td>
+    <td style="padding:6px 10px;font-size:13px;font-weight:600;color:#1D3557;text-align:center">${proyLoros}</td>
+    <td style="padding:6px 8px;text-align:center">
+      <input type="time" id="rl-${gid}" value=""
+        onchange="calcTiempoFaena('${gid}','${tipo}','${convoy.horaS}',${minsToto})"
+        style="padding:3px 5px;border:1px solid #D1D5DB;border-radius:5px;font-size:12px;width:82px;text-align:center;font-family:'Inter',sans-serif">
+    </td>
+    <td rowspan="${eqs.length+1}" id="tt-${gid}" style="padding:8px;font-size:12px;font-weight:700;text-align:center;vertical-align:middle;color:#94a3b8">—</td>`;
+  tbody.appendChild(tr1);
+
+  // Filas intermedias (conductores 2..N-1) + fila Totoralillo en la última
+  for(let ei=1;ei<eqs.length;ei++){
     const tr=document.createElement('tr');
-    tr.style.cssText='border-bottom:0.5px solid #E5E7EB;background:'+(ei%2===0?'#fff':'#F9FAFB');
+    tr.style.cssText='border-bottom:0.5px solid #e2e8f0;background:'+(ei%2===0?'#fff':'#F9FAFB');
+    const esToto=ei===eqs.length-1||eqs.length===1;
     tr.innerHTML=`
-      <td style="padding:6px 10px;font-size:13px;font-weight:700;color:#1D3557;text-align:center">${convoy.num}.${ei+1}</td>
-      <td style="padding:6px 10px;font-size:12px;color:#374151">${eq.conductor||'—'}${ei===0?panneHtml:''}</td>
-      <td style="padding:6px 10px;font-size:13px;font-weight:700;color:#003DA5;text-align:center">${convoy.horaS}</td>
-      <td style="padding:6px 10px;font-size:13px;font-weight:700;color:#1B7E3A;text-align:center">${ei===0?'~'+eta:'↑'}</td>`;
+      <td style="padding:6px 10px;font-size:12px;font-weight:600;color:#111">${eqs[ei].conductor||'—'}</td>
+      <td style="padding:6px 10px;font-size:11px;color:#6B7280;text-align:center">${eqs[ei].tracto||'—'}</td>
+      <td style="padding:6px 10px;font-size:12px;font-weight:700;color:#fff;background:#003DA5;text-align:center;white-space:nowrap">Totoralillo</td>
+      <td style="padding:6px 10px;font-size:13px;font-weight:600;color:#1D3557;text-align:center">${proyToto}</td>
+      <td id="hl-${gid}" style="padding:6px 8px;text-align:center">
+        <input type="time" id="rt-${gid}" value=""
+          onchange="calcTiempoFaena('${gid}','${tipo}','${convoy.horaS}',${minsToto})"
+          style="padding:3px 5px;border:1px solid #D1D5DB;border-radius:5px;font-size:12px;width:82px;text-align:center;font-family:'Inter',sans-serif">
+      </td>`;
     tbody.appendChild(tr);
-  });
+  }
+
+  // Si solo hay 1 conductor, agregar fila Totoralillo aparte
+  if(eqs.length===1){
+    const tr=document.createElement('tr');
+    tr.style.cssText='border-bottom:0.5px solid #e2e8f0;background:#F9FAFB';
+    tr.innerHTML=`
+      <td style="padding:6px 10px;font-size:12px;color:#9CA3AF"></td>
+      <td style="padding:6px 10px"></td>
+      <td style="padding:6px 10px;font-size:12px;font-weight:700;color:#fff;background:#003DA5;text-align:center;white-space:nowrap">Totoralillo</td>
+      <td style="padding:6px 10px;font-size:13px;font-weight:600;color:#1D3557;text-align:center">${proyToto}</td>
+      <td id="hl-${gid}" style="padding:6px 8px;text-align:center">
+        <input type="time" id="rt-${gid}" value=""
+          onchange="calcTiempoFaena('${gid}','${tipo}','${convoy.horaS}',${minsToto})"
+          style="padding:3px 5px;border:1px solid #D1D5DB;border-radius:5px;font-size:12px;width:82px;text-align:center;font-family:'Inter',sans-serif">
+      </td>`;
+    tbody.appendChild(tr);
+  }
+
+  // Separador entre grupos
+  const sep=document.createElement('tr');
+  sep.innerHTML='<td colspan="9" style="height:3px;background:#E5E7EB"></td>';
+  tbody.appendChild(sep);
+
   cont.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
@@ -1108,26 +1185,32 @@ function iniciarTarjetaFaena(tipo){
   const cont=document.getElementById('tarjeta-faena-'+tipo);
   const sup=getSup();
   const fecha=document.getElementById('f-'+tipo+'-fecha').value||getHoy();
-  const tipoLabel=tipo==='bat'?'BATEAS':'RAMPLAS';
+  const tipoLabel=tipo==='bat'?'Transporte de Concentrado / Bateas':'Catodos de Cobre / Ramplas';
   const condLabel={'normal':'Normal','precaucion':'Precaución ⚠️','critica':'Crítica 🔴'}[getCond(tipo)];
   const hora=new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
-  cont.innerHTML=`<div style="font-family:'Segoe UI',Arial,sans-serif;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);max-width:480px;margin:0 auto">
-    <div style="background:#1D3557;padding:12px 16px;display:flex;align-items:center;gap:10px">
-      <div style="background:#fff;border-radius:5px;padding:2px 7px"><span style="font-size:12px;font-weight:900;color:#1D3557;letter-spacing:1px">INCOM</span></div>
-      <div style="flex:1"><div style="font-size:14px;font-weight:700;color:#fff">Salida Faena — ${tipoLabel}</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.7)">${fecha} · Sup: ${sup} · ${condLabel}</div></div>
-      <div style="text-align:right"><div style="font-size:22px;font-weight:700;color:#fff;line-height:1">${hora}</div>
-        <div style="font-size:10px;color:rgba(255,255,255,.6)">hrs</div></div>
+  cont.innerHTML=`<div style="font-family:'Segoe UI',Arial,sans-serif;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12)">
+    <div style="background:#1D3557;padding:10px 14px;text-align:center">
+      <div style="font-size:13px;font-weight:700;color:#fff">${tipoLabel} &nbsp; ${fecha}</div>
+      <div style="font-size:10px;color:rgba(255,255,255,.6)">Sup: ${sup} · ${condLabel}</div>
     </div>
-    <table style="width:100%;border-collapse:collapse">
-      <thead><tr style="background:#F1F5F9">
-        <th style="padding:7px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:center">GRUPO</th>
-        <th style="padding:7px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:left">CONDUCTOR</th>
-        <th style="padding:7px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:center">SALIDA</th>
-        <th style="padding:7px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:center">ETA</th>
-      </tr></thead>
-      <tbody></tbody>
-    </table>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+      <table style="width:100%;border-collapse:collapse;min-width:700px">
+        <thead>
+          <tr style="background:#1D4ED8">
+            <th style="padding:6px 8px;font-size:10px;color:#fff;font-weight:700;text-align:center;white-space:nowrap">GRUPO</th>
+            <th style="padding:6px 8px;font-size:10px;color:#fff;font-weight:700;text-align:left;white-space:nowrap">NOMBRE</th>
+            <th style="padding:6px 8px;font-size:10px;color:#fff;font-weight:700;text-align:center;white-space:nowrap">TRACTO</th>
+            <th style="padding:6px 8px;font-size:10px;color:#fff;font-weight:700;text-align:center;white-space:nowrap">EQ. DESPACHADOS</th>
+            <th style="padding:6px 8px;font-size:10px;color:#fff;font-weight:700;text-align:center;white-space:nowrap">SALIDA K1</th>
+            <th style="padding:6px 8px;font-size:10px;color:#fff;font-weight:700;text-align:center;white-space:nowrap">TRAMOS</th>
+            <th style="padding:6px 8px;font-size:10px;color:#fff;font-weight:700;text-align:center;white-space:nowrap">HORA PROYECTADA</th>
+            <th style="padding:6px 8px;font-size:10px;color:#fff;font-weight:700;text-align:center;white-space:nowrap">HORA DE LLEGADA</th>
+            <th style="padding:6px 8px;font-size:10px;color:#fff;font-weight:700;text-align:center;white-space:nowrap">TIEMPO TOTAL</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-faena-${tipo}"></tbody>
+      </table>
+    </div>
     <div style="background:#f8fafc;padding:6px 14px;display:flex;justify-content:space-between;border-top:0.5px solid #e2e8f0">
       <span style="font-size:10px;color:#94a3b8">Supervisor: <strong style="color:#374151">${sup}</strong></span>
       <span style="font-size:10px;color:#94a3b8">INCOM Control de Tráfico</span>
