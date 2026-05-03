@@ -223,6 +223,10 @@ input[type=time],input[type=date],input[type=text],select.normal{width:100%;padd
       <div class="sel-grid" id="grp-tr"></div>
       <div style="font-size:11px;font-weight:700;color:#6B7280;letter-spacing:.8px;margin:14px 0 8px" id="grp-sm-label">SEMIRREMOLQUE</div>
       <div class="sel-grid" id="grp-sm"></div>
+      <div id="grp-mov-section" class="hidden">
+        <div style="font-size:11px;font-weight:700;color:#6B7280;letter-spacing:.8px;margin:14px 0 8px">MOVIMIENTO</div>
+        <div class="sel-grid" id="grp-mov"></div>
+      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px">
         <button class="btn-primary" style="margin:0;padding:13px;font-size:14px" onclick="confirmarEquipo()">✓ Agregar</button>
         <button class="btn-danger" style="margin:0;padding:13px;font-size:14px" onclick="confirmarFueraServicio()">🔴 Fuera de servicio</button>
@@ -807,6 +811,7 @@ function rowEquipo(eq,i,tipo){
     <div class="equipo-info">
       <div class="equipo-nombre"><span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;background:${eq.fueraServicio?'#DC2626':'#1D3557'};color:#fff;border-radius:50%;font-size:10px;margin-right:6px">${num}</span>${eq.conductor||'—'}</div>
       <div class="equipo-patentes">${eq.tracto||'—'} · ${eq.semi||'—'}</div>
+      ${eq.movimiento?`<div style="font-size:11px;color:#2563EB;font-weight:500;margin-top:2px">→ ${eq.movimiento}</div>`:''}
       ${eq.fueraServicio?`<div class="equipo-motivo">🔴 ${eq.motivo}</div>`:''}
     </div>
     <button class="btn-sm btn-sm-red" onclick="quitarEquipo('${tipo}',${i})">✕</button>
@@ -838,6 +843,19 @@ function abrirSelector(tipo){
   renderSelGrid('grp-tr',TRACTOS,usadosTr,'tr');
   renderSelGrid('grp-sm',semis,usadosSm,'sm');
 
+  // Movimiento solo para ramplas
+  const movSection=document.getElementById('grp-mov-section');
+  if(tipo==='ram'){
+    movSection.classList.remove('hidden');
+    const movs=['Carga','Descarga','Carga de neumáticos','En ruta a base INCOM'];
+    const grpMov=document.getElementById('grp-mov');
+    grpMov.innerHTML=movs.map(m=>`<button class="sel-btn" onclick="selMovimiento(this,'${m}')">${m}</button>`).join('');
+    selCond.mov='';
+  } else {
+    movSection.classList.add('hidden');
+    selCond.mov='';
+  }
+
   document.getElementById('selector-modal').classList.remove('hidden');
 }
 
@@ -857,12 +875,20 @@ function selItem(btn,campo,val){
   selCond[campo]=val;
 }
 
+function selMovimiento(btn, val){
+  document.querySelectorAll('#grp-mov .sel-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selCond.mov=val;
+}
+
 function cerrarSelector(){document.getElementById('selector-modal').classList.add('hidden');}
 
 function confirmarEquipo(){
   if(!selCond.cond||!selCond.tr||!selCond.sm){mostrarAviso('⚠ Selecciona conductor, tracto y semirremolque');return;}
+  if(tipoSelector==='ram'&&!selCond.mov){mostrarAviso('⚠ Selecciona el movimiento de la rampla');return;}
   const arr=tipoSelector==='bat'?planActivo.equiposBat:planActivo.equiposRam;
-  arr.push({conductor:selCond.cond,tracto:selCond.tr,semi:selCond.sm,fueraServicio:false,motivo:''});
+  arr.push({conductor:selCond.cond,tracto:selCond.tr,semi:selCond.sm,
+            movimiento:selCond.mov||'',fueraServicio:false,motivo:''});
   cerrarSelector();
   tipoSelector==='bat'?renderListaBat():renderListaRam();
   guardarStorage();
@@ -918,7 +944,7 @@ function genTarjetaConductores(tipo){
       </td>
       <td style="padding:8px 10px;font-size:13px;color:#475569;text-align:center">${eq.tracto||'—'}</td>
       <td style="padding:8px 10px;font-size:13px;font-weight:700;color:#2563EB;text-align:center">${eq.semi||'—'}</td>
-      <td style="padding:8px 10px;font-size:12px;color:#94a3b8;text-align:center">—</td>
+      <td style="padding:8px 10px;font-size:12px;color:#2563EB;font-weight:600;text-align:center">${eq.movimiento||'—'}</td>
     </tr>`;
   }
 
