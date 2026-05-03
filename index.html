@@ -371,7 +371,7 @@ input[type=time],input[type=date],input[type=text],select.normal{width:100%;padd
     </div>
   </div>
 
-  <div class="card" id="card-disponibles" style="display:none!important">
+  <div class="card" id="card-disponibles" style="display:none">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
       <div class="card-title" style="margin:0">Equipos disponibles</div>
       <span style="font-size:11px;color:var(--gray-text)">Asigna a un grupo →</span>
@@ -931,8 +931,7 @@ function setCond(c,btn){
   document.getElementById('cond-info-txt').textContent=info[c];
 }
 
-// equipos disponibles para armar grupos (cargados desde planificación)
-let equiposDisponibles=[];
+let gfId=0;
 
 function cargarGruposDesdePlan(){
   if(!planActivo){mostrarAviso('⚠ No hay planificación activa');return;}
@@ -940,113 +939,124 @@ function cargarGruposDesdePlan(){
   const arr=tipo==='bateas'?(planActivo.equiposBat||[]):(planActivo.equiposRam||[]);
   const activos=arr.filter(e=>!e.fueraServicio);
   if(!activos.length){mostrarAviso('⚠ No hay equipos activos en la planificación');return;}
-  equiposDisponibles=activos.map((e,i)=>({...e,id:i,usado:true}));
-  gruposFaena=[{num:1,equipos:activos.map((e,i)=>({...e,id:i})),horaS:'',panne:false}];
+  gruposFaena=activos.map((eq,i)=>({
+    id:gfId++,num:i+1,
+    equipos:[{conductor:eq.conductor,tracto:eq.tracto,semi:eq.semi}],
+    horaS:'',panne:false,panneEquipo:'',panneEscolta:''
+  }));
   document.getElementById('f-total').textContent=activos.length;
-  renderDisponibles();
   renderGruposFaena();
-  mostrarAviso('✓ '+activos.length+' equipos cargados en Grupo 1');
-}
-
-function renderDisponibles(){
-  const cont=document.getElementById('equipos-disponibles');
-  if(!equiposDisponibles.length){cont.innerHTML='';cont.parentElement.classList.add('hidden');return;}
-  cont.parentElement.classList.remove('hidden');
-  const libres=equiposDisponibles.filter(e=>!e.usado);
-  if(!libres.length){
-    cont.innerHTML='<p style="font-size:12px;color:#16A34A;padding:4px 0">✓ Todos los equipos fueron asignados a grupos</p>';
-    return;
-  }
-  cont.innerHTML=libres.map(e=>`
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:7px;margin-bottom:4px">
-      <div>
-        <div style="font-size:12px;font-weight:600;color:#111">${e.conductor||'—'}</div>
-        <div style="font-size:11px;color:var(--gray-text)">${e.tracto||'—'} · ${e.semi||'—'}</div>
-      </div>
-      <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">
-        ${gruposFaena.map((g,gi)=>`<button class="btn-sm btn-sm-blue" style="font-size:11px;padding:4px 8px" onclick="asignarAGrupo(${e.id},${gi})">G${g.num}</button>`).join('')}
-        <button class="btn-sm" style="font-size:11px;padding:4px 8px;background:#E0E7FF;color:#3730A3;border:none" onclick="nuevoGrupoConEquipo(${e.id})">+ Grupo</button>
-      </div>
-    </div>`).join('');
-}
-
-function asignarAGrupo(eqId,grupoIdx){
-  const eq=equiposDisponibles.find(e=>e.id===eqId);
-  if(!eq||eq.usado)return;
-  eq.usado=true;
-  gruposFaena[grupoIdx].equipos.push(eq);
-  renderDisponibles();
-  renderGruposFaena();
-}
-
-function nuevoGrupoConEquipo(eqId){
-  const n=gruposFaena.length+1;
-  gruposFaena.push({num:n,equipos:[],horaS:'',panne:false});
-  asignarAGrupo(eqId,gruposFaena.length-1);
+  mostrarAviso('✓ '+activos.length+' equipos cargados');
 }
 
 function addGrupoFaena(){
-  gruposFaena.push({num:gruposFaena.length+1,equipos:[],horaS:'',panne:false});
-  renderDisponibles();
+  gruposFaena.push({id:gfId++,num:gruposFaena.length+1,equipos:[{conductor:'',tracto:'',semi:''}],horaS:'',panne:false,panneEquipo:'',panneEscolta:''});
   renderGruposFaena();
 }
 
-function quitarEquipoDeGrupo(eqId,grupoIdx){
-  const eq=equiposDisponibles.find(e=>e.id===eqId);
-  if(eq)eq.usado=false;
-  gruposFaena[grupoIdx].equipos=gruposFaena[grupoIdx].equipos.filter(e=>e.id!==eqId);
-  renderDisponibles();
-  renderGruposFaena();
-}
-
-function quitarGrupo(idx){
-  // liberar equipos del grupo
-  gruposFaena[idx].equipos.forEach(e=>{const eq=equiposDisponibles.find(x=>x.id===e.id);if(eq)eq.usado=false;});
-  gruposFaena.splice(idx,1);
+function quitarGrupo(gid){
+  gruposFaena=gruposFaena.filter(g=>g.id!==gid);
   gruposFaena.forEach((g,i)=>g.num=i+1);
-  renderDisponibles();
   renderGruposFaena();
+}
+
+function addEqF(gid){
+  leerGrupos();
+  const g=gruposFaena.find(x=>x.id===gid);
+  if(g)g.equipos.push({conductor:'',tracto:'',semi:''});
+  renderGruposFaena();
+}
+
+function quitarEqF(gid,ei){
+  leerGrupos();
+  const g=gruposFaena.find(x=>x.id===gid);
+  if(g&&g.equipos.length>1)g.equipos.splice(ei,1);
+  renderGruposFaena();
+}
+
+function leerGrupos(){
+  gruposFaena.forEach(g=>{
+    const s=document.getElementById('fsal-'+g.id);if(s)g.horaS=s.value;
+    g.equipos.forEach((eq,ei)=>{
+      const c=document.getElementById('fcond-'+g.id+'-'+ei);
+      const t=document.getElementById('ftr-'+g.id+'-'+ei);
+      const sm=document.getElementById('fsm-'+g.id+'-'+ei);
+      if(c)eq.conductor=c.value;if(t)eq.tracto=t.value;if(sm)eq.semi=sm.value;
+    });
+  });
+}
+
+function selConductorOpts(val){
+  return CONDUCTORES.map(c=>`<option value="${c}" ${val===c?'selected':''}>${c}</option>`).join('');
+}
+function selTractoOpts(val){
+  return TRACTOS.map(t=>`<option value="${t}" ${val===t?'selected':''}>${t}</option>`).join('');
+}
+function selSemiOpts(tipo,val){
+  const lista=tipo==='ramplas'?SEMIS_RAM:SEMIS_BAT;
+  return lista.map(s=>`<option value="${s}" ${val===s?'selected':''}>${s}</option>`).join('');
 }
 
 function renderGruposFaena(){
+  const tipo=document.getElementById('f-tipo').value;
   const cont=document.getElementById('grupos-faena-cont');
-  if(!gruposFaena.length){cont.innerHTML='<p style="font-size:12px;color:var(--gray-text);padding:4px 0">Sin grupos — presiona "↓ Cargar desde planificación" o "+ Agregar grupo"</p>';return;}
-  cont.innerHTML=gruposFaena.map((g,i)=>`
+  if(!gruposFaena.length){
+    cont.innerHTML='<p style="font-size:12px;color:var(--gray-text);padding:4px 0">Sin grupos — usa "↓ Desde plan" o "+ Grupo vacío"</p>';
+    return;
+  }
+  cont.innerHTML=gruposFaena.map((g)=>`
     <div class="grupo-card">
       <div class="grupo-header">
-        <div class="grupo-title">Grupo ${g.num} <span style="font-size:11px;color:var(--gray-text);font-weight:400">(${(g.equipos||[]).length} equipos)</span></div>
+        <div class="grupo-title">Grupo ${g.num}</div>
         <div style="display:flex;gap:6px;align-items:center">
-          <input type="time" value="${g.horaS||''}" onchange="gruposFaena[${i}].horaS=this.value"
+          <input type="time" id="fsal-${g.id}" value="${g.horaS||''}"
             style="padding:4px 7px;border:1px solid var(--gray-border);border-radius:6px;font-size:12px;font-family:'Inter',sans-serif">
-          <button class="btn-sm btn-sm-red" onclick="quitarGrupo(${i})">✕</button>
+          <button class="btn-sm btn-sm-red" onclick="leerGrupos();quitarGrupo(${g.id})">✕</button>
         </div>
       </div>
-      ${(g.equipos||[]).length?
-        (g.equipos||[]).map(e=>`
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:5px 8px;background:#fff;border:1px solid #E5E7EB;border-radius:6px;margin-bottom:4px">
-            <div>
-              <div style="font-size:12px;font-weight:600;color:#111">${e.conductor||'—'}</div>
-              <div style="font-size:11px;color:var(--gray-text)">${e.tracto||'—'} · ${e.semi||'—'}</div>
-            </div>
-            <button class="btn-sm btn-sm-red" style="font-size:11px" onclick="quitarEquipoDeGrupo(${e.id},${i})">✕</button>
-          </div>`).join('')
-        :'<p style="font-size:11px;color:var(--gray-text);padding:2px 0">Sin equipos asignados</p>'}
-      <div style="display:flex;align-items:center;gap:6px;margin-top:6px;padding-top:6px;border-top:1px solid #F3F4F6">
-        <input type="checkbox" id="panne-${i}" ${g.panne?'checked':''} onchange="togglePanne(${i},this.checked)">
-        <label for="panne-${i}" style="font-size:12px;color:var(--gray-text)">Equipo en panne</label>
+      ${g.equipos.map((eq,ei)=>`
+        <div style="background:#fff;border:1px solid #E5E7EB;border-radius:7px;padding:8px;margin-bottom:6px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <span style="font-size:11px;font-weight:600;color:#6B7280">Equipo ${ei+1}</span>
+            ${g.equipos.length>1?`<button class="btn-sm btn-sm-red" style="font-size:10px;padding:2px 7px" onclick="leerGrupos();quitarEqF(${g.id},${ei})">✕</button>`:''}
+          </div>
+          <select id="fcond-${g.id}-${ei}"
+            style="width:100%;padding:6px 8px;border:1px solid var(--gray-border);border-radius:6px;font-size:12px;font-family:'Inter',sans-serif;margin-bottom:5px">
+            <option value="">— Conductor —</option>
+            ${selConductorOpts(eq.conductor)}
+          </select>
+          <select id="ftr-${g.id}-${ei}"
+            style="width:100%;padding:6px 8px;border:1px solid var(--gray-border);border-radius:6px;font-size:12px;font-family:'Inter',sans-serif;margin-bottom:5px">
+            <option value="">— Tracto —</option>
+            ${selTractoOpts(eq.tracto)}
+          </select>
+          <select id="fsm-${g.id}-${ei}"
+            style="width:100%;padding:6px 8px;border:1px solid var(--gray-border);border-radius:6px;font-size:12px;font-family:'Inter',sans-serif">
+            <option value="">— Semirremolque —</option>
+            ${selSemiOpts(tipo,eq.semi)}
+          </select>
+        </div>`).join('')}
+      <button class="btn-sm btn-sm-gray" style="width:100%;padding:6px;margin-bottom:8px" onclick="leerGrupos();addEqF(${g.id})">+ Equipo al grupo</button>
+      <div style="display:flex;align-items:center;gap:6px;padding-top:6px;border-top:1px solid #F3F4F6">
+        <input type="checkbox" id="panne-${g.id}" ${g.panne?'checked':''} onchange="leerGrupos();togglePanne(${g.id},this.checked)">
+        <label for="panne-${g.id}" style="font-size:12px;color:var(--gray-text)">Equipo en panne</label>
       </div>
       ${g.panne?`<div style="margin-top:6px;padding:8px;background:#FEF2F2;border-radius:6px;border:1px solid #FECACA">
         <input type="text" placeholder="Equipo en panne (patente)" value="${g.panneEquipo||''}"
-          onchange="gruposFaena[${i}].panneEquipo=this.value"
+          onchange="leerGrupos();gruposFaena.find(x=>x.id==${g.id}).panneEquipo=this.value"
           style="width:100%;padding:6px;border:1px solid #FECACA;border-radius:5px;font-size:12px;font-family:'Inter',sans-serif;margin-bottom:6px;background:#fff">
         <input type="text" placeholder="Escolta: Camioneta + Conductor INCOM" value="${g.panneEscolta||''}"
-          onchange="gruposFaena[${i}].panneEscolta=this.value"
+          onchange="leerGrupos();gruposFaena.find(x=>x.id==${g.id}).panneEscolta=this.value"
           style="width:100%;padding:6px;border:1px solid #FECACA;border-radius:5px;font-size:12px;font-family:'Inter',sans-serif;background:#fff">
       </div>`:''}
     </div>`).join('');
 }
 
-function togglePanne(i,v){gruposFaena[i].panne=v;if(!v){delete gruposFaena[i].panneEquipo;delete gruposFaena[i].panneEscolta;}renderGruposFaena();}
+function togglePanne(gid,v){
+  const g=gruposFaena.find(x=>x.id===gid);
+  if(g){g.panne=v;if(!v){g.panneEquipo='';g.panneEscolta='';}}
+  renderGruposFaena();
+}
 
 function calcHoraLlegada(horaS,minsExtra){
   if(!horaS)return'—';
@@ -1056,6 +1066,7 @@ function calcHoraLlegada(horaS,minsExtra){
 }
 
 function genFaena(){
+  leerGrupos();
   if(!gruposFaena.length){mostrarAviso('⚠ Agrega al menos un grupo');return;}
   const tipo=document.getElementById('f-tipo').value;
   const tipoLabel=tipo==='bateas'?'BATEAS':'RAMPLAS';
