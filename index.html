@@ -1136,7 +1136,8 @@ function agregarConvoyATarjeta(tipo, convoy){
 
   const factor=getCond(tipo)==='normal'?1:getCond(tipo)==='precaucion'?1.15:1.30;
   const minsLoros=Math.round((segmentos[0].mins+segmentos[1].mins)*factor);
-  const minsToto=Math.round(segmentos.reduce((s,sg)=>s+sg.mins,0)*factor);
+  // Excluir último segmento (Totoralillo Descargando) — no es tiempo de viaje
+  const minsToto=Math.round(segmentos.slice(0,-1).reduce((s,sg)=>s+sg.mins,0)*factor);
   const proyLoros=calcHoraLlegada(convoy.horaS,minsLoros);
   const proyToto=calcHoraLlegada(convoy.horaS,minsToto);
 
@@ -1353,7 +1354,8 @@ function actualizarFilaFaena(gid){
   // mins hasta Los Loros = seg 0+1+2 (KM1→T.Lautaro + T.Lautaro→LosLoros + LosLoros→Pabellon NO, solo hasta Los Loros)
   // Los Loros es el tramo 0+1 = seg[0]+seg[1]
   const minsLoros=Math.round((segmentos[0].mins+segmentos[1].mins)*factor);
-  const minsToto=Math.round(segmentos.reduce((s,sg)=>s+sg.mins,0)*factor);
+  // Excluir último segmento (Totoralillo Descargando) — no es tiempo de viaje
+  const minsToto=Math.round(segmentos.slice(0,-1).reduce((s,sg)=>s+sg.mins,0)*factor);
 
   const hr=horasReales[gid]||{};
   const horaReal=hr.toto||'';
@@ -1391,7 +1393,8 @@ function genFaena(){
 
   // Minutos proyectados a Los Loros (seg 0+1) y a Totoralillo (total)
   const minsLoros=Math.round((segmentos[0].mins+segmentos[1].mins)*factor);
-  const minsToto=Math.round(segmentos.reduce((s,sg)=>s+sg.mins,0)*factor);
+  // Excluir último segmento (Totoralillo Descargando) — no es tiempo de viaje
+  const minsToto=Math.round(segmentos.slice(0,-1).reduce((s,sg)=>s+sg.mins,0)*factor);
 
   // Total equipos del día
   const totalEq=gruposFaena.reduce((s,g)=>s+(g.equipos||[]).length,0);
