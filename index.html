@@ -31,7 +31,7 @@ body{font-family:'Inter',sans-serif;background:var(--gray-bg);color:var(--text);
 .main-tab.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
 
 /* LAYOUT */
-.content{max-width:680px;margin:0 auto;padding:12px}
+.content{max-width:960px;margin:0 auto;padding:12px}
 .hidden{display:none!important}
 
 /* CARDS */
@@ -638,7 +638,7 @@ function genMatutino(){
   }
 
   const html=`
-  <div style="font-family:'Segoe UI',Arial,sans-serif;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);max-width:420px;margin:0 auto">
+  <div style="font-family:'Segoe UI',Arial,sans-serif;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);max-width:700px;margin:0 auto">
     <div style="background:#1D3557;padding:12px 16px;display:flex;align-items:center;gap:10px">
       <div style="background:#fff;border-radius:5px;padding:2px 7px"><span style="font-size:12px;font-weight:900;color:#1D3557;letter-spacing:1px">INCOM</span></div>
       <div style="flex:1"><div style="font-size:14px;font-weight:700;color:#fff">Reporte de Turno</div>
@@ -655,7 +655,7 @@ function genMatutino(){
         <div style="background:#f1f5f9;border-radius:10px;overflow:hidden">
           <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 12px;border-bottom:0.5px solid #e2e8f0">
             <span style="font-size:12px;font-weight:700;color:#1D3557">Total equipos del día</span>
-            <span style="font-size:22px;font-weight:900;color:#003DA5;line-height:1">${bT}</span></div>
+            <span style="font-size:28px;font-weight:900;color:#003DA5;line-height:1">${bT}</span></div>
           ${fila('En base',bB)}${fila('En ruta a faena',bRF)}${fila('En faena',bF,true,true)}</div></div>
       <div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
@@ -665,7 +665,7 @@ function genMatutino(){
         <div style="background:#f1f5f9;border-radius:10px;overflow:hidden">
           <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 12px;border-bottom:0.5px solid #e2e8f0">
             <span style="font-size:12px;font-weight:700;color:#1D3557">Total equipos del día</span>
-            <span style="font-size:22px;font-weight:900;color:#003DA5;line-height:1">${rT}</span></div>
+            <span style="font-size:28px;font-weight:900;color:#003DA5;line-height:1">${rT}</span></div>
           ${fila('En carga',rC)}${fila('En descarga',rD)}${fila('En ruta a faena',rRF)}
           ${fila('En faena',rF)}${fila('En ruta a descarga',rRD)}
           ${fila('Carga de neumáticos',rN)}${fila('En ruta a base INCOM',rRB,true,true)}</div></div>
@@ -907,16 +907,16 @@ function genTarjetaConductores(tipo){
 
   function filaEq(eq, i){
     return`<tr style="border-bottom:0.5px solid #e2e8f0">
-      <td style="padding:8px 10px;font-size:13px;font-weight:700;color:#1e293b">
+      <td style="padding:8px 10px;font-size:14px;font-weight:700;color:#1e293b">
         <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;background:#1D3557;color:#fff;border-radius:50%;font-size:10px;margin-right:7px">${i+1}</span>${eq.conductor||'—'}
       </td>
-      <td style="padding:8px 10px;font-size:12px;color:#475569;text-align:center">${eq.tracto||'—'}</td>
-      <td style="padding:8px 10px;font-size:12px;font-weight:700;color:#2563EB;text-align:center">${eq.semi||'—'}</td>
+      <td style="padding:8px 10px;font-size:13px;color:#475569;text-align:center">${eq.tracto||'—'}</td>
+      <td style="padding:8px 10px;font-size:13px;font-weight:700;color:#2563EB;text-align:center">${eq.semi||'—'}</td>
       <td style="padding:8px 10px;font-size:12px;color:#94a3b8;text-align:center">—</td>
     </tr>`;
   }
 
-  const html=`<div style="font-family:'Segoe UI',Arial,sans-serif;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);max-width:100%;margin:0 auto">
+  const html=`<div style="font-family:'Segoe UI',Arial,sans-serif;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);max-width:780px;margin:0 auto">
     <div style="background:linear-gradient(135deg,#1D3557 0%,#2563EB 100%);padding:16px 18px 14px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
         <div style="display:flex;align-items:center;gap:8px">
@@ -927,7 +927,7 @@ function genTarjetaConductores(tipo){
           </div>
         </div>
         <div style="text-align:center;background:rgba(255,255,255,0.15);border-radius:10px;padding:6px 14px;border:1px solid rgba(255,255,255,0.25)">
-          <div style="font-size:38px;font-weight:900;color:#fff;line-height:1">${arr.length}</div>
+          <div style="font-size:44px;font-weight:900;color:#fff;line-height:1">${arr.length}</div>
           <div style="font-size:10px;color:#bfdbfe;font-weight:600;letter-spacing:1px">EQ ${esBat?'BATEAS':'RAMPLAS'}</div>
         </div>
       </div>
@@ -937,7 +937,7 @@ function genTarjetaConductores(tipo){
     </div>
     <table style="width:100%;border-collapse:collapse">
       <thead><tr style="background:#f1f5f9">
-        <th style="padding:8px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:left;letter-spacing:.5px">CONDUCTOR</th>
+        <th style="padding:9px 12px;font-size:11px;color:#64748b;font-weight:700;text-align:left;letter-spacing:.5px">CONDUCTOR</th>
         <th style="padding:8px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:center">TRACTO</th>
         <th style="padding:8px 10px;font-size:10px;color:#f59e0b;font-weight:700;text-align:center">SEMIRREMOLQUE</th>
         <th style="padding:8px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:center">MOVIMIENTO</th>
@@ -1458,7 +1458,7 @@ function genFaena(){
     <tr><td colspan="9" style="height:4px;background:#F1F5F9"></td></tr>`;
   }).join('');
 
-  const html=`<div style="font-family:'Segoe UI',Arial,sans-serif;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);max-width:100%">
+  const html=`<div style="font-family:'Segoe UI',Arial,sans-serif;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);max-width:780px">
     <div style="background:#1D3557;padding:10px 14px;text-align:center">
       <div style="font-size:14px;font-weight:700;color:#fff">${tipoLabel} / ${esBat?'Bateas':'Ramplas'} &nbsp; ${fecha}</div>
     </div>
@@ -1659,7 +1659,7 @@ function genPosicion(){
     });
   });
 
-  const html=`<div style="font-family:'Segoe UI',Arial,sans-serif;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);max-width:100%">
+  const html=`<div style="font-family:'Segoe UI',Arial,sans-serif;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);max-width:780px">
     <div style="background:#1D3557;padding:11px 14px;display:flex;align-items:center;justify-content:space-between">
       <div style="display:flex;align-items:center;gap:8px">
         <div style="background:#fff;border-radius:4px;padding:2px 7px"><span style="font-size:12px;font-weight:900;color:#1D3557;letter-spacing:1px">INCOM</span></div>
@@ -1674,12 +1674,12 @@ function genPosicion(){
       </div>
     </div>
     <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
-      <table style="width:100%;border-collapse:collapse;min-width:700px">
+      <table style="width:100%;border-collapse:collapse">
         <thead>
           <tr style="background:#F1F5F9">
             <th style="padding:6px 8px;font-size:10px;color:#64748b;font-weight:700;text-align:left;white-space:nowrap">CONDUCTOR</th>
             <th style="padding:6px 8px;font-size:10px;color:#64748b;font-weight:700;text-align:left;white-space:nowrap">TRACTO · SEMI</th>
-            ${tramosAbrev.map(t=>`<th style="padding:4px 3px;font-size:8px;color:#64748b;font-weight:700;text-align:center;white-space:nowrap;writing-mode:vertical-rl;min-width:28px">${t}</th>`).join('')}
+            ${tramosAbrev.map(t=>`<th style="padding:4px 3px;font-size:10px;color:#64748b;font-weight:700;text-align:center;white-space:nowrap;writing-mode:vertical-rl;min-width:34px">${t}</th>`).join('')}
             <th style="padding:6px 4px;font-size:10px;color:#64748b;font-weight:700;text-align:center">EST.</th>
             <th style="padding:6px 4px;font-size:10px;color:#64748b;font-weight:700;text-align:center">TIEMPO</th>
             <th style="padding:6px 4px;font-size:10px;color:#003DA5;font-weight:700;text-align:center">ETA</th>
