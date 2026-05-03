@@ -1067,30 +1067,34 @@ function crearConvoyTipo(tipo){
   mostrarAviso('✓ Convoy '+n+' creado — '+sel.length+' equipos · '+hora+' hrs');
 }
 
-function calcTiempoFaena(gid, tipo, horaS, minsToto){
-  const elTt=document.getElementById('tt-'+gid);
-  const elHl=document.getElementById('hl-'+gid);
+function calcTiempoFaena(gid, horaS, minsLoros, minsToto){
+  const rlEl=document.getElementById('rl-'+gid);
   const rtEl=document.getElementById('rt-'+gid);
-  if(!rtEl||!horaS) return;
-  const realToto=rtEl.value;
-  if(!realToto){if(elTt)elTt.textContent='—';return;}
-  const diff=diffMins(horaS,realToto);
-  if(diff===null) return;
-  const atraso=diff-minsToto;
-  const enTiempo=atraso<=5;
-  if(elTt){
-    elTt.textContent=formatMins(diff)+' hrs';
-    elTt.style.color=enTiempo?'#16A34A':'#DC2626';
+  const ttEl=document.getElementById('tt-'+gid);
+  const hlL=document.getElementById('hl-loros-'+gid);
+  const hlT=document.getElementById('hl-toto-'+gid);
+
+  // Los Loros
+  if(rlEl&&rlEl.value&&horaS){
+    const diff=diffMins(horaS,rlEl.value);
+    if(diff!==null){
+      const ok=diff-minsLoros<=5;
+      if(hlL){hlL.style.background=ok?'#DCFCE7':'#FEE2E2';}
+      if(rlEl){rlEl.style.borderColor=ok?'#16A34A':'#DC2626';rlEl.style.color=ok?'#166534':'#B91C1C';}
+    }
   }
-  if(elHl){
-    elHl.style.background=enTiempo?'rgba(22,163,74,0.1)':'rgba(220,38,38,0.1)';
-    const inp=elHl.querySelector('input');
-    if(inp) inp.style.borderColor=enTiempo?'#16A34A':'#DC2626';
-  }
-  // Actualizar texto tiempo total con estado
-  if(elTt){
-    const estadoTxt=enTiempo?' ✓':' ⚠ +'+formatMins(atraso);
-    elTt.innerHTML=formatMins(diff)+'<br><span style="font-size:10px;font-weight:600">'+estadoTxt+'</span>';
+  // Totoralillo + tiempo total
+  if(rtEl&&rtEl.value&&horaS){
+    const diff=diffMins(horaS,rtEl.value);
+    if(diff!==null){
+      const atraso=diff-minsToto;
+      const ok=atraso<=5;
+      if(hlT){hlT.style.background=ok?'#16A34A':'#DC2626';}
+      if(rtEl){rtEl.style.background=ok?'#16A34A':'#DC2626';rtEl.style.color='#fff';rtEl.style.borderColor='transparent';}
+      if(ttEl){
+        ttEl.innerHTML='<div style="font-size:14px;font-weight:900;color:'+(ok?'#16A34A':'#DC2626')+'">'+formatMins(diff)+'</div><div style="font-size:10px;font-weight:600;color:'+(ok?'#16A34A':'#DC2626')+'">'+(ok?'En tiempo':'⚠ +'+formatMins(atraso))+'</div>';
+      }
+    }
   }
 }
 
@@ -1098,8 +1102,8 @@ function agregarConvoyATarjeta(tipo, convoy){
   const outEl=document.getElementById('out-faena-'+tipo);
   outEl.classList.remove('hidden');
   const cont=document.getElementById('tarjeta-faena-'+tipo);
-  if(!cont.querySelector('tbody')) iniciarTarjetaFaena(tipo);
-  const tbody=document.getElementById('tbody-faena-'+tipo)||cont.querySelector('tbody');
+  if(!document.getElementById('tbl-faena-'+tipo)) iniciarTarjetaFaena(tipo);
+  const tbl=document.getElementById('tbl-faena-'+tipo);
 
   const factor=getCond(tipo)==='normal'?1:getCond(tipo)==='precaucion'?1.15:1.30;
   const minsLoros=Math.round((segmentos[0].mins+segmentos[1].mins)*factor);
@@ -1107,76 +1111,81 @@ function agregarConvoyATarjeta(tipo, convoy){
   const proyLoros=calcHoraLlegada(convoy.horaS,minsLoros);
   const proyToto=calcHoraLlegada(convoy.horaS,minsToto);
 
-  // Calcular total equipos ya despachados hasta este convoy
   const grupos=getGrupos(tipo);
   let acum=0;
-  for(const g of grupos){
-    acum+=(g.equipos||[]).length;
-    if(g.id===convoy.id) break;
-  }
+  for(const g of grupos){acum+=(g.equipos||[]).length;if(g.id===convoy.id)break;}
   const totalEq=grupos.reduce((s,g)=>s+(g.equipos||[]).length,0);
-
   const eqs=convoy.equipos||[];
   const gid=convoy.id;
+  const nRows=eqs.length+1; // filas de conductores + 1 fila Totoralillo
 
-  // Fila 1: primer conductor + fila Los Loros
+  // ── HEADER de columnas (se repite por grupo, igual a la imagen) ──
+  const colStyles='background:#1D4ED8;padding:5px 6px;font-size:10px;font-weight:700;color:#fff;text-align:center;white-space:nowrap;letter-spacing:.3px';
+  const hdr=document.createElement('tr');
+  hdr.innerHTML=`
+    <td style="${colStyles}">GRUPO</td>
+    <td style="${colStyles};text-align:left">NOMBRE</td>
+    <td style="${colStyles}">TRACTO</td>
+    <td style="${colStyles}">EQ. DESPACHADOS</td>
+    <td style="${colStyles}">SALIDA K1</td>
+    <td style="${colStyles}">TRAMOS</td>
+    <td style="${colStyles}">HORA PROYECTADA</td>
+    <td style="${colStyles}">HORA DE LLEGADA</td>
+    <td style="${colStyles}">TIEMPO TOTAL</td>`;
+  tbl.appendChild(hdr);
+
+  // ── FILA 1: primer conductor + Los Loros ──
   const tr1=document.createElement('tr');
-  tr1.style.cssText='border-bottom:0.5px solid #e2e8f0;background:#fff';
+  tr1.style.cssText='border-bottom:0.5px solid #CBD5E1;background:#fff';
   tr1.innerHTML=`
-    <td rowspan="${eqs.length+1}" style="padding:8px;font-size:24px;font-weight:900;color:#1D3557;text-align:center;vertical-align:middle;border-right:2px solid #E5E7EB;border-left:3px solid #1D4ED8">${convoy.num}</td>
-    <td style="padding:6px 10px;font-size:12px;font-weight:600;color:#111">${eqs[0]?eqs[0].conductor:'—'}</td>
-    <td style="padding:6px 10px;font-size:11px;color:#6B7280;text-align:center">${eqs[0]?eqs[0].tracto:'—'}</td>
-    <td rowspan="${eqs.length+1}" style="padding:8px;font-size:15px;font-weight:700;color:#1D3557;text-align:center;vertical-align:middle;border-left:1px solid #E5E7EB;border-right:1px solid #E5E7EB">${acum}/${totalEq}</td>
-    <td rowspan="${eqs.length+1}" style="padding:8px;font-size:16px;font-weight:700;color:#003DA5;text-align:center;vertical-align:middle;border-right:1px solid #E5E7EB">${convoy.horaS||'—'}</td>
-    <td style="padding:6px 10px;font-size:12px;font-weight:700;color:#fff;background:#003DA5;text-align:center;white-space:nowrap">Los Loros</td>
-    <td style="padding:6px 10px;font-size:13px;font-weight:600;color:#1D3557;text-align:center">${proyLoros}</td>
-    <td style="padding:6px 8px;text-align:center">
-      <input type="time" id="rl-${gid}" value=""
-        onchange="calcTiempoFaena('${gid}','${tipo}','${convoy.horaS}',${minsToto})"
-        style="padding:3px 5px;border:1px solid #D1D5DB;border-radius:5px;font-size:12px;width:82px;text-align:center;font-family:'Inter',sans-serif">
+    <td rowspan="${nRows}" style="padding:6px 8px;font-size:26px;font-weight:900;color:#fff;background:#1D3557;text-align:center;vertical-align:middle;min-width:36px">${convoy.num}</td>
+    <td style="padding:5px 8px;font-size:12px;font-weight:600;color:#111">${eqs[0]?eqs[0].conductor:'—'}</td>
+    <td style="padding:5px 8px;font-size:11px;color:#6B7280;text-align:center">${eqs[0]?eqs[0].tracto:'—'}</td>
+    <td rowspan="${nRows}" style="padding:6px 8px;font-size:18px;font-weight:700;color:#1D3557;text-align:center;vertical-align:middle;border-left:1px solid #E5E7EB;border-right:1px solid #E5E7EB">${acum}/${totalEq}</td>
+    <td rowspan="${nRows}" style="padding:6px 8px;font-size:18px;font-weight:700;color:#003DA5;text-align:center;vertical-align:middle;border-right:1px solid #E5E7EB">${convoy.horaS||'—'}</td>
+    <td style="padding:5px 8px;font-size:12px;font-weight:700;color:#fff;background:#003DA5;text-align:center">Los Loros</td>
+    <td style="padding:5px 8px;font-size:13px;font-weight:600;color:#1D3557;text-align:center">${proyLoros}</td>
+    <td id="hl-loros-${gid}" style="padding:4px 6px;text-align:center">
+      <input type="time" id="rl-${gid}"
+        onchange="calcTiempoFaena('${gid}','${convoy.horaS}',${minsLoros},${minsToto})"
+        style="padding:3px 5px;border:2px solid #E5E7EB;border-radius:5px;font-size:12px;width:85px;text-align:center;font-family:'Inter',sans-serif;font-weight:600;background:#fff">
     </td>
-    <td rowspan="${eqs.length+1}" id="tt-${gid}" style="padding:8px;font-size:12px;font-weight:700;text-align:center;vertical-align:middle;color:#94a3b8">—</td>`;
-  tbody.appendChild(tr1);
+    <td rowspan="${nRows}" id="tt-${gid}" style="padding:6px 8px;font-size:13px;font-weight:700;text-align:center;vertical-align:middle;color:#94a3b8;min-width:70px">—</td>`;
+  tbl.appendChild(tr1);
 
-  // Filas intermedias (conductores 2..N-1) + fila Totoralillo en la última
+  // ── FILAS intermedias (conductores 2..N) ──
   for(let ei=1;ei<eqs.length;ei++){
     const tr=document.createElement('tr');
-    tr.style.cssText='border-bottom:0.5px solid #e2e8f0;background:'+(ei%2===0?'#fff':'#F9FAFB');
-    const esToto=ei===eqs.length-1||eqs.length===1;
+    tr.style.cssText='border-bottom:0.5px solid #CBD5E1;background:#F9FAFB';
     tr.innerHTML=`
-      <td style="padding:6px 10px;font-size:12px;font-weight:600;color:#111">${eqs[ei].conductor||'—'}</td>
-      <td style="padding:6px 10px;font-size:11px;color:#6B7280;text-align:center">${eqs[ei].tracto||'—'}</td>
-      <td style="padding:6px 10px;font-size:12px;font-weight:700;color:#fff;background:#003DA5;text-align:center;white-space:nowrap">Totoralillo</td>
-      <td style="padding:6px 10px;font-size:13px;font-weight:600;color:#1D3557;text-align:center">${proyToto}</td>
-      <td id="hl-${gid}" style="padding:6px 8px;text-align:center">
-        <input type="time" id="rt-${gid}" value=""
-          onchange="calcTiempoFaena('${gid}','${tipo}','${convoy.horaS}',${minsToto})"
-          style="padding:3px 5px;border:1px solid #D1D5DB;border-radius:5px;font-size:12px;width:82px;text-align:center;font-family:'Inter',sans-serif">
+      <td style="padding:5px 8px;font-size:12px;font-weight:600;color:#111">${eqs[ei].conductor||'—'}</td>
+      <td style="padding:5px 8px;font-size:11px;color:#6B7280;text-align:center">${eqs[ei].tracto||'—'}</td>
+      <td style="padding:5px 8px;font-size:12px;font-weight:700;color:#fff;background:#003DA5;text-align:center">Totoralillo</td>
+      <td style="padding:5px 8px;font-size:13px;font-weight:600;color:#1D3557;text-align:center">${proyToto}</td>
+      <td id="hl-toto-${gid}" style="padding:4px 6px;text-align:center">
+        <input type="time" id="rt-${gid}"
+          onchange="calcTiempoFaena('${gid}','${convoy.horaS}',${minsLoros},${minsToto})"
+          style="padding:3px 5px;border:2px solid #E5E7EB;border-radius:5px;font-size:12px;width:85px;text-align:center;font-family:'Inter',sans-serif;font-weight:600;background:#fff">
       </td>`;
-    tbody.appendChild(tr);
+    tbl.appendChild(tr);
   }
 
-  // Si solo hay 1 conductor, agregar fila Totoralillo aparte
+  // ── FILA Totoralillo (si solo 1 conductor o como fila adicional) ──
   if(eqs.length===1){
     const tr=document.createElement('tr');
-    tr.style.cssText='border-bottom:0.5px solid #e2e8f0;background:#F9FAFB';
+    tr.style.cssText='border-bottom:2px solid #CBD5E1;background:#F9FAFB';
     tr.innerHTML=`
-      <td style="padding:6px 10px;font-size:12px;color:#9CA3AF"></td>
-      <td style="padding:6px 10px"></td>
-      <td style="padding:6px 10px;font-size:12px;font-weight:700;color:#fff;background:#003DA5;text-align:center;white-space:nowrap">Totoralillo</td>
-      <td style="padding:6px 10px;font-size:13px;font-weight:600;color:#1D3557;text-align:center">${proyToto}</td>
-      <td id="hl-${gid}" style="padding:6px 8px;text-align:center">
-        <input type="time" id="rt-${gid}" value=""
-          onchange="calcTiempoFaena('${gid}','${tipo}','${convoy.horaS}',${minsToto})"
-          style="padding:3px 5px;border:1px solid #D1D5DB;border-radius:5px;font-size:12px;width:82px;text-align:center;font-family:'Inter',sans-serif">
+      <td style="padding:5px 8px;font-size:12px;color:#9CA3AF"></td>
+      <td style="padding:5px 8px"></td>
+      <td style="padding:5px 8px;font-size:12px;font-weight:700;color:#fff;background:#003DA5;text-align:center">Totoralillo</td>
+      <td style="padding:5px 8px;font-size:13px;font-weight:600;color:#1D3557;text-align:center">${proyToto}</td>
+      <td id="hl-toto-${gid}" style="padding:4px 6px;text-align:center">
+        <input type="time" id="rt-${gid}"
+          onchange="calcTiempoFaena('${gid}','${convoy.horaS}',${minsLoros},${minsToto})"
+          style="padding:3px 5px;border:2px solid #E5E7EB;border-radius:5px;font-size:12px;width:85px;text-align:center;font-family:'Inter',sans-serif;font-weight:600;background:#fff">
       </td>`;
-    tbody.appendChild(tr);
+    tbl.appendChild(tr);
   }
-
-  // Separador entre grupos
-  const sep=document.createElement('tr');
-  sep.innerHTML='<td colspan="9" style="height:3px;background:#E5E7EB"></td>';
-  tbody.appendChild(sep);
 
   cont.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
@@ -1185,33 +1194,14 @@ function iniciarTarjetaFaena(tipo){
   const cont=document.getElementById('tarjeta-faena-'+tipo);
   const sup=getSup();
   const fecha=document.getElementById('f-'+tipo+'-fecha').value||getHoy();
-  const tipoLabel=tipo==='bat'?'Transporte de Concentrado / Bateas':'Catodos de Cobre / Ramplas';
-  const condLabel={'normal':'Normal','precaucion':'Precaución ⚠️','critica':'Crítica 🔴'}[getCond(tipo)];
-  const hora=new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
-  cont.innerHTML=`<div style="font-family:'Segoe UI',Arial,sans-serif;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12)">
+  const tipoLabel=tipo==='bat'?'Transporte de Concentrado / Catodos de Cobre':'Catodos de Cobre / Ramplas';
+  cont.innerHTML=`<div id="wrap-faena-${tipo}" style="font-family:'Barlow Condensed','Segoe UI',Arial,sans-serif;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.15);max-width:520px;margin:0 auto">
     <div style="background:#1D3557;padding:10px 14px;text-align:center">
-      <div style="font-size:13px;font-weight:700;color:#fff">${tipoLabel} &nbsp; ${fecha}</div>
-      <div style="font-size:10px;color:rgba(255,255,255,.6)">Sup: ${sup} · ${condLabel}</div>
+      <div style="font-size:15px;font-weight:700;color:#fff;letter-spacing:.3px">${tipoLabel} &nbsp; ${fecha}</div>
     </div>
-    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
-      <table style="width:100%;border-collapse:collapse;min-width:700px">
-        <thead>
-          <tr style="background:#1D4ED8">
-            <th style="padding:6px 8px;font-size:10px;color:#fff;font-weight:700;text-align:center;white-space:nowrap">GRUPO</th>
-            <th style="padding:6px 8px;font-size:10px;color:#fff;font-weight:700;text-align:left;white-space:nowrap">NOMBRE</th>
-            <th style="padding:6px 8px;font-size:10px;color:#fff;font-weight:700;text-align:center;white-space:nowrap">TRACTO</th>
-            <th style="padding:6px 8px;font-size:10px;color:#fff;font-weight:700;text-align:center;white-space:nowrap">EQ. DESPACHADOS</th>
-            <th style="padding:6px 8px;font-size:10px;color:#fff;font-weight:700;text-align:center;white-space:nowrap">SALIDA K1</th>
-            <th style="padding:6px 8px;font-size:10px;color:#fff;font-weight:700;text-align:center;white-space:nowrap">TRAMOS</th>
-            <th style="padding:6px 8px;font-size:10px;color:#fff;font-weight:700;text-align:center;white-space:nowrap">HORA PROYECTADA</th>
-            <th style="padding:6px 8px;font-size:10px;color:#fff;font-weight:700;text-align:center;white-space:nowrap">HORA DE LLEGADA</th>
-            <th style="padding:6px 8px;font-size:10px;color:#fff;font-weight:700;text-align:center;white-space:nowrap">TIEMPO TOTAL</th>
-          </tr>
-        </thead>
-        <tbody id="tbody-faena-${tipo}"></tbody>
-      </table>
-    </div>
-    <div style="background:#f8fafc;padding:6px 14px;display:flex;justify-content:space-between;border-top:0.5px solid #e2e8f0">
+    <table id="tbl-faena-${tipo}" style="width:100%;border-collapse:collapse">
+    </table>
+    <div style="background:#f8fafc;padding:6px 12px;display:flex;justify-content:space-between;border-top:1px solid #e2e8f0">
       <span style="font-size:10px;color:#94a3b8">Supervisor: <strong style="color:#374151">${sup}</strong></span>
       <span style="font-size:10px;color:#94a3b8">INCOM Control de Tráfico</span>
     </div>
