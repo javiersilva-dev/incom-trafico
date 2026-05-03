@@ -1195,64 +1195,210 @@ function togglePanne(gid,v){
   });
 }
 
-function calcHoraLlegada(horaS,minsExtra){
-  if(!horaS)return'—';
+function calcHoraLlegada(horaS, minsExtra){
+  if(!horaS) return '—';
   const [h,m]=horaS.split(':').map(Number);
   const tot=h*60+m+minsExtra;
   return String(Math.floor(tot/60)%24).padStart(2,'0')+':'+String(tot%60).padStart(2,'0');
 }
 
-function genFaena(){
-  if(!gruposFaena.length){mostrarAviso('⚠ Agrega al menos un grupo');return;}
-  const tipo=document.getElementById('f-tipo').value;
-  const tipoLabel=tipo==='bateas'?'BATEAS':'RAMPLAS';
-  const sup=getSup(), fecha=document.getElementById('f-fecha').value||getHoy();
-  const factor=condicion==='normal'?1:condicion==='precaucion'?1.15:1.30;
-  const condLabel={'normal':'Normal','precaucion':'Precaución ⚠️','critica':'Crítica 🔴'}[condicion];
-  const minsRuta=Math.round(segmentos.reduce((s,sg)=>s+sg.mins,0)*factor);
+function sumarMins(hora, mins){
+  if(!hora||hora==='—') return '—';
+  const [h,m]=hora.split(':').map(Number);
+  const tot=h*60+m+mins;
+  return String(Math.floor(tot/60)%24).padStart(2,'0')+':'+String(tot%60).padStart(2,'0');
+}
 
-  const rows=gruposFaena.map(g=>{
+function diffMins(h1, h2){
+  // h2 - h1 en minutos
+  if(!h1||!h2||h1==='—'||h2==='—') return null;
+  const [a,b]=h1.split(':').map(Number);
+  const [c,d]=h2.split(':').map(Number);
+  return (c*60+d)-(a*60+b);
+}
+
+function formatMins(m){
+  if(m===null) return '—';
+  const abs=Math.abs(m);
+  return String(Math.floor(abs/60)).padStart(2,'0')+':'+String(abs%60).padStart(2,'0');
+}
+
+// Estado global de horas reales ingresadas por el supervisor
+// horasReales[grupoId] = {loros: 'HH:MM', toto: 'HH:MM'}
+let horasReales={};
+
+function setHoraReal(gid, campo, val){
+  if(!horasReales[gid]) horasReales[gid]={loros:'',toto:''};
+  horasReales[gid][campo]=val;
+  actualizarFilaFaena(gid);
+}
+
+function actualizarFilaFaena(gid){
+  // Recalcular tiempo total y estado para este grupo
+  const g=gruposFaena.find(x=>x.id===gid);
+  if(!g) return;
+  const tipo=document.getElementById('f-tipo').value;
+  const factor=condicion==='normal'?1:condicion==='precaucion'?1.15:1.30;
+  // mins hasta Los Loros = seg 0+1+2 (KM1→T.Lautaro + T.Lautaro→LosLoros + LosLoros→Pabellon NO, solo hasta Los Loros)
+  // Los Loros es el tramo 0+1 = seg[0]+seg[1]
+  const minsLoros=Math.round((segmentos[0].mins+segmentos[1].mins)*factor);
+  const minsToto=Math.round(segmentos.reduce((s,sg)=>s+sg.mins,0)*factor);
+
+  const hr=horasReales[gid]||{};
+  const horaReal=hr.toto||'';
+  const horaLoros=hr.loros||'';
+
+  // Tiempo total real si tenemos hora llegada toto
+  let tiempoTotalEl=document.getElementById('tt-'+gid);
+  let estadoEl=document.getElementById('est-'+gid);
+  let horaLlegadaEl=document.getElementById('hl-'+gid);
+
+  if(horaReal && g.horaS){
+    const diff=diffMins(g.horaS, horaReal);
+    const proyectado=minsToto;
+    const atraso=diff-proyectado;
+    const enTiempo=atraso<=5; // tolerancia 5 min
+    if(tiempoTotalEl) tiempoTotalEl.textContent=formatMins(diff)+' hrs';
+    if(estadoEl){
+      estadoEl.textContent=enTiempo?'✓ En tiempo':'⚠ Retraso +'+formatMins(atraso);
+      estadoEl.style.color=enTiempo?'#16A34A':'#DC2626';
+    }
+    if(horaLlegadaEl){
+      horaLlegadaEl.style.background=enTiempo?'#16A34A':'#DC2626';
+    }
+  }
+}
+
+function genFaena(){
+  if(!gruposFaena.length){mostrarAviso('⚠ Crea al menos un convoy');return;}
+  const tipo=document.getElementById('f-tipo').value;
+  const esBat=tipo==='bateas';
+  const tipoLabel=esBat?'Transporte de Concentrado':'Catodos de Cobre';
+  const sup=getSup();
+  const fecha=document.getElementById('f-fecha').value||getHoy();
+  const factor=condicion==='normal'?1:condicion==='precaucion'?1.15:1.30;
+
+  // Minutos proyectados a Los Loros (seg 0+1) y a Totoralillo (total)
+  const minsLoros=Math.round((segmentos[0].mins+segmentos[1].mins)*factor);
+  const minsToto=Math.round(segmentos.reduce((s,sg)=>s+sg.mins,0)*factor);
+
+  // Total equipos del día
+  const totalEq=gruposFaena.reduce((s,g)=>s+(g.equipos||[]).length,0);
+  let acum=0;
+
+  const filas=gruposFaena.map(g=>{
+    const eqs=g.equipos||[];
+    acum+=eqs.length;
     const hs=g.horaS||'—';
-    const ll=g.horaS?calcHoraLlegada(g.horaS,minsRuta):'—';
-    const equiposGrupo=(g.equipos||[]);
-    const conds=equiposGrupo.length
-      ? equiposGrupo.map(e=>`<span style="display:block">${e.conductor||'—'} · <span style="color:#475569">${e.tracto||'—'} / ${e.semi||'—'}</span></span>`).join('')
-      : '—';
-    const panneHtml=g.panne?`<div style="margin-top:4px;padding:4px 8px;background:#FEE2E2;border-radius:4px;font-size:11px;color:#B91C1C">
-      🔴 Panne: ${g.panneEquipo||'—'} · Escolta: ${g.panneEscolta||'—'}</div>`:'';
-    return`<tr style="border-bottom:1px solid #E5E7EB">
-      <td style="padding:8px 10px;font-size:13px;font-weight:700;color:#1D3557;text-align:center;vertical-align:top">G${g.num}</td>
-      <td style="padding:8px 10px;font-size:12px;color:#374151;vertical-align:top">${conds}${panneHtml}</td>
-      <td style="padding:8px 10px;font-size:13px;font-weight:700;color:#003DA5;text-align:center;vertical-align:top">${hs}</td>
-      <td style="padding:8px 10px;font-size:13px;font-weight:700;color:#1B7E3A;text-align:center;vertical-align:top">${ll}</td>
-    </tr>`;
+    const proyLoros=g.horaS?calcHoraLlegada(g.horaS,minsLoros):'—';
+    const proyToto=g.horaS?calcHoraLlegada(g.horaS,minsToto):'—';
+    const hr=horasReales[g.id]||{};
+    const realLoros=hr.loros||'';
+    const realToto=hr.toto||'';
+
+    // Calcular tiempo total y estado si hay hora real
+    let tiempoTotalTxt='—';
+    let estadoTxt=''; let estadoColor='#94a3b8';
+    let llegadaBg=esBat?'#003DA5':'#1D3557';
+    if(realToto && g.horaS){
+      const diff=diffMins(g.horaS,realToto);
+      const atraso=diff-minsToto;
+      const enTiempo=atraso<=5;
+      tiempoTotalTxt=formatMins(diff)+' hrs';
+      estadoTxt=enTiempo?'En tiempo':'Retraso +'+formatMins(atraso);
+      estadoColor=enTiempo?'#16A34A':'#DC2626';
+      llegadaBg=enTiempo?'#16A34A':'#DC2626';
+    }
+
+    // Filas de conductores del grupo
+    const condRows=eqs.map(eq=>`
+      <tr style="border-bottom:0.5px solid #e2e8f0">
+        <td style="padding:5px 10px;font-size:12px;font-weight:600;color:#111">${eq.conductor||'—'}</td>
+        <td style="padding:5px 10px;font-size:11px;color:#6B7280">${eq.tracto||'—'}</td>
+      </tr>`).join('');
+
+    return`
+    <!-- GRUPO ${g.num} HEADER -->
+    <tr style="background:#1D4ED8">
+      <td style="padding:5px 10px;font-size:11px;font-weight:700;color:#fff;text-align:center">GRUPO</td>
+      <td style="padding:5px 10px;font-size:11px;font-weight:700;color:#fff">NOMBRE</td>
+      <td style="padding:5px 10px;font-size:11px;font-weight:700;color:#fff">TRACTO</td>
+      <td style="padding:5px 10px;font-size:11px;font-weight:700;color:#fff;text-align:center">EQ. DESPACHADOS</td>
+      <td style="padding:5px 10px;font-size:11px;font-weight:700;color:#fff;text-align:center">SALIDA K1</td>
+      <td style="padding:5px 10px;font-size:11px;font-weight:700;color:#fff;text-align:center">TRAMOS</td>
+      <td style="padding:5px 10px;font-size:11px;font-weight:700;color:#fff;text-align:center">HORA PROYECTADA</td>
+      <td style="padding:5px 10px;font-size:11px;font-weight:700;color:#fff;text-align:center">HORA DE LLEGADA</td>
+      <td style="padding:5px 10px;font-size:11px;font-weight:700;color:#fff;text-align:center">TIEMPO TOTAL</td>
+    </tr>
+    <!-- FILA LOS LOROS -->
+    <tr style="border-bottom:0.5px solid #e2e8f0">
+      <td rowspan="${eqs.length+1}" style="padding:8px;font-size:22px;font-weight:900;color:#1D3557;text-align:center;vertical-align:middle;border-right:2px solid #E5E7EB">${g.num}</td>
+      ${eqs.slice(0,1).map(eq=>`
+        <td style="padding:5px 10px;font-size:12px;font-weight:600;color:#111">${eq.conductor||'—'}</td>
+        <td style="padding:5px 10px;font-size:11px;color:#6B7280">${eq.tracto||'—'}</td>
+      `).join('')}
+      <td rowspan="${eqs.length+1}" style="padding:8px;font-size:16px;font-weight:700;color:#1D3557;text-align:center;vertical-align:middle;border-right:2px solid #E5E7EB">${acum}/${totalEq}</td>
+      <td rowspan="${eqs.length+1}" style="padding:8px;font-size:18px;font-weight:700;color:#003DA5;text-align:center;vertical-align:middle;border-right:2px solid #E5E7EB">${hs}</td>
+      <td style="padding:5px 10px;font-size:12px;font-weight:600;color:#fff;background:#003DA5;text-align:center">Los Loros</td>
+      <td style="padding:5px 10px;font-size:12px;font-weight:600;color:#1D3557;text-align:center">${proyLoros}</td>
+      <td style="padding:5px 10px;text-align:center">
+        <input type="time" value="${realLoros}"
+          onchange="setHoraReal(${g.id},'loros',this.value)"
+          style="padding:3px 6px;border:1px solid #D1D5DB;border-radius:5px;font-size:12px;font-family:'Inter',sans-serif;width:80px;text-align:center">
+      </td>
+      <td rowspan="${eqs.length+1}" style="padding:8px;font-size:13px;font-weight:700;text-align:center;vertical-align:middle;color:${estadoColor}" id="tt-${g.id}">${tiempoTotalTxt}</td>
+    </tr>
+    <!-- FILAS RESTO CONDUCTORES + FILA TOTORALILLO -->
+    ${eqs.slice(1).map(eq=>`
+    <tr style="border-bottom:0.5px solid #e2e8f0">
+      <td style="padding:5px 10px;font-size:12px;font-weight:600;color:#111">${eq.conductor||'—'}</td>
+      <td style="padding:5px 10px;font-size:11px;color:#6B7280">${eq.tracto||'—'}</td>
+      <td style="padding:5px 10px;font-size:12px;font-weight:600;color:#fff;background:#003DA5;text-align:center">Totoralillo</td>
+      <td style="padding:5px 10px;font-size:12px;font-weight:600;color:#1D3557;text-align:center">${proyToto}</td>
+      <td style="padding:5px 10px;text-align:center">
+        <input type="time" value="${realToto}"
+          onchange="setHoraReal(${g.id},'toto',this.value)"
+          style="padding:3px 6px;border:1px solid #D1D5DB;border-radius:5px;font-size:12px;font-family:'Inter',sans-serif;width:80px;text-align:center">
+      </td>
+    </tr>`).join('')}
+    ${eqs.length===1?`
+    <tr style="border-bottom:0.5px solid #e2e8f0">
+      <td style="padding:5px 10px;font-size:12px;font-weight:600;color:#111"></td>
+      <td style="padding:5px 10px;font-size:11px;color:#6B7280"></td>
+      <td style="padding:5px 10px;font-size:12px;font-weight:600;color:#fff;background:#003DA5;text-align:center">Totoralillo</td>
+      <td style="padding:5px 10px;font-size:12px;font-weight:600;color:#1D3557;text-align:center">${proyToto}</td>
+      <td id="hl-${g.id}" style="padding:5px 10px;text-align:center;background:${llegadaBg};border-radius:6px">
+        <input type="time" value="${realToto}"
+          onchange="setHoraReal(${g.id},'toto',this.value)"
+          style="padding:3px 6px;border:1px solid rgba(255,255,255,0.4);border-radius:5px;font-size:12px;font-family:'Inter',sans-serif;width:80px;text-align:center;background:transparent;color:#fff;font-weight:700">
+      </td>
+    </tr>`:''}
+    <!-- SEPARADOR -->
+    <tr><td colspan="9" style="height:4px;background:#F1F5F9"></td></tr>`;
   }).join('');
 
-  const html=`<div style="font-family:'Segoe UI',Arial,sans-serif;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);max-width:480px;margin:0 auto">
-    <div style="background:#1D3557;padding:12px 16px;display:flex;align-items:center;gap:10px">
-      <div style="background:#fff;border-radius:5px;padding:2px 7px"><span style="font-size:12px;font-weight:900;color:#1D3557;letter-spacing:1px">INCOM</span></div>
-      <div style="flex:1"><div style="font-size:14px;font-weight:700;color:#fff">Reporte Salida Faena — ${tipoLabel}</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.7)">${fecha} · Sup: ${sup} · Condición: ${condLabel}</div></div>
+  const html=`<div style="font-family:'Segoe UI',Arial,sans-serif;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);max-width:100%">
+    <div style="background:#1D3557;padding:10px 14px;text-align:center">
+      <div style="font-size:14px;font-weight:700;color:#fff">${tipoLabel} / ${esBat?'Bateas':'Ramplas'} &nbsp; ${fecha}</div>
     </div>
-    <table style="width:100%;border-collapse:collapse">
-      <thead><tr style="background:#F1F5F9">
-        <th style="padding:7px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:center">GRUPO</th>
-        <th style="padding:7px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:left">CONDUCTORES / EQUIPOS</th>
-        <th style="padding:7px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:center">SALIDA</th>
-        <th style="padding:7px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:center">LLEGADA</th>
-      </tr></thead>
-      <tbody>${rows}</tbody>
-    </table>
-    <div style="background:#f8fafc;padding:6px 14px;display:flex;justify-content:space-between;border-top:1px solid #E5E7EB">
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+      <table style="width:100%;border-collapse:collapse;min-width:750px">
+        <tbody>${filas}</tbody>
+      </table>
+    </div>
+    <div style="background:#f8fafc;padding:6px 14px;display:flex;justify-content:space-between;border-top:0.5px solid #e2e8f0">
       <span style="font-size:10px;color:#94a3b8">Supervisor: <strong style="color:#374151">${sup}</strong></span>
       <span style="font-size:10px;color:#94a3b8">INCOM Control de Tráfico</span>
     </div>
   </div>`;
 
-  const cont=document.getElementById('tarjeta-faena');
-  cont.innerHTML=html;
-  document.getElementById('out-faena').classList.remove('hidden');
-  cont.scrollIntoView({behavior:'smooth',block:'start'});
+  const contId=document.getElementById('tarjeta-faena')||document.getElementById('tarjeta-faena-bat');
+  if(contId){
+    contId.innerHTML=html;
+    const outEl=document.getElementById('out-faena')||document.getElementById('out-faena-bat');
+    if(outEl) outEl.classList.remove('hidden');
+    contId.scrollIntoView({behavior:'smooth',block:'start'});
+  }
 }
 
 // ══════════════════════════════════════════════════════════════
