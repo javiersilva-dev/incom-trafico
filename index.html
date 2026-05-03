@@ -134,11 +134,12 @@ input[type=time],input[type=date],input[type=text],select.normal{width:100%;padd
 
 <!-- TABS -->
 <div class="main-tabs">
-  <button class="main-tab active" id="tab-btn-plan"     onclick="switchTab('plan')">📋 Plan</button>
-  <button class="main-tab"        id="tab-btn-matutino" onclick="switchTab('matutino')">🕗 8 AM</button>
-  <button class="main-tab"        id="tab-btn-faena"    onclick="switchTab('faena')">🚛 Faena</button>
-  <button class="main-tab"        id="tab-btn-posicion" onclick="switchTab('posicion')">📍 Ruta</button>
-  <button class="main-tab"        id="tab-btn-tiempos"  onclick="switchTab('tiempos')">⚙ Tiempos</button>
+  <button class="main-tab active" id="tab-btn-plan"      onclick="switchTab('plan')">📋 Plan</button>
+  <button class="main-tab"        id="tab-btn-matutino"  onclick="switchTab('matutino')">🕗 8 AM</button>
+  <button class="main-tab"        id="tab-btn-faenabat"  onclick="switchTab('faenabat')">🟢 Bat.</button>
+  <button class="main-tab"        id="tab-btn-faenarам"  onclick="switchTab('faenaram')">🔵 Ram.</button>
+  <button class="main-tab"        id="tab-btn-posicion"  onclick="switchTab('posicion')">📍 Ruta</button>
+  <button class="main-tab"        id="tab-btn-tiempos"   onclick="switchTab('tiempos')">⚙ Tiempos</button>
 </div>
 
 <div class="content">
@@ -194,11 +195,17 @@ input[type=time],input[type=date],input[type=text],select.normal{width:100%;padd
       <button class="btn-outline" onclick="abrirSelector('ram')">+ Agregar equipo</button>
     </div>
 
-    <button class="btn-primary" onclick="genTarjetaConductores()">📋 Generar programación</button>
-    <div id="out-conductores" class="hidden tarjeta-wrap">
-      <div id="tarjeta-conductores"></div>
-      <button class="btn-primary" style="background:#7C3AED;margin-top:10px" onclick="descargarPNG('tarjeta-conductores','programacion_conductores')">⬇ Descargar imagen</button>
-      <p style="font-size:11px;color:var(--gray-text);text-align:center;margin-top:4px">Descarga y envía por WhatsApp a los conductores</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <button class="btn-primary" style="margin:0;background:#1B7E3A" onclick="genTarjetaConductores('bat')">🟢 Programación Bateas</button>
+      <button class="btn-primary" style="margin:0" onclick="genTarjetaConductores('ram')">🔵 Programación Ramplas</button>
+    </div>
+    <div id="out-conductores-bat" class="hidden tarjeta-wrap">
+      <div id="tarjeta-conductores-bat"></div>
+      <p style="font-size:11px;color:var(--gray-text);text-align:center;margin-top:4px">📸 Captura y envía por WhatsApp</p>
+    </div>
+    <div id="out-conductores-ram" class="hidden tarjeta-wrap" style="margin-top:10px">
+      <div id="tarjeta-conductores-ram"></div>
+      <p style="font-size:11px;color:var(--gray-text);text-align:center;margin-top:4px">📸 Captura y envía por WhatsApp</p>
     </div>
   </div>
 
@@ -336,60 +343,100 @@ input[type=time],input[type=date],input[type=text],select.normal{width:100%;padd
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     TAB SALIDA FAENA
-══════════════════════════════════════════ -->
-<div id="tab-faena" class="hidden">
+<div id="tab-faenabat" class="hidden">
 
   <div class="card">
     <div class="card-title">Condición de ruta</div>
     <div class="cond-row">
-      <button class="cond-btn active-normal" id="cond-normal" onclick="setCond('normal',this)">✅ Normal</button>
-      <button class="cond-btn" id="cond-prec"   onclick="setCond('precaucion',this)">⚠️ Precaución</button>
-      <button class="cond-btn" id="cond-crit"   onclick="setCond('critica',this)">🔴 Crítica</button>
+      <button class="cond-btn active-normal" id="cond-bat-normal" onclick="setCondTipo('bat','normal',this)">✅ Normal</button>
+      <button class="cond-btn" id="cond-bat-prec"   onclick="setCondTipo('bat','precaucion',this)">⚠️ Precaución</button>
+      <button class="cond-btn" id="cond-bat-crit"   onclick="setCondTipo('bat','critica',this)">🔴 Crítica</button>
     </div>
-    <div style="font-size:12px;color:var(--gray-text)" id="cond-info-txt">Normal — tiempos estándar de ruta</div>
+    <div style="font-size:12px;color:var(--gray-text)" id="cond-bat-info">Normal — tiempos estándar de ruta</div>
   </div>
 
   <div class="card">
-    <div class="card-title">Tipo de transporte</div>
-    <select id="f-tipo" class="normal">
-      <option value="bateas">Transporte Concentrado — Bateas</option>
-      <option value="ramplas">Transporte Cátodo/Molibdeno — Ramplas</option>
-    </select>
-    <div class="field-row">
-      <span class="field-label">Total equipos</span>
-      <div class="eq-counter">
-        <button onclick="adjNum('f-total',-1)">−</button>
-        <span class="eq-num" id="f-total">0</span>
-        <button onclick="adjNum('f-total',1)">+</button>
-      </div>
+    <div class="section-header section-bat" style="margin-bottom:10px">
+      <span class="section-label">🟢 BATEAS Puerto Totoralillo</span>
     </div>
-    <div class="field-row" style="margin-top:8px">
+    <div class="field-row">
+      <span class="field-label">Total equipos del día</span>
+      <div style="font-size:18px;font-weight:700;color:var(--blue)" id="f-bat-total-lbl">0</div>
+    </div>
+    <div class="field-row">
       <span class="field-label">Fecha</span>
-      <input type="date" id="f-fecha" style="width:auto;padding:6px 8px;border:1px solid var(--gray-border);border-radius:6px;font-size:13px;margin:0">
+      <input type="date" id="f-bat-fecha" style="width:auto;padding:6px 8px;border:1px solid var(--gray-border);border-radius:6px;font-size:13px;margin:0">
     </div>
   </div>
 
-  <div class="card" id="card-pool" style="display:none">
+  <div class="card" id="card-pool-bat" style="display:none">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
       <div class="card-title" style="margin:0">🚛 Equipos disponibles</div>
       <span style="font-size:11px;color:var(--gray-text)">Selecciona para convoy</span>
     </div>
-    <div id="pool-equipos"></div>
+    <div id="pool-equipos-bat"></div>
   </div>
 
   <div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
       <div class="card-title" style="margin:0">Convoys creados</div>
-      <button class="btn-sm" style="background:#7C3AED;color:#fff;border:none;padding:6px 12px;border-radius:6px;font-size:12px" onclick="cargarGruposDesdePlan()">↓ Cargar desde plan</button>
+      <button class="btn-sm" style="background:#7C3AED;color:#fff;border:none;padding:6px 12px;border-radius:6px;font-size:12px" onclick="cargarGruposDesdePlanTipo('bat')">↓ Cargar desde plan</button>
     </div>
-    <div id="grupos-faena-cont"></div>
+    <div id="grupos-faena-cont-bat"></div>
   </div>
 
-  <button class="btn-primary" onclick="genFaena()">📋 Generar tarjeta salida</button>
-  <div id="out-faena" class="hidden tarjeta-wrap">
-    <div id="tarjeta-faena"></div>
+  <button class="btn-primary" onclick="genFaenaTipo('bat')">📋 Generar tarjeta salida</button>
+  <div id="out-faena-bat" class="hidden tarjeta-wrap">
+    <div id="tarjeta-faena-bat"></div>
+    <p style="font-size:11px;color:var(--gray-text);text-align:center;margin-top:8px">📸 Captura y envía por WhatsApp</p>
+  </div>
+</div>
+
+<div id="tab-faenaram" class="hidden">
+
+  <div class="card">
+    <div class="card-title">Condición de ruta</div>
+    <div class="cond-row">
+      <button class="cond-btn active-normal" id="cond-ram-normal" onclick="setCondTipo('ram','normal',this)">✅ Normal</button>
+      <button class="cond-btn" id="cond-ram-prec"   onclick="setCondTipo('ram','precaucion',this)">⚠️ Precaución</button>
+      <button class="cond-btn" id="cond-ram-crit"   onclick="setCondTipo('ram','critica',this)">🔴 Crítica</button>
+    </div>
+    <div style="font-size:12px;color:var(--gray-text)" id="cond-ram-info">Normal — tiempos estándar de ruta</div>
+  </div>
+
+  <div class="card">
+    <div class="section-header section-ram" style="margin-bottom:10px">
+      <span class="section-label">🔵 RAMPLAS Base INCOM Copiapó</span>
+    </div>
+    <div class="field-row">
+      <span class="field-label">Total equipos del día</span>
+      <div style="font-size:18px;font-weight:700;color:var(--blue)" id="f-ram-total-lbl">0</div>
+    </div>
+    <div class="field-row">
+      <span class="field-label">Fecha</span>
+      <input type="date" id="f-ram-fecha" style="width:auto;padding:6px 8px;border:1px solid var(--gray-border);border-radius:6px;font-size:13px;margin:0">
+    </div>
+  </div>
+
+  <div class="card" id="card-pool-ram" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div class="card-title" style="margin:0">🚛 Equipos disponibles</div>
+      <span style="font-size:11px;color:var(--gray-text)">Selecciona para convoy</span>
+    </div>
+    <div id="pool-equipos-ram"></div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div class="card-title" style="margin:0">Convoys creados</div>
+      <button class="btn-sm" style="background:#7C3AED;color:#fff;border:none;padding:6px 12px;border-radius:6px;font-size:12px" onclick="cargarGruposDesdePlanTipo('ram')">↓ Cargar desde plan</button>
+    </div>
+    <div id="grupos-faena-cont-ram"></div>
+  </div>
+
+  <button class="btn-primary" onclick="genFaenaTipo('ram')">📋 Generar tarjeta salida</button>
+  <div id="out-faena-ram" class="hidden tarjeta-wrap">
+    <div id="tarjeta-faena-ram"></div>
     <p style="font-size:11px;color:var(--gray-text);text-align:center;margin-top:8px">📸 Captura y envía por WhatsApp</p>
   </div>
 </div>
@@ -473,7 +520,7 @@ const TRAMOS=[
 // ══════════════════════════════════════════════════════════════
 let planes=[], planActivo=null;
 let condicion='normal';
-let gruposFaena=[];
+let gruposBat=[], gruposRam=[], gruposPosBat=[], gruposPosRam=[];
 let segmentos=TRAMOS.map((t,i)=>({nombre:t,mins:[45,30,20,25,15,20,25,30,20,60][i]||30}));
 let motivoSeleccionado='';
 let tipoSelector='bat';
@@ -511,7 +558,7 @@ window.onload=function(){
 // NAV
 // ══════════════════════════════════════════════════════════════
 function switchTab(t){
-  ['plan','matutino','faena','posicion','tiempos'].forEach(id=>{
+  ['plan','matutino','faenabat','faenaram','posicion','tiempos'].forEach(id=>{
     document.getElementById('tab-'+id).classList.toggle('hidden',id!==t);
     document.getElementById('tab-btn-'+id).classList.toggle('active',id===t);
   });
@@ -839,16 +886,25 @@ function confirmarFuera(){
 }
 
 // ── Tarjeta conductores ───────────────────────────────────────
-function genTarjetaConductores(){
+function genTarjetaConductores(tipo){
   if(!planActivo){mostrarAviso('⚠ Carga una planificación primero');return;}
-  const bat=(planActivo.equiposBat||[]).filter(e=>!e.fueraServicio);
-  const ram=(planActivo.equiposRam||[]).filter(e=>!e.fueraServicio);
-  const fueraBat=(planActivo.equiposBat||[]).filter(e=>e.fueraServicio);
-  const fueraRam=(planActivo.equiposRam||[]).filter(e=>e.fueraServicio);
-  const totalEq=bat.length+ram.length;
-  const fecha=planActivo.fecha||getHoy();
+  const esBat = tipo==='bat';
+  const arr = esBat
+    ? (planActivo.equiposBat||[]).filter(e=>!e.fueraServicio)
+    : (planActivo.equiposRam||[]).filter(e=>!e.fueraServicio);
 
-  function fila(eq,i){
+  if(!arr.length){
+    mostrarAviso('⚠ No hay equipos '+(esBat?'BATEAS':'RAMPLAS')+' activos en la planificación');
+    return;
+  }
+
+  const fecha = planActivo.fecha || getHoy();
+  const colorBanner = esBat ? '#1B7E3A' : '#1D3557';
+  const icono = esBat ? '🟢' : '🔵';
+  const titulo = esBat ? 'BATEAS — Puerto Totoralillo' : 'RAMPLAS — Base INCOM Copiapó';
+  const colorSubtotal = esBat ? '#86efac' : '#93c5fd';
+
+  function filaEq(eq, i){
     return`<tr style="border-bottom:0.5px solid #e2e8f0">
       <td style="padding:8px 10px;font-size:13px;font-weight:700;color:#1e293b">
         <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;background:#1D3557;color:#fff;border-radius:50%;font-size:10px;margin-right:7px">${i+1}</span>${eq.conductor||'—'}
@@ -858,38 +914,24 @@ function genTarjetaConductores(){
       <td style="padding:8px 10px;font-size:12px;color:#94a3b8;text-align:center">—</td>
     </tr>`;
   }
-  function seccion(titulo,arr,colorBanner,icono){
-    if(!arr.length)return'';
-    return`<tr><td colspan="4" style="background:${colorBanner};padding:8px 12px">
-      <span style="color:#fff;font-size:12px;font-weight:700">${icono} ${titulo} (${arr.length} equipo${arr.length!==1?'s':''})</span></td></tr>
-      ${arr.map((eq,i)=>fila(eq,i)).join('')}`;
-  }
-  function filasRojo(arr){
-    return arr.map(eq=>`<tr style="background:#FEF2F2;border-bottom:0.5px solid #FECACA">
-      <td colspan="2" style="padding:7px 10px;font-size:12px;color:#B91C1C;font-weight:600">🔴 ${eq.tracto||'—'} / ${eq.semi||'—'}</td>
-      <td colspan="2" style="padding:7px 10px;font-size:11px;color:#B91C1C;text-align:right">${eq.motivo}</td></tr>`).join('');
-  }
 
   const html=`<div style="font-family:'Segoe UI',Arial,sans-serif;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);max-width:480px;margin:0 auto">
     <div style="background:linear-gradient(135deg,#1D3557 0%,#2563EB 100%);padding:16px 18px 14px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
         <div style="display:flex;align-items:center;gap:8px">
           <div style="background:#fff;border-radius:6px;padding:4px 8px"><span style="font-size:13px;font-weight:900;color:#1D3557;letter-spacing:1px">INCOM</span></div>
-          <div><div style="color:#fff;font-size:11px;font-weight:700">Programación de Equipos</div>
-            <div style="color:#93c5fd;font-size:10px">PROGRAMACION · ${fecha}</div></div>
+          <div>
+            <div style="color:#fff;font-size:11px;font-weight:700">Programación de Equipos</div>
+            <div style="color:#93c5fd;font-size:10px">PROGRAMACION · ${fecha}</div>
+          </div>
         </div>
         <div style="text-align:center;background:rgba(255,255,255,0.15);border-radius:10px;padding:6px 14px;border:1px solid rgba(255,255,255,0.25)">
-          <div style="font-size:38px;font-weight:900;color:#fff;line-height:1">${totalEq}</div>
-          <div style="font-size:10px;color:#bfdbfe;font-weight:600;letter-spacing:1px">EQ Total</div>
+          <div style="font-size:38px;font-weight:900;color:#fff;line-height:1">${arr.length}</div>
+          <div style="font-size:10px;color:#bfdbfe;font-weight:600;letter-spacing:1px">EQ ${esBat?'BATEAS':'RAMPLAS'}</div>
         </div>
       </div>
-      <div style="display:flex;gap:10px">
-        ${bat.length?`<div style="flex:1;background:rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;border:1px solid rgba(255,255,255,0.2);text-align:center">
-          <div style="font-size:28px;font-weight:900;color:#fff;line-height:1">${bat.length}</div>
-          <div style="font-size:10px;color:#86efac;font-weight:600;margin-top:2px">● BATEAS</div></div>`:''}
-        ${ram.length?`<div style="flex:1;background:rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;border:1px solid rgba(255,255,255,0.2);text-align:center">
-          <div style="font-size:28px;font-weight:900;color:#fff;line-height:1">${ram.length}</div>
-          <div style="font-size:10px;color:#93c5fd;font-weight:600;margin-top:2px">● RAMPLAS</div></div>`:''}
+      <div style="background:rgba(255,255,255,0.12);border-radius:8px;padding:7px 12px;border:1px solid rgba(255,255,255,0.2)">
+        <div style="font-size:11px;font-weight:700;color:${colorSubtotal}">${icono} ${titulo}</div>
       </div>
     </div>
     <table style="width:100%;border-collapse:collapse">
@@ -898,13 +940,12 @@ function genTarjetaConductores(){
         <th style="padding:8px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:center">TRACTO</th>
         <th style="padding:8px 10px;font-size:10px;color:#f59e0b;font-weight:700;text-align:center">SEMIRREMOLQUE</th>
         <th style="padding:8px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:center">MOVIMIENTO</th>
-      </thead>
+      </tr></thead>
       <tbody>
-        ${seccion('BATEAS — Puerto Totoralillo',bat,'#1D7A3A','🟢')}
-        ${seccion('RAMPLAS — Base INCOM Copiapó',ram,'#1D3557','🔵')}
-        ${(fueraBat.length||fueraRam.length)?`<tr><td colspan="4" style="background:#B91C1C;padding:8px 12px">
-          <span style="color:#fff;font-size:12px;font-weight:700">🔴 EQUIPOS FUERA DE SERVICIO</span></td></tr>
-          ${filasRojo([...fueraBat,...fueraRam])}`:'' }
+        <tr><td colspan="4" style="background:${colorBanner};padding:8px 12px">
+          <span style="color:#fff;font-size:12px;font-weight:700">${icono} ${titulo} (${arr.length} equipo${arr.length!==1?'s':''})</span>
+        </td></tr>
+        ${arr.map((eq,i)=>filaEq(eq,i)).join('')}
       </tbody>
     </table>
     <div style="background:#f8fafc;padding:8px 14px;display:flex;justify-content:space-between;border-top:1px solid #e2e8f0">
@@ -913,78 +954,91 @@ function genTarjetaConductores(){
     </div>
   </div>`;
 
-  const cont=document.getElementById('tarjeta-conductores');
-  cont.innerHTML=html;
-  document.getElementById('out-conductores').classList.remove('hidden');
+  const contId = esBat ? 'tarjeta-conductores-bat' : 'tarjeta-conductores-ram';
+  const outId  = esBat ? 'out-conductores-bat'     : 'out-conductores-ram';
+  const cont = document.getElementById(contId);
+  cont.innerHTML = html;
+  document.getElementById(outId).classList.remove('hidden');
   cont.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 // ══════════════════════════════════════════════════════════════
 // SALIDA FAENA
 // ══════════════════════════════════════════════════════════════
-function setCond(c,btn){
-  condicion=c;
-  document.querySelectorAll('.cond-btn').forEach(b=>b.className='cond-btn');
+let condicionBat='normal', condicionRam='normal';
+
+function setCondTipo(tipo,c,btn){
+  if(tipo==='bat') condicionBat=c; else condicionRam=c;
+  const prefix='cond-'+tipo+'-';
+  document.querySelectorAll('[id^="'+prefix+'"]').forEach(b=>{
+    if(b.tagName==='BUTTON') b.className='cond-btn';
+  });
   btn.className='cond-btn active-'+({'normal':'normal','precaucion':'prec','critica':'crit'}[c]);
-  const info={'normal':'Normal — tiempos estándar de ruta','precaucion':'Precaución — +15% en tiempos proyectados','critica':'Crítica — +30% en tiempos proyectados'};
-  document.getElementById('cond-info-txt').textContent=info[c];
+  const info={'normal':'Normal — tiempos estándar','precaucion':'Precaución — +15% en tiempos','critica':'Crítica — +30% en tiempos'};
+  const el=document.getElementById('cond-'+tipo+'-info');
+  if(el) el.textContent=info[c];
 }
 
 let gfId=0;
-// Lista de equipos disponibles para armar convoys
-let equiposPool=[];
+let equiposPoolBat=[], equiposPoolRam=[];
 
-function cargarGruposDesdePlan(){
-  if(!planActivo){mostrarAviso('⚠ No hay planificación activa');return;}
-  const tipo=document.getElementById('f-tipo').value;
-  const arr=tipo==='bateas'?(planActivo.equiposBat||[]):(planActivo.equiposRam||[]);
+function getGrupos(tipo){ return tipo==='bat'?gruposBat:gruposRam; }
+function getPool(tipo){ return tipo==='bat'?equiposPoolBat:equiposPoolRam; }
+function getCond(tipo){ return tipo==='bat'?condicionBat:condicionRam; }
+
+function cargarGruposDesdePlanTipo(tipo){
+  if(!planActivo){mostrarAviso('⚠ Carga una planificación primero');return;}
+  const arr=tipo==='bat'?(planActivo.equiposBat||[]):(planActivo.equiposRam||[]);
   const activos=arr.filter(e=>!e.fueraServicio);
   if(!activos.length){mostrarAviso('⚠ No hay equipos activos en la planificación');return;}
-  // Cargar pool de equipos disponibles
-  equiposPool=activos.map((eq,i)=>({id:i,conductor:eq.conductor,tracto:eq.tracto,semi:eq.semi,asignado:false}));
-  gruposFaena=[];
-  document.getElementById('f-total').textContent=activos.length;
-  renderPool();
-  renderGruposFaena();
-  mostrarAviso('✓ '+activos.length+' equipos listos para asignar convoy');
+  const pool=activos.map((e,i)=>({id:i,conductor:e.conductor,tracto:e.tracto,semi:e.semi,asignado:false,_sel:false}));
+  if(tipo==='bat'){equiposPoolBat=pool;gruposBat=[];}
+  else{equiposPoolRam=pool;gruposRam=[];}
+  document.getElementById('f-'+tipo+'-total-lbl').textContent=activos.length;
+  renderPool(tipo);
+  renderGruposFaenaTipo(tipo);
+  mostrarAviso('✓ '+activos.length+' equipos cargados');
 }
 
-function renderPool(){
-  const cont=document.getElementById('pool-equipos');
-  const card=document.getElementById('card-pool');
-  if(!equiposPool.length){card.style.display='none';return;}
+function renderPool(tipo){
+  const pool=getPool(tipo);
+  const card=document.getElementById('card-pool-'+tipo);
+  const cont=document.getElementById('pool-equipos-'+tipo);
+  if(!pool.length){card.style.display='none';return;}
   card.style.display='block';
-  const libres=equiposPool.filter(e=>!e.asignado);
+  const libres=pool.filter(e=>!e.asignado);
   if(!libres.length){
     cont.innerHTML='<p style="font-size:12px;color:#16A34A;font-weight:600;padding:4px 0">✓ Todos los equipos han salido a faena</p>';
     return;
   }
+  const grupos=getGrupos(tipo);
   cont.innerHTML=`
-    <p style="font-size:11px;color:var(--gray-text);margin-bottom:8px">Selecciona los equipos del convoy y presiona "Crear convoy"</p>
+    <p style="font-size:11px;color:var(--gray-text);margin-bottom:8px">Selecciona los equipos del convoy (mín. 2) y asigna hora de salida</p>
     ${libres.map(e=>`
-      <div onclick="toggleSelPool(${e.id})" id="pool-row-${e.id}"
-        style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:#fff;border:1.5px solid #E5E7EB;border-radius:8px;margin-bottom:5px;cursor:pointer;transition:all .15s">
-        <div style="width:20px;height:20px;border-radius:5px;border:2px solid #D1D5DB;display:flex;align-items:center;justify-content:center;flex-shrink:0" id="chk-${e.id}"></div>
+      <div onclick="toggleSelPool('${tipo}',${e.id})" id="pool-row-${tipo}-${e.id}"
+        style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:#fff;border:1.5px solid #E5E7EB;border-radius:8px;margin-bottom:5px;cursor:pointer">
+        <div style="width:20px;height:20px;border-radius:5px;border:2px solid #D1D5DB;display:flex;align-items:center;justify-content:center;flex-shrink:0" id="chk-${tipo}-${e.id}"></div>
         <div style="flex:1;min-width:0">
-          <div style="font-size:12px;font-weight:600;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e.conductor||'—'}</div>
+          <div style="font-size:12px;font-weight:600;color:#111">${e.conductor||'—'}</div>
           <div style="font-size:11px;color:var(--gray-text)">${e.tracto||'—'} · ${e.semi||'—'}</div>
         </div>
       </div>`).join('')}
     <div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px;align-items:center">
       <div style="display:flex;align-items:center;gap:8px">
         <label style="font-size:12px;color:var(--gray-text)">Hora salida:</label>
-        <input type="time" id="pool-hora" style="padding:5px 8px;border:1px solid var(--gray-border);border-radius:6px;font-size:13px;font-family:'Inter',sans-serif">
+        <input type="time" id="pool-hora-${tipo}" style="padding:5px 8px;border:1px solid var(--gray-border);border-radius:6px;font-size:13px;font-family:'Inter',sans-serif">
       </div>
-      <button class="btn-sm btn-sm-blue" style="padding:8px 14px;font-size:13px" onclick="crearConvoy()">🚛 Crear convoy</button>
+      <button class="btn-sm btn-sm-blue" style="padding:8px 14px;font-size:13px" onclick="crearConvoyTipo('${tipo}')">🚛 Crear convoy</button>
     </div>`;
 }
 
-function toggleSelPool(id){
-  const row=document.getElementById('pool-row-'+id);
-  const chk=document.getElementById('chk-'+id);
-  const eq=equiposPool.find(e=>e.id===id);
+function toggleSelPool(tipo,id){
+  const pool=getPool(tipo);
+  const eq=pool.find(e=>e.id===id);
   if(!eq||eq.asignado)return;
   eq._sel=!eq._sel;
+  const row=document.getElementById('pool-row-'+tipo+'-'+id);
+  const chk=document.getElementById('chk-'+tipo+'-'+id);
   if(eq._sel){
     row.style.borderColor='#2563EB';row.style.background='#EFF6FF';
     chk.style.background='#2563EB';chk.style.borderColor='#2563EB';
@@ -995,77 +1049,150 @@ function toggleSelPool(id){
   }
 }
 
-function crearConvoy(){
-  const seleccionados=equiposPool.filter(e=>e._sel&&!e.asignado);
-  if(seleccionados.length<2){mostrarAviso('⚠ Selecciona al menos 2 equipos para el convoy');return;}
-  const hora=document.getElementById('pool-hora').value||'';
-  if(!hora){mostrarAviso('⚠ Ingresa la hora de salida del convoy');return;}
-  // Marcar como asignados
-  seleccionados.forEach(e=>{e.asignado=true;e._sel=false;});
-  const n=gruposFaena.length+1;
-  gruposFaena.push({id:gfId++,num:n,equipos:seleccionados.map(e=>({...e})),horaS:hora,panne:false,panneEquipo:'',panneEscolta:''});
-  renderPool();
-  renderGruposFaena();
-  mostrarAviso('✓ Convoy '+n+' creado — '+seleccionados.length+' equipos · '+hora+' hrs');
+function crearConvoyTipo(tipo){
+  const pool=getPool(tipo);
+  const grupos=getGrupos(tipo);
+  const sel=pool.filter(e=>e._sel&&!e.asignado);
+  if(sel.length<2){mostrarAviso('⚠ Selecciona al menos 2 equipos');return;}
+  const hora=document.getElementById('pool-hora-'+tipo).value;
+  if(!hora){mostrarAviso('⚠ Ingresa la hora de salida');return;}
+  sel.forEach(e=>{e.asignado=true;e._sel=false;});
+  const n=grupos.length+1;
+  const convoy={id:gfId++,num:n,equipos:sel.map(e=>({...e})),horaS:hora,panne:false,panneEquipo:'',panneEscolta:'',tramoActual:null,tramosPasados:[]};
+  grupos.push(convoy);
+  // Agregar convoy a la tarjeta en vivo
+  agregarConvoyATarjeta(tipo, convoy);
+  renderPool(tipo);
+  renderGruposFaenaTipo(tipo);
+  mostrarAviso('✓ Convoy '+n+' creado — '+sel.length+' equipos · '+hora+' hrs');
 }
 
-function quitarGrupo(gid){
-  const g=gruposFaena.find(x=>x.id===gid);
-  if(g){
-    // Devolver equipos al pool
-    g.equipos.forEach(eq=>{
-      const p=equiposPool.find(e=>e.id===eq.id);
-      if(p){p.asignado=false;p._sel=false;}
-    });
+function agregarConvoyATarjeta(tipo, convoy){
+  // Mostrar el contenedor si estaba oculto
+  const outEl=document.getElementById('out-faena-'+tipo);
+  outEl.classList.remove('hidden');
+  const cont=document.getElementById('tarjeta-faena-'+tipo);
+  // Si no tiene la tabla aun, crearla
+  if(!cont.querySelector('table')){
+    iniciarTarjetaFaena(tipo);
   }
-  gruposFaena=gruposFaena.filter(g=>g.id!==gid);
-  gruposFaena.forEach((g,i)=>g.num=i+1);
-  renderPool();
-  renderGruposFaena();
+  // Agregar filas al tbody existente
+  const tbody=cont.querySelector('tbody');
+  const fecha=document.getElementById('f-'+tipo+'-fecha').value||getHoy();
+  const factor=getCond(tipo)==='normal'?1:getCond(tipo)==='precaucion'?1.15:1.30;
+  const totalMins=Math.round(segmentos.reduce((s,sg)=>s+sg.mins,0)*factor);
+  const eta=calcHoraLlegada(convoy.horaS,totalMins);
+  const panneHtml=convoy.panne?`<div style="margin-top:3px;padding:3px 7px;background:#FEE2E2;border-radius:4px;font-size:11px;color:#B91C1C">🔴 Panne: ${convoy.panneEquipo||'—'} · Escolta: ${convoy.panneEscolta||'—'}</div>`:'';
+  // Fila header del convoy
+  const tr0=document.createElement('tr');
+  tr0.style.cssText='background:#1D3557';
+  tr0.innerHTML=`<td colspan="4" style="padding:5px 10px;color:#fff;font-size:11px;font-weight:700">
+    CONVOY ${convoy.num} · Salida KM1: ${convoy.horaS} hrs${convoy.panne?` · 🔴 Panne: ${convoy.panneEquipo}`:''}
+  </td>`;
+  tbody.appendChild(tr0);
+  // Filas de equipos
+  convoy.equipos.forEach((eq,ei)=>{
+    const tr=document.createElement('tr');
+    tr.style.cssText='border-bottom:0.5px solid #E5E7EB;background:'+(ei%2===0?'#fff':'#F9FAFB');
+    tr.innerHTML=`
+      <td style="padding:6px 10px;font-size:13px;font-weight:700;color:#1D3557;text-align:center">${convoy.num}.${ei+1}</td>
+      <td style="padding:6px 10px;font-size:12px;color:#374151">${eq.conductor||'—'}${ei===0?panneHtml:''}</td>
+      <td style="padding:6px 10px;font-size:13px;font-weight:700;color:#003DA5;text-align:center">${convoy.horaS}</td>
+      <td style="padding:6px 10px;font-size:13px;font-weight:700;color:#1B7E3A;text-align:center">${ei===0?'~'+eta:'↑'}</td>`;
+    tbody.appendChild(tr);
+  });
+  cont.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
-function renderGruposFaena(){
-  const cont=document.getElementById('grupos-faena-cont');
-  if(!gruposFaena.length){
-    cont.innerHTML='<p style="font-size:12px;color:var(--gray-text);padding:4px 0">Sin convoys aún — carga la planificación y selecciona equipos arriba</p>';
+function iniciarTarjetaFaena(tipo){
+  const cont=document.getElementById('tarjeta-faena-'+tipo);
+  const sup=getSup();
+  const fecha=document.getElementById('f-'+tipo+'-fecha').value||getHoy();
+  const tipoLabel=tipo==='bat'?'BATEAS':'RAMPLAS';
+  const condLabel={'normal':'Normal','precaucion':'Precaución ⚠️','critica':'Crítica 🔴'}[getCond(tipo)];
+  const hora=new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
+  cont.innerHTML=`<div style="font-family:'Segoe UI',Arial,sans-serif;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);max-width:480px;margin:0 auto">
+    <div style="background:#1D3557;padding:12px 16px;display:flex;align-items:center;gap:10px">
+      <div style="background:#fff;border-radius:5px;padding:2px 7px"><span style="font-size:12px;font-weight:900;color:#1D3557;letter-spacing:1px">INCOM</span></div>
+      <div style="flex:1"><div style="font-size:14px;font-weight:700;color:#fff">Salida Faena — ${tipoLabel}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.7)">${fecha} · Sup: ${sup} · ${condLabel}</div></div>
+      <div style="text-align:right"><div style="font-size:22px;font-weight:700;color:#fff;line-height:1">${hora}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.6)">hrs</div></div>
+    </div>
+    <table style="width:100%;border-collapse:collapse">
+      <thead><tr style="background:#F1F5F9">
+        <th style="padding:7px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:center">GRUPO</th>
+        <th style="padding:7px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:left">CONDUCTOR</th>
+        <th style="padding:7px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:center">SALIDA</th>
+        <th style="padding:7px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:center">ETA</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+    <div style="background:#f8fafc;padding:6px 14px;display:flex;justify-content:space-between;border-top:0.5px solid #e2e8f0">
+      <span style="font-size:10px;color:#94a3b8">Supervisor: <strong style="color:#374151">${sup}</strong></span>
+      <span style="font-size:10px;color:#94a3b8">INCOM Control de Tráfico</span>
+    </div>
+  </div>`;
+}
+
+function quitarGrupo(tipo,gid){
+  const grupos=getGrupos(tipo);
+  const pool=getPool(tipo);
+  const g=grupos.find(x=>x.id===gid);
+  if(g) g.equipos.forEach(eq=>{const p=pool.find(e=>e.id===eq.id);if(p){p.asignado=false;p._sel=false;}});
+  if(tipo==='bat') gruposBat=gruposBat.filter(g=>g.id!==gid);
+  else gruposRam=gruposRam.filter(g=>g.id!==gid);
+  getGrupos(tipo).forEach((g,i)=>g.num=i+1);
+  renderPool(tipo);
+  renderGruposFaenaTipo(tipo);
+  // Regenerar tarjeta completa
+  regenerarTarjetaFaena(tipo);
+}
+
+function regenerarTarjetaFaena(tipo){
+  const grupos=getGrupos(tipo);
+  const cont=document.getElementById('tarjeta-faena-'+tipo);
+  const out=document.getElementById('out-faena-'+tipo);
+  if(!grupos.length){out.classList.add('hidden');cont.innerHTML='';return;}
+  iniciarTarjetaFaena(tipo);
+  grupos.forEach(g=>agregarConvoyATarjeta(tipo,g));
+}
+
+function renderGruposFaenaTipo(tipo){
+  const grupos=getGrupos(tipo);
+  const cont=document.getElementById('grupos-faena-cont-'+tipo);
+  if(!grupos.length){
+    cont.innerHTML='<p style="font-size:12px;color:var(--gray-text);padding:4px 0">Sin convoys — carga la planificación y selecciona equipos arriba</p>';
     return;
   }
-  cont.innerHTML=gruposFaena.map(g=>`
-    <div class="grupo-card">
-      <div class="grupo-header">
+  cont.innerHTML=grupos.map(g=>`
+    <div style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;padding:10px;margin-bottom:6px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
         <div>
-          <div class="grupo-title">Convoy ${g.num} <span style="font-size:11px;color:var(--gray-text);font-weight:400">(${g.equipos.length} equipos)</span></div>
-          <div style="font-size:12px;color:#003DA5;font-weight:600;margin-top:1px">🕐 Salida: ${g.horaS||'—'} hrs</div>
+          <span style="font-size:13px;font-weight:700;color:#1D3557">Convoy ${g.num}</span>
+          <span style="font-size:11px;color:#003DA5;font-weight:600;margin-left:8px">🕐 ${g.horaS} hrs</span>
+          <span style="font-size:11px;color:var(--gray-text);margin-left:6px">(${g.equipos.length} equipos)</span>
         </div>
-        <button class="btn-sm btn-sm-red" onclick="quitarGrupo(${g.id})">✕ Disolver</button>
+        <button class="btn-sm btn-sm-red" style="font-size:11px" onclick="quitarGrupo('${tipo}',${g.id})">✕</button>
       </div>
-      ${g.equipos.map((eq,ei)=>`
-        <div style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:#fff;border:1px solid #E5E7EB;border-radius:7px;margin-bottom:4px">
-          <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;background:#1D3557;color:#fff;border-radius:50%;font-size:10px;font-weight:700;flex-shrink:0">${ei+1}</span>
-          <div style="flex:1;min-width:0">
-            <div style="font-size:12px;font-weight:600;color:#111">${eq.conductor||'—'}</div>
-            <div style="font-size:11px;color:var(--gray-text)">${eq.tracto||'—'} · ${eq.semi||'—'}</div>
-          </div>
+      ${g.equipos.map(eq=>`
+        <div style="font-size:12px;color:#374151;padding:2px 0">
+          · ${eq.conductor||'—'} <span style="color:var(--gray-text)">${eq.tracto||'—'} / ${eq.semi||'—'}</span>
         </div>`).join('')}
-      <div style="display:flex;align-items:center;gap:6px;margin-top:6px;padding-top:6px;border-top:1px solid #F3F4F6">
-        <input type="checkbox" id="panne-${g.id}" ${g.panne?'checked':''} onchange="togglePanne(${g.id},this.checked)">
-        <label for="panne-${g.id}" style="font-size:12px;color:var(--gray-text)">Equipo en panne en este convoy</label>
-      </div>
-      ${g.panne?`<div style="margin-top:6px;padding:8px;background:#FEF2F2;border-radius:6px;border:1px solid #FECACA">
-        <input type="text" placeholder="Equipo en panne (patente)" value="${g.panneEquipo||''}"
-          onchange="gruposFaena.find(x=>x.id==${g.id}).panneEquipo=this.value"
-          style="width:100%;padding:6px;border:1px solid #FECACA;border-radius:5px;font-size:12px;font-family:'Inter',sans-serif;margin-bottom:6px;background:#fff">
-        <input type="text" placeholder="Escolta: Camioneta + Conductor INCOM" value="${g.panneEscolta||''}"
-          onchange="gruposFaena.find(x=>x.id==${g.id}).panneEscolta=this.value"
-          style="width:100%;padding:6px;border:1px solid #FECACA;border-radius:5px;font-size:12px;font-family:'Inter',sans-serif;background:#fff">
-      </div>`:''}
     </div>`).join('');
 }
 
+function genFaenaTipo(tipo){
+  const grupos=getGrupos(tipo);
+  if(!grupos.length){mostrarAviso('⚠ Crea al menos un convoy');return;}
+  regenerarTarjetaFaena(tipo);
+  mostrarAviso('✓ Tarjeta generada');
+}
+
 function togglePanne(gid,v){
-  const g=gruposFaena.find(x=>x.id===gid);
-  if(g){g.panne=v;if(!v){g.panneEquipo='';g.panneEscolta='';}}
-  renderGruposFaena();
+  [...gruposBat,...gruposRam].forEach(g=>{
+    if(g.id===gid){g.panne=v;if(!v){g.panneEquipo='';g.panneEscolta='';}}
+  });
 }
 
 function calcHoraLlegada(horaS,minsExtra){
@@ -1134,82 +1261,212 @@ function genFaena(){
 let gruposPos=[];
 
 function importarGruposPos(){
-  if(!gruposFaena.length){mostrarAviso('⚠ No hay grupos en Salida Faena');return;}
-  gruposPos=gruposFaena.map(g=>({...g,tramo:TRAMOS[0]}));
-  renderGruposPos();mostrarAviso('✓ Grupos importados desde Salida Faena');
+  const bat=gruposBat.map(g=>({...g,tipo:'bat',tramoActual:g.tramoActual??null,tramosPasados:g.tramosPasados??[]}));
+  const ram=gruposRam.map(g=>({...g,tipo:'ram',tramoActual:g.tramoActual??null,tramosPasados:g.tramosPasados??[]}));
+  gruposPos=[...bat,...ram];
+  if(!gruposPos.length){mostrarAviso('⚠ Crea primero convoys en Bat. o Ram.');return;}
+  renderGruposPos();
+  mostrarAviso('✓ '+gruposPos.length+' convoys importados');
 }
 
 function addGrupoPos(){
-  gruposPos.push({num:gruposPos.length+1,conductores:[],tramo:TRAMOS[0],panne:false});
+  gruposPos.push({
+    id:Date.now(), num:gruposPos.length+1,
+    equipos:[], horaS:'', panne:false, panneEquipo:'', panneEscolta:'',
+    tramoActual:null, tramosPasados:[]
+  });
+  renderGruposPos();
+}
+
+function quitarGrupoPos(gid){
+  gruposPos=gruposPos.filter(g=>g.id!==gid);
+  gruposPos.forEach((g,i)=>g.num=i+1);
+  renderGruposPos();
+}
+
+function setTramo(gid, idx){
+  const g=gruposPos.find(x=>x.id===gid);
+  if(!g)return;
+  // todos los tramos antes del seleccionado quedan como pasados
+  g.tramosPasados=Array.from({length:idx},(_,i)=>i);
+  g.tramoActual=idx;
+  renderGruposPos();
+}
+
+function togglePannePos(gid,v){
+  const g=gruposPos.find(x=>x.id===gid);
+  if(g){g.panne=v;if(!v){g.panneEquipo='';g.panneEscolta='';}}
   renderGruposPos();
 }
 
 function renderGruposPos(){
   const cont=document.getElementById('grupos-pos-cont');
-  if(!gruposPos.length){cont.innerHTML='<p style="font-size:12px;color:var(--gray-text);padding:4px 0">Sin grupos</p>';return;}
-  cont.innerHTML=gruposPos.map((g,i)=>`
-    <div class="grupo-card">
-      <div class="grupo-header">
-        <div class="grupo-title">Grupo ${g.num}</div>
-        <button class="btn-sm btn-sm-red" onclick="quitarGrupoPos(${i})">✕</button>
+  if(!gruposPos.length){
+    cont.innerHTML='<p style="font-size:12px;color:var(--gray-text);padding:4px 0">Importa los convoys desde Salida Faena</p>';
+    return;
+  }
+  cont.innerHTML=gruposPos.map(g=>{
+    const ta=g.tramoActual;
+    return`<div class="grupo-card">
+      <div class="grupo-header" style="margin-bottom:8px">
+        <div>
+          <div class="grupo-title">Convoy ${g.num} · ${g.equipos.map(e=>e.conductor||'—').join(', ')}</div>
+          <div style="font-size:11px;color:#6B7280">Salida KM1: ${g.horaS||'—'} hrs</div>
+        </div>
+        <button class="btn-sm btn-sm-red" onclick="quitarGrupoPos(${g.id})">✕</button>
       </div>
-      <select class="tramo-sel" onchange="gruposPos[${i}].tramo=this.value">
-        ${TRAMOS.map(t=>`<option value="${t}" ${g.tramo===t?'selected':''}>${t}</option>`).join('')}
-      </select>
-      <textarea placeholder="Conductores / patentes..." rows="2"
-        style="width:100%;padding:7px;border:1px solid var(--gray-border);border-radius:6px;font-size:12px;font-family:'Inter',sans-serif;resize:none;margin-bottom:6px"
-        onchange="gruposPos[${i}].conductores=this.value.split('\\n').filter(Boolean)">${g.conductores.join('\n')}</textarea>
-      <div style="display:flex;align-items:center;gap:6px">
-        <input type="checkbox" id="pos-panne-${i}" ${g.panne?'checked':''} onchange="togglePannePos(${i},this.checked)">
-        <label for="pos-panne-${i}" style="font-size:12px;color:var(--gray-text)">Equipo en panne</label>
+      <div style="font-size:11px;font-weight:600;color:var(--gray-text);margin-bottom:5px">Selecciona tramo actual:</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">
+        ${TRAMOS.map((t,i)=>{
+          const esPasado=g.tramosPasados.includes(i);
+          const esActual=ta===i;
+          let bg='#F3F4F6',color='#374151',border='#E5E7EB';
+          if(esPasado){bg='#DCFCE7';color='#166534';border='#86EFAC';}
+          if(esActual){bg='#003DA5';color='#fff';border='#003DA5';}
+          return`<button onclick="setTramo(${g.id},${i})"
+            style="padding:3px 8px;font-size:10px;border-radius:5px;border:1.5px solid ${border};background:${bg};color:${color};cursor:pointer;font-family:'Inter',sans-serif;font-weight:${esActual?'700':'400'}">
+            ${esActual?'● ':''}${t.split(' → ')[0]||t}
+          </button>`;
+        }).join('')}
+      </div>
+      ${ta!==null?`<div style="font-size:11px;padding:5px 10px;background:#EFF6FF;border-radius:6px;color:#1D4ED8;font-weight:500;margin-bottom:8px">
+        📍 Actual: ${TRAMOS[ta]}</div>`:''}
+      <div style="display:flex;align-items:center;gap:6px;padding-top:6px;border-top:1px solid #F3F4F6">
+        <input type="checkbox" id="ppos-${g.id}" ${g.panne?'checked':''} onchange="togglePannePos(${g.id},this.checked)">
+        <label for="ppos-${g.id}" style="font-size:12px;color:var(--gray-text)">Equipo en panne</label>
       </div>
       ${g.panne?`<div style="margin-top:6px;padding:8px;background:#FEF2F2;border-radius:6px;border:1px solid #FECACA">
         <input type="text" placeholder="Equipo en panne" value="${g.panneEquipo||''}"
-          onchange="gruposPos[${i}].panneEquipo=this.value"
-          style="width:100%;padding:6px;border:1px solid #FECACA;border-radius:5px;font-size:12px;font-family:'Inter',sans-serif;margin-bottom:6px;background:#fff">
+          onchange="gruposPos.find(x=>x.id==${g.id}).panneEquipo=this.value"
+          style="width:100%;padding:6px;border:1px solid #FECACA;border-radius:5px;font-size:12px;font-family:'Inter',sans-serif;margin-bottom:5px;background:#fff">
         <input type="text" placeholder="Escolta INCOM" value="${g.panneEscolta||''}"
-          onchange="gruposPos[${i}].panneEscolta=this.value"
+          onchange="gruposPos.find(x=>x.id==${g.id}).panneEscolta=this.value"
           style="width:100%;padding:6px;border:1px solid #FECACA;border-radius:5px;font-size:12px;font-family:'Inter',sans-serif;background:#fff">
       </div>`:''}
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
-function quitarGrupoPos(i){gruposPos.splice(i,1);gruposPos.forEach((g,j)=>g.num=j+1);renderGruposPos();}
-function togglePannePos(i,v){gruposPos[i].panne=v;renderGruposPos();}
-
 function genPosicion(){
-  if(!gruposPos.length){mostrarAviso('⚠ Agrega al menos un grupo');return;}
-  const sup=getSup(), hora=new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
+  if(!gruposPos.length){mostrarAviso('⚠ Importa los convoys primero');return;}
+  const sup=getSup();
+  const hora=new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
+  const fecha=getHoy();
+  const tipo=document.getElementById('f-tipo')?document.getElementById('f-tipo').value:'bateas';
+  const tipoLabel=tipo==='ramplas'?'RAMPLAS':'BATEAS';
 
-  const filas=gruposPos.map(g=>{
-    const panneHtml=g.panne?`<div style="margin-top:4px;padding:4px 8px;background:#FEE2E2;border-radius:4px;font-size:11px;color:#B91C1C">
-      🔴 Panne: ${g.panneEquipo||'—'} · Escolta: ${g.panneEscolta||'—'}</div>`:'';
-    const tramoIdx=TRAMOS.indexOf(g.tramo);
-    const semaforo=tramoIdx<=2?'🟢':tramoIdx<=5?'🟡':'🔴';
-    return`<tr style="border-bottom:1px solid #E5E7EB">
-      <td style="padding:8px 10px;font-size:13px;font-weight:700;color:#1D3557;text-align:center">${semaforo} G${g.num}</td>
-      <td style="padding:8px 10px;font-size:12px;color:#374151">${g.conductores.join('<br>')||'—'}${panneHtml}</td>
-      <td style="padding:8px 10px;font-size:12px;color:#fff;background:#003DA5;font-weight:600;text-align:center;border-radius:0 0 0 0">${g.tramo}</td>
+  // Calcular tiempo total de ruta y ETA para cada convoy
+  const totalMins=segmentos.reduce((s,sg)=>s+sg.mins,0);
+  const factor=condicion==='normal'?1:condicion==='precaucion'?1.15:1.30;
+
+  function calcETA(horaS, tramoActual){
+    if(!horaS||tramoActual===null)return'Sin datos';
+    const [h,m]=horaS.split(':').map(Number);
+    const salidaMins=h*60+m;
+    // minutos acumulados hasta el tramo actual
+    const minsHastaActual=segmentos.slice(0,tramoActual).reduce((s,sg)=>s+Math.round(sg.mins*factor),0);
+    // tiempo total
+    const totalMinsAjust=Math.round(totalMins*factor);
+    // ETA llegada
+    const etaMins=salidaMins+totalMinsAjust;
+    const etaH=Math.floor(etaMins/60)%24;
+    const etaM=etaMins%60;
+    const eta=String(etaH).padStart(2,'0')+':'+String(etaM).padStart(2,'0');
+    // Tiempo transcurrido estimado
+    const ahoraMins=new Date().getHours()*60+new Date().getMinutes();
+    const transcurrido=ahoraMins-salidaMins;
+    const restante=totalMinsAjust-transcurrido;
+    const enTiempo=restante>=0;
+    return {eta, enTiempo, restante:Math.abs(restante)};
+  }
+
+  // Abreviaturas de tramos para el header de la tabla
+  const tramosAbrev=[
+    'KM1','T.LAU','L.LOROS','PAB.','NANT.','AC.R5','BYP.TOL','PEAJE PV','CALDERA','TOTORALILLO'
+  ];
+
+  // Generar filas de la tabla por convoy y sus equipos
+  let rows='';
+  gruposPos.forEach(g=>{
+    const eqCount=g.equipos.length;
+    const ta=g.tramoActual;
+    const etaInfo=calcETA(g.horaS, ta);
+    const etaTxt=typeof etaInfo==='string'?etaInfo:etaInfo.eta;
+    const enTiempo=typeof etaInfo==='object'?etaInfo.enTiempo:null;
+    const semaforo=ta===null?'⚪':ta>=8?'🔴':ta>=5?'🟡':'🟢';
+    const estadoTxt=ta===null?'Sin datos':enTiempo?'En tiempo':'Demorado';
+    const estadoColor=ta===null?'#94a3b8':enTiempo?'#16A34A':'#DC2626';
+
+    // Fila de header del grupo
+    rows+=`<tr style="background:#1D3557">
+      <td colspan="${2+TRAMOS.length+3}" style="padding:5px 10px;color:#fff;font-size:11px;font-weight:700">
+        GRUPO ${g.num} · Salida KM1: ${g.horaS||'—'} hrs
+        ${g.panne?`<span style="margin-left:8px;background:#DC2626;color:#fff;padding:1px 7px;border-radius:4px;font-size:10px">🔴 PANNE: ${g.panneEquipo||'—'} · Escolta: ${g.panneEscolta||'—'}</span>`:''}
+      </td>
     </tr>`;
-  }).join('');
 
-  const html=`<div style="font-family:'Segoe UI',Arial,sans-serif;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);max-width:480px;margin:0 auto">
-    <div style="background:#1D3557;padding:12px 16px;display:flex;align-items:center;gap:10px">
-      <div style="background:#fff;border-radius:5px;padding:2px 7px"><span style="font-size:12px;font-weight:900;color:#1D3557;letter-spacing:1px">INCOM</span></div>
-      <div style="flex:1"><div style="font-size:14px;font-weight:700;color:#fff">Posición en Ruta</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.7)">${getHoy()} · ${hora} hrs · Sup: ${sup}</div></div>
+    // Filas de cada equipo del convoy
+    g.equipos.forEach((eq,ei)=>{
+      // Marcas de tramos
+      const tramoCells=TRAMOS.map((_,ti)=>{
+        const pasado=g.tramosPasados.includes(ti);
+        const actual=ta===ti;
+        if(actual) return`<td style="text-align:center;background:#003DA5;padding:3px 2px"><span style="color:#fff;font-size:13px">●</span></td>`;
+        if(pasado) return`<td style="text-align:center;padding:3px 2px"><span style="color:#16A34A;font-size:13px">✓</span></td>`;
+        return`<td style="padding:3px 2px"></td>`;
+      }).join('');
+
+      // Solo en la primera fila del grupo mostrar EST/TIEMPO/ETA con rowspan
+      const extraCols=ei===0?`
+        <td rowspan="${eqCount}" style="text-align:center;font-size:14px;padding:4px 6px">${semaforo}</td>
+        <td rowspan="${eqCount}" style="text-align:center;font-size:11px;font-weight:600;color:${estadoColor};padding:4px 6px">${estadoTxt}</td>
+        <td rowspan="${eqCount}" style="text-align:center;font-size:12px;font-weight:700;color:#003DA5;padding:4px 6px">${etaTxt==='Sin datos'?'—':'~'+etaTxt}</td>`:'';
+
+      const bgRow=ei%2===0?'#fff':'#F9FAFB';
+      rows+=`<tr style="background:${bgRow};border-bottom:0.5px solid #E5E7EB">
+        <td style="padding:5px 8px;font-size:12px;font-weight:600;color:#111;white-space:nowrap">${eq.conductor||'—'}</td>
+        <td style="padding:5px 8px;font-size:11px;color:#6B7280;white-space:nowrap">${eq.tracto||'—'} · ${eq.semi||'—'}</td>
+        ${tramoCells}
+        ${extraCols}
+      </tr>`;
+    });
+  });
+
+  const html=`<div style="font-family:'Segoe UI',Arial,sans-serif;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);max-width:100%">
+    <div style="background:#1D3557;padding:11px 14px;display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="background:#fff;border-radius:4px;padding:2px 7px"><span style="font-size:12px;font-weight:900;color:#1D3557;letter-spacing:1px">INCOM</span></div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:#fff">Posición en Ruta — ${tipoLabel}</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.7)">${fecha} · Sup: ${sup}</div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:24px;font-weight:700;color:#fff;line-height:1">${hora}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.6)">hrs</div>
+      </div>
     </div>
-    <table style="width:100%;border-collapse:collapse">
-      <thead><tr style="background:#F1F5F9">
-        <th style="padding:7px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:center">GRUPO</th>
-        <th style="padding:7px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:left">EQUIPOS</th>
-        <th style="padding:7px 10px;font-size:10px;color:#64748b;font-weight:700;text-align:center">UBICACIÓN</th>
-      </tr></thead>
-      <tbody>${filas}</tbody>
-    </table>
-    <div style="background:#f8fafc;padding:6px 14px;display:flex;justify-content:space-between;border-top:1px solid #E5E7EB">
-      <span style="font-size:10px;color:#94a3b8">🟢 Inicio · 🟡 Ruta media · 🔴 Llegada</span>
-      <span style="font-size:10px;color:#94a3b8">INCOM Control de Tráfico</span>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+      <table style="width:100%;border-collapse:collapse;min-width:700px">
+        <thead>
+          <tr style="background:#F1F5F9">
+            <th style="padding:6px 8px;font-size:10px;color:#64748b;font-weight:700;text-align:left;white-space:nowrap">CONDUCTOR</th>
+            <th style="padding:6px 8px;font-size:10px;color:#64748b;font-weight:700;text-align:left;white-space:nowrap">TRACTO · SEMI</th>
+            ${tramosAbrev.map(t=>`<th style="padding:4px 3px;font-size:8px;color:#64748b;font-weight:700;text-align:center;white-space:nowrap;writing-mode:vertical-rl;min-width:28px">${t}</th>`).join('')}
+            <th style="padding:6px 4px;font-size:10px;color:#64748b;font-weight:700;text-align:center">EST.</th>
+            <th style="padding:6px 4px;font-size:10px;color:#64748b;font-weight:700;text-align:center">TIEMPO</th>
+            <th style="padding:6px 4px;font-size:10px;color:#003DA5;font-weight:700;text-align:center">ETA</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div style="background:#f8fafc;padding:6px 12px;display:flex;justify-content:space-between;align-items:center;border-top:0.5px solid #e2e8f0;flex-wrap:wrap;gap:4px">
+      <div style="font-size:10px;color:#94a3b8">Sup: <strong style="color:#374151">${sup}</strong>
+        &nbsp;·&nbsp; ✓ pasado &nbsp;·&nbsp; <span style="color:#003DA5">●</span> actual
+        &nbsp;·&nbsp; 🟢 en tiempo &nbsp;·&nbsp; 🟡 leve &nbsp;·&nbsp; 🔴 demora
+      </div>
+      <div style="font-size:10px;color:#94a3b8">INCOM Control de Tráfico</div>
     </div>
   </div>`;
 
