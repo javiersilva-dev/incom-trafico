@@ -21,13 +21,13 @@ body{font-family:'Inter',sans-serif;background:var(--gray-bg);color:var(--text);
 /* TOP */
 .topbar{background:var(--navy);padding:0 1rem;display:flex;align-items:center;gap:10px;height:50px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.3)}
 .topbar-logo{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:#fff;letter-spacing:1px;border:1.5px solid rgba(255,255,255,0.4);padding:2px 10px;border-radius:4px}
-.topbar-title{font-size:12px;color:rgba(255,255,255,0.75);flex:1}
+.topbar-title{font-size:14px;color:rgba(255,255,255,0.9);flex:1;font-weight:500}
 .topbar select{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:#fff;font-family:'Inter',sans-serif;font-size:12px;padding:5px 8px;border-radius:6px;outline:none;max-width:180px}
 .topbar select option{background:#1D3557;color:#fff}
 
 /* TABS */
 .main-tabs{display:flex;background:#fff;border-bottom:1px solid var(--gray-border);overflow-x:auto;-webkit-overflow-scrolling:touch;position:sticky;top:50px;z-index:99}
-.main-tab{flex:1;min-width:75px;padding:10px 4px;font-family:'Inter',sans-serif;font-size:11px;font-weight:500;color:var(--gray-text);background:transparent;border:none;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap;transition:color .15s}
+.main-tab{flex:1;min-width:100px;padding:12px 8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:var(--gray-text);background:transparent;border:none;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap;transition:color .15s}
 .main-tab.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
 
 /* LAYOUT */
@@ -135,10 +135,10 @@ input[type=time],input[type=date],input[type=text],select.normal{width:100%;padd
 <!-- TABS -->
 <div class="main-tabs">
   <button class="main-tab active" id="tab-btn-plan"      onclick="switchTab('plan')">📋 Plan</button>
-  <button class="main-tab"        id="tab-btn-matutino"  onclick="switchTab('matutino')">🕗 8 AM</button>
-  <button class="main-tab"        id="tab-btn-faenabat"  onclick="switchTab('faenabat')">🟢 Bat.</button>
-  <button class="main-tab"        id="tab-btn-faenarам"  onclick="switchTab('faenaram')">🔵 Ram.</button>
-  <button class="main-tab"        id="tab-btn-posicion"  onclick="switchTab('posicion')">📍 Ruta</button>
+  <button class="main-tab"        id="tab-btn-matutino"  onclick="switchTab('matutino')">🕗 Rep. 8 AM</button>
+  <button class="main-tab"        id="tab-btn-faenabat"  onclick="switchTab('faenabat')">🟢 Bateas</button>
+  <button class="main-tab"        id="tab-btn-faenaram"  onclick="switchTab('faenaram')">🔵 Ramplas</button>
+  <button class="main-tab"        id="tab-btn-posicion"  onclick="switchTab('posicion')">📍 Pos. Ruta</button>
   <button class="main-tab"        id="tab-btn-tiempos"   onclick="switchTab('tiempos')">⚙ Tiempos</button>
 </div>
 
@@ -522,6 +522,9 @@ const TRAMOS=[
 let planes=[], planActivo=null;
 let condicion='normal';
 let gruposBat=[], gruposRam=[], gruposPosBat=[], gruposPosRam=[];
+let equiposPoolBat=[], equiposPoolRam=[];
+let condicionBat='normal', condicionRam='normal';
+let gfId=0;
 let segmentos=TRAMOS.map((t,i)=>({nombre:t,mins:[45,30,20,25,15,20,25,30,20,60][i]||30}));
 let motivoSeleccionado='';
 let tipoSelector='bat';
@@ -549,7 +552,10 @@ window.onload=function(){
   renderSegmentos();
 
   // Fecha faena
-  document.getElementById('f-fecha').value=new Date().toISOString().slice(0,10);
+  const fFecha=document.getElementById('f-fecha');
+  if(fFecha)fFecha.value=new Date().toISOString().slice(0,10);
+  const hoy=new Date().toISOString().slice(0,10);
+  ['f-bat-fecha','f-ram-fecha'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=hoy;});
 
   // Fecha actual en reporte
   switchTab('plan');
@@ -980,7 +986,6 @@ function setCondTipo(tipo,c,btn){
   if(el) el.textContent=info[c];
 }
 
-let gfId=0;
 let equiposPoolBat=[], equiposPoolRam=[];
 
 function getGrupos(tipo){ return tipo==='bat'?gruposBat:gruposRam; }
@@ -1579,118 +1584,130 @@ function genPosicion(){
   const sup=getSup();
   const hora=new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
   const fecha=getHoy();
-  const tipo=document.getElementById('f-tipo')?document.getElementById('f-tipo').value:'bateas';
-  const tipoLabel=tipo==='ramplas'?'RAMPLAS':'BATEAS';
 
-  // Calcular tiempo total de ruta y ETA para cada convoy
-  const totalMins=segmentos.reduce((s,sg)=>s+sg.mins,0);
+  // Detectar tipo desde los grupos importados
+  const tieneBat=gruposPos.some(g=>g.tipo==='bat'||!g.tipo);
+  const tipoLabel=gruposPos.every(g=>g.tipo==='ram')?'RAMPLAS':'BATEAS';
+
   const factor=condicion==='normal'?1:condicion==='precaucion'?1.15:1.30;
+  const totalMins=Math.round(segmentos.reduce((s,sg)=>s+sg.mins,0)*factor);
 
   function calcETA(horaS, tramoActual){
-    if(!horaS||tramoActual===null)return'Sin datos';
+    if(!horaS||tramoActual===null) return {txt:'Sin datos',enTiempo:null};
     const [h,m]=horaS.split(':').map(Number);
     const salidaMins=h*60+m;
-    // minutos acumulados hasta el tramo actual
     const minsHastaActual=segmentos.slice(0,tramoActual).reduce((s,sg)=>s+Math.round(sg.mins*factor),0);
-    // tiempo total
-    const totalMinsAjust=Math.round(totalMins*factor);
-    // ETA llegada
-    const etaMins=salidaMins+totalMinsAjust;
-    const etaH=Math.floor(etaMins/60)%24;
-    const etaM=etaMins%60;
-    const eta=String(etaH).padStart(2,'0')+':'+String(etaM).padStart(2,'0');
-    // Tiempo transcurrido estimado
+    const etaMins=salidaMins+totalMins;
+    const eta=String(Math.floor(etaMins/60)%24).padStart(2,'0')+':'+String(etaMins%60).padStart(2,'0');
     const ahoraMins=new Date().getHours()*60+new Date().getMinutes();
     const transcurrido=ahoraMins-salidaMins;
-    const restante=totalMinsAjust-transcurrido;
-    const enTiempo=restante>=0;
-    return {eta, enTiempo, restante:Math.abs(restante)};
+    const enTiempo=transcurrido<=(minsHastaActual+10);
+    return {txt:eta, enTiempo};
   }
 
-  // Abreviaturas de tramos para el header de la tabla
   const tramosAbrev=[
-    'KM1','T.LAU','L.LOROS','PAB.','NANT.','AC.R5','BYP.TOL','PEAJE PV','CALDERA','TOTORALILLO'
+    'KM1
+→
+T.LAUTARO','T.LAUTARO
+→
+LOS LOROS','LOS LOROS
+→
+PABELLON',
+    'PABELLON
+→
+NANTOCO','NANTOCO
+→
+AC.RUTA 5','AC.RUTA 5
+→
+BYPASS TOL.',
+    'BYPASS TOL.
+→
+PEAJE P.V.','PEAJE P.V.
+→
+CALDERA','CALDERA
+→
+TOTORALILLO','TOTORALILLO'
   ];
 
-  // Generar filas de la tabla por convoy y sus equipos
   let rows='';
   gruposPos.forEach(g=>{
-    const eqCount=g.equipos.length;
+    const eqs=g.equipos||[];
     const ta=g.tramoActual;
-    const etaInfo=calcETA(g.horaS, ta);
-    const etaTxt=typeof etaInfo==='string'?etaInfo:etaInfo.eta;
-    const enTiempo=typeof etaInfo==='object'?etaInfo.enTiempo:null;
+    const etaInfo=calcETA(g.horaS,ta);
     const semaforo=ta===null?'⚪':ta>=8?'🔴':ta>=5?'🟡':'🟢';
-    const estadoTxt=ta===null?'Sin datos':enTiempo?'En tiempo':'Demorado';
-    const estadoColor=ta===null?'#94a3b8':enTiempo?'#16A34A':'#DC2626';
+    const estadoTxt=ta===null?'Sin datos':etaInfo.enTiempo?'En tiempo':'Demora';
+    const estadoColor=ta===null?'#94a3b8':etaInfo.enTiempo?'#16A34A':'#DC2626';
+    const etaTxt=ta===null?'Sin datos':('~'+etaInfo.txt);
 
-    // Fila de header del grupo
+    // Header del grupo
     rows+=`<tr style="background:#1D3557">
-      <td colspan="${2+TRAMOS.length+3}" style="padding:5px 10px;color:#fff;font-size:11px;font-weight:700">
+      <td colspan="${2+TRAMOS.length+3}" style="padding:5px 12px;color:#fff;font-size:12px;font-weight:700">
         GRUPO ${g.num} · Salida KM1: ${g.horaS||'—'} hrs
-        ${g.panne?`<span style="margin-left:8px;background:#DC2626;color:#fff;padding:1px 7px;border-radius:4px;font-size:10px">🔴 PANNE: ${g.panneEquipo||'—'} · Escolta: ${g.panneEscolta||'—'}</span>`:''}
+        ${g.panne?`<span style="margin-left:10px;background:#DC2626;padding:1px 8px;border-radius:4px;font-size:10px">🔴 PANNE: ${g.panneEquipo||'—'} · Escolta: ${g.panneEscolta||'—'}</span>`:''}
       </td>
     </tr>`;
 
-    // Filas de cada equipo del convoy
-    g.equipos.forEach((eq,ei)=>{
-      // Marcas de tramos
+    const eqCount=Math.max(eqs.length,1);
+    eqs.forEach((eq,ei)=>{
       const tramoCells=TRAMOS.map((_,ti)=>{
         const pasado=g.tramosPasados.includes(ti);
         const actual=ta===ti;
-        if(actual) return`<td style="text-align:center;background:#003DA5;padding:3px 2px"><span style="color:#fff;font-size:13px">●</span></td>`;
-        if(pasado) return`<td style="text-align:center;padding:3px 2px"><span style="color:#16A34A;font-size:13px">✓</span></td>`;
+        if(actual) return`<td style="text-align:center;background:#003DA5;padding:3px 2px"><span style="color:#fff;font-size:14px">●</span></td>`;
+        if(pasado) return`<td style="text-align:center;padding:3px 2px"><span style="color:#16A34A;font-size:14px">✓</span></td>`;
         return`<td style="padding:3px 2px"></td>`;
       }).join('');
 
-      // Solo en la primera fila del grupo mostrar EST/TIEMPO/ETA con rowspan
       const extraCols=ei===0?`
-        <td rowspan="${eqCount}" style="text-align:center;font-size:14px;padding:4px 6px">${semaforo}</td>
-        <td rowspan="${eqCount}" style="text-align:center;font-size:11px;font-weight:600;color:${estadoColor};padding:4px 6px">${estadoTxt}</td>
-        <td rowspan="${eqCount}" style="text-align:center;font-size:12px;font-weight:700;color:#003DA5;padding:4px 6px">${etaTxt==='Sin datos'?'—':'~'+etaTxt}</td>`:'';
+        <td rowspan="${eqCount}" style="text-align:center;font-size:16px;padding:5px 6px">${semaforo}</td>
+        <td rowspan="${eqCount}" style="text-align:center;font-size:11px;font-weight:700;color:${estadoColor};padding:5px 6px;white-space:nowrap">${estadoTxt}</td>
+        <td rowspan="${eqCount}" style="text-align:center;font-size:12px;font-weight:700;color:#003DA5;padding:5px 6px;white-space:nowrap">${etaTxt}</td>`:'';
 
-      const bgRow=ei%2===0?'#fff':'#F9FAFB';
-      rows+=`<tr style="background:${bgRow};border-bottom:0.5px solid #E5E7EB">
-        <td style="padding:5px 8px;font-size:12px;font-weight:600;color:#111;white-space:nowrap">${eq.conductor||'—'}</td>
-        <td style="padding:5px 8px;font-size:11px;color:#6B7280;white-space:nowrap">${eq.tracto||'—'} · ${eq.semi||'—'}</td>
-        ${tramoCells}
-        ${extraCols}
+      rows+=`<tr style="background:${ei%2===0?'#fff':'#F9FAFB'};border-bottom:0.5px solid #E5E7EB">
+        <td style="padding:5px 10px;font-size:12px;font-weight:600;color:#111;white-space:nowrap">${eq.conductor||'—'}</td>
+        <td style="padding:5px 10px;font-size:11px;color:#6B7280;white-space:nowrap">${eq.tracto||'—'} · ${eq.semi||'—'}</td>
+        ${tramoCells}${extraCols}
       </tr>`;
     });
+
+    // Separador entre grupos
+    rows+=`<tr><td colspan="${2+TRAMOS.length+3}" style="height:3px;background:#E5E7EB"></td></tr>`;
   });
 
-  const html=`<div style="font-family:'Segoe UI',Arial,sans-serif;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);max-width:780px">
-    <div style="background:#1D3557;padding:11px 14px;display:flex;align-items:center;justify-content:space-between">
-      <div style="display:flex;align-items:center;gap:8px">
-        <div style="background:#fff;border-radius:4px;padding:2px 7px"><span style="font-size:12px;font-weight:900;color:#1D3557;letter-spacing:1px">INCOM</span></div>
+  const thS='padding:5px 4px;font-size:9px;color:#64748b;font-weight:700;text-align:center;white-space:pre-line;writing-mode:vertical-rl;transform:rotate(180deg);min-width:30px;max-width:36px;border-bottom:1px solid #E5E7EB';
+
+  const html=`<div style="font-family:'Segoe UI',Arial,sans-serif;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);max-width:780px;margin:0 auto">
+    <div style="background:#1D3557;padding:11px 16px;display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="background:#fff;border-radius:4px;padding:2px 8px"><span style="font-size:13px;font-weight:900;color:#1D3557;letter-spacing:1px">INCOM</span></div>
         <div>
-          <div style="font-size:13px;font-weight:700;color:#fff">Posición en Ruta — ${tipoLabel}</div>
-          <div style="font-size:10px;color:rgba(255,255,255,.7)">${fecha} · Sup: ${sup}</div>
+          <div style="font-size:15px;font-weight:700;color:#fff">Posición en Ruta — ${tipoLabel}</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.7)">${fecha} · Sup: ${sup}</div>
         </div>
       </div>
       <div style="text-align:right">
-        <div style="font-size:24px;font-weight:700;color:#fff;line-height:1">${hora}</div>
+        <div style="font-size:28px;font-weight:700;color:#fff;line-height:1">${hora}</div>
         <div style="font-size:10px;color:rgba(255,255,255,.6)">hrs</div>
       </div>
     </div>
-    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+    <div style="overflow-x:auto">
       <table style="width:100%;border-collapse:collapse">
         <thead>
           <tr style="background:#F1F5F9">
-            <th style="padding:6px 8px;font-size:10px;color:#64748b;font-weight:700;text-align:left;white-space:nowrap">CONDUCTOR</th>
-            <th style="padding:6px 8px;font-size:10px;color:#64748b;font-weight:700;text-align:left;white-space:nowrap">TRACTO · SEMI</th>
-            ${tramosAbrev.map(t=>`<th style="padding:4px 3px;font-size:10px;color:#64748b;font-weight:700;text-align:center;white-space:nowrap;writing-mode:vertical-rl;min-width:34px">${t}</th>`).join('')}
-            <th style="padding:6px 4px;font-size:10px;color:#64748b;font-weight:700;text-align:center">EST.</th>
-            <th style="padding:6px 4px;font-size:10px;color:#64748b;font-weight:700;text-align:center">TIEMPO</th>
-            <th style="padding:6px 4px;font-size:10px;color:#003DA5;font-weight:700;text-align:center">ETA</th>
+            <th style="padding:8px 10px;font-size:11px;color:#64748b;font-weight:700;text-align:left;white-space:nowrap">CONDUCTOR</th>
+            <th style="padding:8px 10px;font-size:11px;color:#64748b;font-weight:700;text-align:left;white-space:nowrap">TRACTO · SEMI</th>
+            ${tramosAbrev.map(t=>`<th style="${thS}">${t}</th>`).join('')}
+            <th style="padding:8px 6px;font-size:11px;color:#64748b;font-weight:700;text-align:center">EST.</th>
+            <th style="padding:8px 6px;font-size:11px;color:#64748b;font-weight:700;text-align:center">TIEMPO</th>
+            <th style="padding:8px 6px;font-size:11px;color:#003DA5;font-weight:700;text-align:center">ETA</th>
           </tr>
         </thead>
         <tbody>${rows}</tbody>
       </table>
     </div>
-    <div style="background:#f8fafc;padding:6px 12px;display:flex;justify-content:space-between;align-items:center;border-top:0.5px solid #e2e8f0;flex-wrap:wrap;gap:4px">
+    <div style="background:#f8fafc;padding:6px 14px;display:flex;justify-content:space-between;align-items:center;border-top:0.5px solid #e2e8f0;flex-wrap:wrap;gap:4px">
       <div style="font-size:10px;color:#94a3b8">Sup: <strong style="color:#374151">${sup}</strong>
-        &nbsp;·&nbsp; ✓ pasado &nbsp;·&nbsp; <span style="color:#003DA5">●</span> actual
+        &nbsp;·&nbsp; <span style="color:#16A34A">✓</span> pasado
+        &nbsp;·&nbsp; <span style="color:#fff;background:#003DA5;padding:0 3px;border-radius:2px">●</span> actual
         &nbsp;·&nbsp; 🟢 en tiempo &nbsp;·&nbsp; 🟡 leve &nbsp;·&nbsp; 🔴 demora
       </div>
       <div style="font-size:10px;color:#94a3b8">INCOM Control de Tráfico</div>
