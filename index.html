@@ -1712,11 +1712,7 @@ function genPosicion(){
     return {txt:eta, enTiempo, leve};
   }
 
-  const tramosAbrev=esRam
-    ? ['KM1','T.LAU','L.LOROS','PAB.','NANTOCO','AC.R5','BASE
-INCOM']
-    : ['KM1','T.LAU','L.LOROS','PAB.','NANTOCO','AC.R5','BYP.TOL','PEAJE PV','CALDERA','TOTORALILLO'];
-
+  const tramosAbrev=esRam?['KM1','T.LAU','L.LOROS','PAB.','NANTOCO','AC.R5','BASE INCOM']:['KM1','T.LAU','L.LOROS','PAB.','NANTOCO','AC.R5','BYP.TOL','PEAJE PV','CALDERA','TOTORALILLO'];
   const tramosUsados=esRam?TRAMOS_RAM:TRAMOS;
 
   let rows='';
