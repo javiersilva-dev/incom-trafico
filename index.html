@@ -640,48 +640,71 @@ function genMatutino(){
 
   function fila(label,val,last,hl){
     const bdr=last?'':'border-bottom:0.5px solid #e2e8f0;';
-    const color=hl?'#003DA5':'#374151', w=hl?'700':'500';
-    return`<div style="${bdr}display:flex;justify-content:space-between;align-items:center;padding:5px 12px">
-      <span style="font-size:12px;color:#6b7280">${label}</span>
-      <span style="font-size:12px;font-weight:${w};color:${color}">${val}</span></div>`;
+    const color=hl?'#003DA5':'#374151';
+    const weight=hl?'700':'400';
+    return`<div style="${bdr}display:flex;justify-content:space-between;align-items:center;padding:7px 16px">
+      <span style="font-size:14px;color:#6b7280">${label}</span>
+      <span style="font-size:14px;font-weight:${weight};color:${color}">${val}</span>
+    </div>`;
   }
+
+  function seccion(titulo, dest, color, totalId, totalVal, filas){
+    return`
+    <div style="padding:10px 16px 4px">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:7px">
+          <div style="width:10px;height:10px;border-radius:50%;background:${color}"></div>
+          <span style="font-size:14px;font-weight:700;color:#111;letter-spacing:.3px">${titulo}</span>
+        </div>
+        <span style="font-size:11px;color:#9ca3af">${dest}</span>
+      </div>
+    </div>
+    <div style="margin:6px 12px 10px;background:#f1f5f9;border-radius:10px;overflow:hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 16px;border-bottom:0.5px solid #e2e8f0">
+        <span style="font-size:14px;font-weight:700;color:#1D3557">Total equipos del día</span>
+        <span style="font-size:26px;font-weight:900;color:#003DA5;line-height:1">${totalVal}</span>
+      </div>
+      ${filas}
+    </div>`;
+  }
+
+  const filasBat=
+    fila('En base',bB)+
+    fila('En ruta a faena',bRF)+
+    fila('En faena',bF,true,true);
+
+  const filasRam=
+    fila('En carga',rC)+
+    fila('En descarga',rD)+
+    fila('En ruta a faena',rRF)+
+    fila('En faena',rF)+
+    fila('En ruta a descarga',rRD)+
+    fila('Carga de neumáticos',rN)+
+    fila('En ruta a base INCOM',rRB,true,true);
 
   const html=`
   <div style="font-family:'Segoe UI',Arial,sans-serif;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);max-width:700px;margin:0 auto">
-    <div style="background:#1D3557;padding:12px 16px;display:flex;align-items:center;gap:10px">
-      <div style="background:#fff;border-radius:5px;padding:2px 7px"><span style="font-size:12px;font-weight:900;color:#1D3557;letter-spacing:1px">INCOM</span></div>
-      <div style="flex:1"><div style="font-size:14px;font-weight:700;color:#fff">Reporte de Turno</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.7)">${fecha} · Sup: ${sup}</div></div>
-      <div style="text-align:right"><div style="font-size:26px;font-weight:700;color:#fff;line-height:1">${hora}</div>
-        <div style="font-size:10px;color:rgba(255,255,255,.6)">hrs</div></div>
+    <div style="background:#1D3557;padding:14px 18px;display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="background:#fff;border-radius:5px;padding:3px 9px">
+          <span style="font-size:14px;font-weight:900;color:#1D3557;letter-spacing:1px">INCOM</span>
+        </div>
+        <div>
+          <div style="font-size:16px;font-weight:700;color:#fff">Reporte de Turno</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.7)">${fecha} · Sup: ${sup}</div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:32px;font-weight:700;color:#fff;line-height:1">${hora}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.6)">hrs</div>
+      </div>
     </div>
-    <div style="padding:10px 14px">
-      <div style="margin-bottom:8px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
-          <div style="display:flex;align-items:center;gap:6px"><div style="width:8px;height:8px;border-radius:50%;background:#16A34A"></div>
-            <span style="font-size:12px;font-weight:700;color:#111">BATEAS</span></div>
-          <span style="font-size:10px;color:#9ca3af">Pto. Totoralillo</span></div>
-        <div style="background:#f1f5f9;border-radius:10px;overflow:hidden">
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 12px;border-bottom:0.5px solid #e2e8f0">
-            <span style="font-size:12px;font-weight:700;color:#1D3557">Total equipos del día</span>
-            <span style="font-size:28px;font-weight:900;color:#003DA5;line-height:1">${bT}</span></div>
-          ${fila('En base',bB)}${fila('En ruta a faena',bRF)}${fila('En faena',bF,true,true)}</div></div>
-      <div>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
-          <div style="display:flex;align-items:center;gap:6px"><div style="width:8px;height:8px;border-radius:50%;background:#2563EB"></div>
-            <span style="font-size:12px;font-weight:700;color:#111">RAMPLAS</span></div>
-          <span style="font-size:10px;color:#9ca3af">Base INCOM Copiapó</span></div>
-        <div style="background:#f1f5f9;border-radius:10px;overflow:hidden">
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 12px;border-bottom:0.5px solid #e2e8f0">
-            <span style="font-size:12px;font-weight:700;color:#1D3557">Total equipos del día</span>
-            <span style="font-size:28px;font-weight:900;color:#003DA5;line-height:1">${rT}</span></div>
-          ${fila('En carga',rC)}${fila('En descarga',rD)}${fila('En ruta a faena',rRF)}
-          ${fila('En faena',rF)}${fila('En ruta a descarga',rRD)}
-          ${fila('Carga de neumáticos',rN)}${fila('En ruta a base INCOM',rRB,true,true)}</div></div>
+    ${seccion('BATEAS','Pto. Totoralillo','#16A34A','mb-total',bT,filasBat)}
+    ${seccion('RAMPLAS','Base INCOM Copiapó','#2563EB','mr-total',rT,filasRam)}
+    <div style="background:#f8fafc;padding:7px 16px;display:flex;justify-content:space-between;align-items:center;border-top:0.5px solid #e2e8f0">
+      <span style="font-size:11px;color:#9ca3af">Supervisor: <strong style="color:#374151">${sup}</strong></span>
+      <span style="font-size:11px;color:#9ca3af">INCOM Control de Tráfico</span>
     </div>
-    <div style="background:#f8fafc;padding:6px 14px;display:flex;justify-content:space-between;border-top:0.5px solid #e2e8f0">
-      <span style="font-size:10px;color:#9ca3af">Supervisor: <strong style="color:#374151">${sup}</strong></span>
-      <span style="font-size:10px;color:#9ca3af">INCOM Control de Tráfico</span></div>
   </div>`;
 
   const cont=document.getElementById('tarjeta-matutino');
