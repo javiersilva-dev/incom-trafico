@@ -1165,9 +1165,31 @@ function addGrupoPos(){
 }
 function removePosGrupo(id){gruposPos=gruposPos.filter(g=>g.id!==id);gruposPos.forEach((g,i)=>g.num=i+1);renderGruposPos();}
 function setPosTramo(gid,tramo,btn){
-  gruposPos.find(x=>x.id===gid).tramo=tramo;
-  btn.closest('.tramos-grid').querySelectorAll('.tramo-btn').forEach(b=>b.classList.remove('sel'));
+  const g=gruposPos.find(x=>x.id===gid);
+  if(!g)return;
+  g.tramo=tramo;
+  // Quitar sel de todos los botones del grupo
+  const card=btn.closest('.card');
+  if(card){
+    card.querySelectorAll('.tramo-btn').forEach(b=>b.classList.remove('sel'));
+    card.querySelectorAll('button[onclick*="setPosTramo('+gid+',"]').forEach(b=>{
+      b.style.background='#fff';
+      b.style.color='#374151';
+      b.style.borderColor='#D1D5DB';
+      b.style.fontWeight='500';
+    });
+  }
+  // Marcar el seleccionado
   btn.classList.add('sel');
+  // Si es estado final, aplicar color especial
+  const sinTiempo=document.getElementById('p-tipo').value==='ramplas'?TRAMOS_SIN_TIEMPO_RAM:TRAMOS_SIN_TIEMPO_BAT;
+  if(sinTiempo.includes(tramo)){
+    const bg=tramo.includes('Descargando')?'#0369A1':tramo.includes('ruta')?'#7C3AED':'#166534';
+    btn.style.background=bg;
+    btn.style.color='#fff';
+    btn.style.borderColor=bg;
+    btn.style.fontWeight='700';
+  }
 }
 function addPanne(gid){const g=gruposPos.find(x=>x.id===gid);if(g){g.pannes=g.pannes||[];g.pannes.push({conductor:'',tracto:'',semi:'',escolta:'',condEscolta:''});}renderGruposPos();}
 function removePanne(gid,pi){const g=gruposPos.find(x=>x.id===gid);if(g)g.pannes.splice(pi,1);renderGruposPos();}
