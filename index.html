@@ -1479,9 +1479,14 @@ function genPosicion(){
   });
 
   // Encabezados de tramos abreviados
+  // Abreviaturas cortas para encabezados
+  const abrevs=tipo==='ramplas'?
+    ['T.LAU','LOROS','PAB.','NANT.','AC.R5','BASE']:
+    ['T.LAU','LOROS','PAB.','NANT.','AC.R5','BYP.','PEAJE','CALD.','TOTO.'];
+
   const thTramos=segs.map((s,i)=>
-    '<th style="background:#002D7A;color:#fff;font-size:8px;font-weight:700;padding:4px 2px;text-align:center;border:1px solid #001F5C;white-space:nowrap;writing-mode:vertical-rl;transform:rotate(180deg);height:70px;vertical-align:bottom">'+
-      s.o+'<br>→<br>'+s.d+
+    '<th style="background:#002D7A;color:#fff;font-size:9px;font-weight:700;padding:4px 3px;text-align:center;border:1px solid #001F5C;white-space:nowrap;min-width:36px">'+
+      abrevs[i]+
     '</th>'
   ).join('');
 
@@ -2012,45 +2017,23 @@ function genTarjetaConductores(){
 function descargarPNG(elementId, nombre){
   const el=document.getElementById(elementId);
   if(!el){alert('Error: no se encontró el elemento');return;}
-  // Guardar estilos originales
-  const origWidth=el.style.width;
-  const origOverflow=el.style.overflow;
-  const origMaxWidth=el.style.maxWidth;
-  // Expandir al ancho completo para captura
-  el.style.width='auto';
-  el.style.maxWidth='none';
-  el.style.overflow='visible';
-  // También expandir tablas internas
-  const tables=el.querySelectorAll('table');
-  const origTableStyles=[];
-  tables.forEach(t=>{origTableStyles.push({w:t.style.width,mw:t.style.maxWidth});t.style.width='auto';t.style.maxWidth='none';});
-  const scrollDiv=el.querySelector('div[style*="overflow-x"]');
-  const origScrollStyle=scrollDiv?scrollDiv.style.overflow:'';
-  if(scrollDiv)scrollDiv.style.overflow='visible';
-
   html2canvas(el,{
     scale:2,
     backgroundColor:'#ffffff',
     useCORS:true,
     logging:false,
+    scrollX:0,
+    scrollY:0,
     width:el.scrollWidth,
-    windowWidth:el.scrollWidth+100,
+    height:el.scrollHeight,
+    windowWidth:el.scrollWidth,
+    windowHeight:el.scrollHeight,
   }).then(canvas=>{
-    // Restaurar estilos
-    el.style.width=origWidth;
-    el.style.maxWidth=origMaxWidth;
-    el.style.overflow=origOverflow;
-    tables.forEach((t,i)=>{t.style.width=origTableStyles[i].w;t.style.maxWidth=origTableStyles[i].mw;});
-    if(scrollDiv)scrollDiv.style.overflow=origScrollStyle;
     const link=document.createElement('a');
     link.download=nombre+'_'+getHoy().replace(/-/g,'')+'.png';
     link.href=canvas.toDataURL('image/png');
     link.click();
-  }).catch(e=>{
-    // Restaurar estilos en caso de error
-    el.style.width=origWidth;el.style.maxWidth=origMaxWidth;el.style.overflow=origOverflow;
-    alert('Error al generar imagen. Intenta con screenshot manual.');
-  });
+  }).catch(()=>alert('Error al generar imagen. Intenta con screenshot manual.'));
 }
 
 // ── SEGMENTOS ─────────────────────────────────────────
