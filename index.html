@@ -1169,26 +1169,30 @@ function setPosTramo(gid,tramo,btn){
   if(!g)return;
   g.tramo=tramo;
   // Quitar sel de todos los botones del grupo
-  const card=btn.closest('.card');
-  if(card){
-    card.querySelectorAll('.tramo-btn').forEach(b=>b.classList.remove('sel'));
-    card.querySelectorAll('button[onclick*="setPosTramo('+gid+',"]').forEach(b=>{
+  const grupoCard=btn.closest('.grupo-card');
+  if(grupoCard){
+    grupoCard.querySelectorAll('.tramo-btn').forEach(b=>{
+      b.classList.remove('sel');
+    });
+    // Resetear botones de estado final
+    grupoCard.querySelectorAll('.btn-estado-final').forEach(b=>{
       b.style.background='#fff';
       b.style.color='#374151';
       b.style.borderColor='#D1D5DB';
       b.style.fontWeight='500';
     });
   }
-  // Marcar el seleccionado
-  btn.classList.add('sel');
-  // Si es estado final, aplicar color especial
+  // Marcar seleccionado
   const sinTiempo=document.getElementById('p-tipo').value==='ramplas'?TRAMOS_SIN_TIEMPO_RAM:TRAMOS_SIN_TIEMPO_BAT;
   if(sinTiempo.includes(tramo)){
+    // Estado final — color especial
     const bg=tramo.includes('Descargando')?'#0369A1':tramo.includes('ruta')?'#7C3AED':'#166534';
     btn.style.background=bg;
     btn.style.color='#fff';
     btn.style.borderColor=bg;
     btn.style.fontWeight='700';
+  } else {
+    btn.classList.add('sel');
   }
 }
 function addPanne(gid){const g=gruposPos.find(x=>x.id===gid);if(g){g.pannes=g.pannes||[];g.pannes.push({conductor:'',tracto:'',semi:'',escolta:'',condEscolta:''});}renderGruposPos();}
@@ -1237,7 +1241,7 @@ function renderGruposPos(){
         const sel=g.tramo===t;
         const bg=sel?(t.includes('Descargando')?'#0369A1':t.includes('ruta')?'#7C3AED':'#166534'):'#fff';
         const border=sel?(t.includes('Descargando')?'#0369A1':t.includes('ruta')?'#7C3AED':'#166534'):'#D1D5DB';
-        return'<button onclick="setPosTramo('+g.id+',\''+t.replace(/\'/g,"\\'")+'\',this)" '+
+        return'<button class="btn-estado-final" onclick="setPosTramo('+g.id+',\''+t.replace(/\'/g,"\\'")+'\',this)" '+
           'style="padding:7px 10px;font-size:11px;border-radius:7px;border:1.5px solid '+border+';background:'+bg+';color:'+(sel?'#fff':'#374151')+';cursor:pointer;font-family:Inter,sans-serif;font-weight:'+(sel?'700':'500')+'">'+t+'</button>';
       }).join('')+'</div>';
     // pannes
@@ -1412,30 +1416,41 @@ function genPosicion(){
     }
 
     // Header del grupo
+    const estadoFinalTxt=esFinal?g.tramo:'';
+    const estadoFinalBg=esFinal?(g.tramo.includes('Descargando')?'#0369A1':g.tramo.includes('ruta')?'#7C3AED':'#166534'):'#002D7A';
     filasHTML+=
       '<tr style="background:#003DA5">'+
         '<td colspan="2" style="padding:6px 10px;color:#fff;font-size:11px;font-weight:700;text-align:left">'+
           'GRUPO '+g.num+(g.salida?' · Salida KM1: '+g.salida+' hrs':'')+
         '</td>'+
-        segs.map((_,i)=>'<td style="background:#002D7A;border:1px solid #001F5C"></td>').join('')+
-        '<td style="background:#002D7A;border:1px solid #001F5C;color:'+semColor+';font-size:12px;font-weight:700;text-align:center">'+semIcon+'</td>'+
-        '<td style="background:#002D7A;border:1px solid #001F5C;color:#fff;font-size:10px;text-align:center">'+semTxt+'</td>'+
-        (analisis?'<td style="background:#002D7A;color:#93C5FD;font-size:10px;text-align:center">~'+analisis.etaFin+'</td>':'<td style="background:#002D7A"></td>')+
+        segs.map(()=>'<td style="background:#002D7A;border:1px solid #001F5C"></td>').join('')+
+        '<td style="background:'+estadoFinalBg+';border:1px solid #001F5C;color:#fff;font-size:10px;font-weight:700;text-align:center">'+
+          (esFinal?semIcon+' '+semTxt:'')+
+        '</td>'+
+        '<td style="background:#002D7A;border:1px solid #001F5C;color:'+semColor+';font-size:14px;text-align:center">'+(esFinal?'':semIcon)+'</td>'+
+        '<td style="background:#002D7A;border:1px solid #001F5C;color:#fff;font-size:10px;text-align:center">'+(esFinal?'':semTxt)+'</td>'+
+        (analisis&&!esFinal?'<td style="background:#002D7A;color:#93C5FD;font-size:10px;text-align:center">~'+analisis.etaFin+'</td>':'<td style="background:#002D7A"></td>')+
       '</tr>';
 
     // Filas por equipo
     eqV.forEach((eq,ei)=>{
       const celdas=segs.map((_,i)=>{
+        // Si es estado final — todos los tramos en verde completo
         if(esFinal)
-          return'<td style="background:#F0FDF4;border:1px solid #E5E7EB;text-align:center;color:#16A34A;font-size:11px">✓</td>';
-        if(enDescarga&&i===segs.length-1)
-          return'<td style="background:#16A34A;border:1px solid #E5E7EB;text-align:center;color:#fff;font-size:14px">✓</td>';
+          return'<td style="background:#DCFCE7;border:1px solid #E5E7EB;text-align:center;color:#16A34A;font-size:12px">✓</td>';
         if(i<idxActual)
           return'<td style="background:#DCFCE7;border:1px solid #E5E7EB;text-align:center;color:#16A34A;font-size:12px">✓</td>';
         if(i===idxActual)
           return'<td style="background:#003DA5;border:1px solid #E5E7EB;text-align:center;color:#fff;font-size:11px;font-weight:700">●</td>';
         return'<td style="border:1px solid #E5E7EB;background:#F9FAFB"></td>';
       }).join('');
+
+      // Celda estado final
+      const celdaEstFinal=ei===0?
+        '<td rowspan="'+eqV.length+'" style="text-align:center;font-size:11px;font-weight:600;color:'+(esFinal?'#fff':'#9CA3AF')+';vertical-align:middle;border:1px solid #E5E7EB;background:'+(esFinal?estadoFinalBg:'#fff')+';white-space:nowrap">'+
+          (esFinal?semIcon+' '+semTxt:'—')+
+        '</td>':'';
+
       filasHTML+=
         '<tr style="border-bottom:1px solid #F3F4F6">'+
           '<td style="padding:7px 10px;font-size:12px;font-weight:600;color:#111;border:1px solid #E5E7EB;white-space:nowrap">'+(eq.conductor||'—')+'</td>'+
@@ -1444,10 +1459,11 @@ function genPosicion(){
             '<span style="background:#EEF2FF;padding:1px 6px;border-radius:4px;color:#4338CA">'+(eq.semi||'—')+'</span>'+
           '</td>'+
           celdas+
-          (ei===0?'<td rowspan="'+eqV.length+'" style="text-align:center;font-size:16px;vertical-align:middle;border:1px solid #E5E7EB">'+semIcon+'</td>':'')+ 
-          (ei===0?'<td rowspan="'+eqV.length+'" style="text-align:center;font-size:10px;font-weight:600;color:'+semColor+';vertical-align:middle;border:1px solid #E5E7EB">'+semTxt+'</td>':'')+ 
+          celdaEstFinal+
+          (ei===0&&!esFinal?'<td rowspan="'+eqV.length+'" style="text-align:center;font-size:16px;vertical-align:middle;border:1px solid #E5E7EB">'+semIcon+'</td>':'')+ 
+          (ei===0&&!esFinal?'<td rowspan="'+eqV.length+'" style="text-align:center;font-size:10px;font-weight:600;color:'+semColor+';vertical-align:middle;border:1px solid #E5E7EB">'+semTxt+'</td>':'')+ 
           (ei===0&&!esFinal&&analisis?'<td rowspan="'+eqV.length+'" style="text-align:center;font-size:10px;color:#003DA5;vertical-align:middle;border:1px solid #E5E7EB">~'+analisis.etaFin+' hrs</td>':'')+ 
-          (ei===0&&(esFinal||!analisis)?'<td rowspan="'+eqV.length+'" style="border:1px solid #E5E7EB;background:'+(esFinal?'#F0FDF4':'#fff')+'"></td>':'')+
+          (ei===0&&!esFinal&&!analisis?'<td rowspan="'+eqV.length+'" style="border:1px solid #E5E7EB"></td>':'')+
         '</tr>';
     });
 
@@ -1464,8 +1480,8 @@ function genPosicion(){
 
   // Encabezados de tramos abreviados
   const thTramos=segs.map((s,i)=>
-    '<th style="background:#002D7A;color:#fff;font-size:8px;font-weight:700;padding:4px 2px;text-align:center;border:1px solid #001F5C;white-space:nowrap;writing-mode:vertical-lr;transform:rotate(180deg);height:60px">'+
-      (s.o+' →<br>'+s.d)+
+    '<th style="background:#002D7A;color:#fff;font-size:8px;font-weight:700;padding:4px 2px;text-align:center;border:1px solid #001F5C;white-space:nowrap;writing-mode:vertical-rl;transform:rotate(180deg);height:70px;vertical-align:bottom">'+
+      s.o+'<br>→<br>'+s.d+
     '</th>'
   ).join('');
 
@@ -1475,7 +1491,8 @@ function genPosicion(){
         '<th style="background:#1F2937;color:#fff;padding:6px 10px;text-align:left;font-size:10px;border:1px solid #374151;white-space:nowrap">CONDUCTOR</th>'+
         '<th style="background:#1F2937;color:#fff;padding:6px 8px;text-align:left;font-size:10px;border:1px solid #374151;white-space:nowrap">TRACTO · SEMI</th>'+
         thTramos+
-        '<th style="background:#1F2937;color:#fff;padding:4px;text-align:center;font-size:9px;border:1px solid #374151">EST.</th>'+
+        '<th style="background:#0369A1;color:#fff;padding:4px;text-align:center;font-size:9px;border:1px solid #374151;white-space:nowrap">ESTADO<br>FINAL</th>'+
+        '<th style="background:#1F2937;color:#fff;padding:4px;text-align:center;font-size:9px;border:1px solid #374151">SEM.</th>'+
         '<th style="background:#1F2937;color:#fff;padding:4px;text-align:center;font-size:9px;border:1px solid #374151">TIEMPO</th>'+
         '<th style="background:#1F2937;color:#fff;padding:4px;text-align:center;font-size:9px;border:1px solid #374151">ETA</th>'+
       '</tr></thead>'+
