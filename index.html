@@ -1479,14 +1479,9 @@ function genPosicion(){
   });
 
   // Encabezados de tramos abreviados
-  // Abreviaturas cortas para encabezados
-  const abrevs=tipo==='ramplas'?
-    ['T.LAU','LOROS','PAB.','NANT.','AC.R5','BASE']:
-    ['T.LAU','LOROS','PAB.','NANT.','AC.R5','BYP.','PEAJE','CALD.','TOTO.'];
-
   const thTramos=segs.map((s,i)=>
-    '<th style="background:#002D7A;color:#fff;font-size:9px;font-weight:700;padding:4px 3px;text-align:center;border:1px solid #001F5C;white-space:nowrap;min-width:36px">'+
-      abrevs[i]+
+    '<th style="background:#002D7A;color:#fff;font-size:8px;font-weight:700;padding:6px 3px;text-align:center;border:1px solid #001F5C;white-space:nowrap;width:28px">'+
+      '<div style="writing-mode:vertical-rl;transform:rotate(180deg);line-height:1.3">'+s.o+' → '+s.d+'</div>'+
     '</th>'
   ).join('');
 
